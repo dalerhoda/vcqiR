@@ -49,6 +49,7 @@ VCQI_ANALYSIS_NAME <- "RI_Test"
 # Set VCQI_CHECK_INSTEAD_OF_RUN value to 1 to test all metadata and code that
 # makes datasets and calculates derived variables, without running the
 # indicators or generating output
+# Note: checks are not fully implemented and tested in the R version of VCQI
 VCQI_CHECK_INSTEAD_OF_RUN <- 0
 
 # *************************************************
