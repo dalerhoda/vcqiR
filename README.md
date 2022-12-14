@@ -20,3 +20,4 @@ At this time, the R version of VCQI analyzes data from routine immunization (RI)
 - RI_QUAL_07B – what would valid coverage be if every child had received every dose that was due at every one of their documented vaccination visits
 - RI_QUAL_08 – percentage of documented vaccination visits that include 1+ missed opportunities for simultaneous vaccination (MOSV)
 - RI_QUAL_09 – percentage of children with 1+ missed opportunities for simultaneous vaccination (MOSV)
+- RI_VCTC_01 – coverage and timeliness charts (the R version does not currently show HBR availability or % fully vaccinated or % not vaccinated, but includes all other VCTC features)

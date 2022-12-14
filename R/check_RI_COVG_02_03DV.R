@@ -48,7 +48,7 @@ check_RI_COVG_02_03DV <- function(VCP = "check_RI_COVG_02_03DV"){
         RI_COVG_02_TEMP_DATASETS <- NULL
       }
 
-      vcqi_global(RI_COVG_02_TEMP_DATASETS,c(RI_COVG_01_TEMP_DATASETS,paste0("RI_COVG_02_",ANALYSIS_COUNTER,".rds")))
+      vcqi_global(RI_COVG_02_TEMP_DATASETS,c(RI_COVG_02_TEMP_DATASETS,paste0("RI_COVG_02_",ANALYSIS_COUNTER,".rds")))
       vcqi_log_comment(VCP, 2, "Warning", paste0(filename, " does not exist. VCQI will make a copy of RI_COVG_02_1.rds and proceed."))
     } else{
       exitflag <- 1
