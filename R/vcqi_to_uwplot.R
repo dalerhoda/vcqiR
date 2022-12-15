@@ -13,7 +13,7 @@
 #' @import ggplot2
 #' @import dplyr
 
-# vcqi_to_uwplot R version 1.03 - Biostat Global Consulting - 2022-10-19
+# vcqi_to_uwplot R version 1.04 - Biostat Global Consulting - 2022-12-15
 # *******************************************************************************
 # Change log
 
@@ -23,6 +23,7 @@
 # 2022-10-13  1.02      Mia Yu          Package version
 # 2022-10-19  1.03      Caitlin Clary   Update error message handling, add calls
 #                                       to vcqi_halt_immediately
+# 2022-12-15  1.04      Mia Yu          Add title etc. to the dataset
 # *******************************************************************************
 
 vcqi_to_uwplot <- function(
@@ -162,6 +163,9 @@ vcqi_to_uwplot <- function(
       " \u2264 N < ", UWPLOT_ANNOTATE_MED_N, ". \u2021 means N < ", UWPLOT_ANNOTATE_LOW_N)
   }
 
+  #DEC 15: add title etc. to the dataset
+  dat <- dat %>% mutate(graphtitle = title, graphcaption = note)
+
   if (!is.na(savedata)){
     saveRDS(dat, file = paste0(savedata, ".rds"))
   }
@@ -170,6 +174,9 @@ vcqi_to_uwplot <- function(
 
   if (IWPLOT_SHOWBARS == 1){
     extraspace <- max(nchar(dat$text))
+    title <- dat$graphtitle[1]
+    note <- dat$graphcaption[1]
+
     ggplot(dat, aes(x = as.factor(rowid), y = estimate * 100)) +
       geom_col(fill = "#2b92be") +
       geom_text(aes(x = as.factor(rowid),

@@ -21,7 +21,7 @@
 #' @import dplyr
 #' @import stringr
 
-# vcqi_to_double_plot R version 1.02 - Biostat Global Consulting - 2022-10-19
+# vcqi_to_double_plot R version 1.03 - Biostat Global Consulting - 2022-12-15
 # *******************************************************************************
 # Change log
 
@@ -30,6 +30,7 @@
 # 2022-10-11  1.01      Mia Yu          Package version
 # 2022-10-19  1.02      Caitlin Clary   Update error message handling, add calls
 #                                       to vcqi_halt_immediately
+# 2022-12-15  1.03      Mia Yu          Add title etc. to the dataset
 # *******************************************************************************
 
 vcqi_to_double_plot <- function(
@@ -41,7 +42,7 @@ vcqi_to_double_plot <- function(
     title = NULL,
     name = NULL,
     subtitle = NULL,
-    note = NA,
+    note = NULL,
     #currently the note is the "caption" as in ggplot2 we use caption = to add note
     caption = NULL,
     savedata = NA,
@@ -237,7 +238,7 @@ vcqi_to_double_plot <- function(
       select(c(level4id,text2))
   }
 
-  if (is.na(note)){
+  if (is.null(note)){
     if (VCQI_DOUBLE_IWPLOT_CITEXT == 1){
       note <- "Text at right: Point estimates from colored and from gray bars"
     }
@@ -330,13 +331,19 @@ vcqi_to_double_plot <- function(
   combined <- combined %>%
     mutate(source = factor(source, levels = c("dat2","dat")))
 
+  #DEC 15: add title etc. to the dataset
+  combined <- combined %>% mutate(graphtitle = title, graphsubtitle = subtitle, graphcaption = note)
+
   if (!is.na(savedata)){
-    saveRDS(dat, file = paste0(savedata, ".rds"))
+    saveRDS(combined, file = paste0(savedata, ".rds"))
   }
 
   if (IWPLOT_SHOWBARS == 1){
     extraspace <- max(nchar(combined$text))
     group.colors <- c(dat = "#2b92be", dat2 = "lightgrey")
+    title <- combined$graphtitle[1]
+    subtitle <- combined$graphsubtitle[1]
+    note <- combined$graphcaption[1]
 
     ggplot(combined, mapping = aes(x = as.factor(rowid),y = estimate * 100,fill = source)) +
       scale_fill_manual(name = "", values = group.colors, guide = "none") +

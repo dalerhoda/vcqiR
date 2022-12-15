@@ -13,7 +13,7 @@ vcqi_to_double_plot(
   title = NULL,
   name = NULL,
   subtitle = NULL,
-  note = NA,
+  note = NULL,
   caption = NULL,
   savedata = NA,
   savew = 7,
