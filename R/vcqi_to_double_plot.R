@@ -332,7 +332,18 @@ vcqi_to_double_plot <- function(
     mutate(source = factor(source, levels = c("dat2","dat")))
 
   #DEC 15: add title etc. to the dataset
-  combined <- combined %>% mutate(graphtitle = title, graphsubtitle = subtitle, graphcaption = note)
+  combined <- combined %>% mutate(graphtitle = NA, graphsubtitle = NA, graphcaption = NA)
+  if (!is.null(title)){
+    combined <- combined %>% mutate(graphtitle = title)
+  }
+
+  if (!is.null(subtitle)){
+    combined <- combined %>% mutate(graphsubtitle = subtitle)
+  }
+
+  if (!is.null(note)){
+    combined <- combined %>% mutate(graphcaption = note)
+  }
 
   if (!is.na(savedata)){
     saveRDS(combined, file = paste0(savedata, ".rds"))
@@ -341,9 +352,24 @@ vcqi_to_double_plot <- function(
   if (IWPLOT_SHOWBARS == 1){
     extraspace <- max(nchar(combined$text))
     group.colors <- c(dat = "#2b92be", dat2 = "lightgrey")
-    title <- combined$graphtitle[1]
-    subtitle <- combined$graphsubtitle[1]
-    note <- combined$graphcaption[1]
+
+    if (is.na(combined$graphtitle[1])){
+      title <- NULL
+    } else {
+      title <- combined$graphtitle[1]
+    }
+
+    if (is.na(combined$graphsubtitle[1])){
+      subtitle <- NULL
+    } else {
+      subtitle <- combined$graphsubtitle[1]
+    }
+
+    if (is.na(combined$graphcaption[1])){
+      note <- NULL
+    } else {
+      note <- combined$graphcaption[1]
+    }
 
     ggplot(combined, mapping = aes(x = as.factor(rowid),y = estimate * 100,fill = source)) +
       scale_fill_manual(name = "", values = group.colors, guide = "none") +
