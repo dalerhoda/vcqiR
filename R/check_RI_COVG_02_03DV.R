@@ -57,13 +57,13 @@ check_RI_COVG_02_03DV <- function(VCP = "check_RI_COVG_02_03DV"){
       vcqi_log_comment(VCP, 1, "Error", paste0("The file ", filename, " does not exist. Run RI_COVG_02_03DV"))
     }
 
-    if(exitflag == 1){
-      vcqi_global(VCQI_ERROR, 1)
-      vcqi_halt_immediately(
-        halt_message = errormsgs
-      )
-    }
+  }
 
+  if(exitflag == 1){
+    vcqi_global(VCQI_ERROR, 1)
+    vcqi_halt_immediately(
+      halt_message = errormsgs
+    )
   }
 
   vcqi_log_comment(VCP, 5, "Flow", "Exiting")
