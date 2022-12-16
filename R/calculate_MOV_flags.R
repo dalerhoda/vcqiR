@@ -14,7 +14,7 @@
 #' @examples
 #' calculate_MOV_flags()
 
-# calculate_MOV_flags R version 1.04 - Biostat Global Consulting - 2022-10-13
+# calculate_MOV_flags R version 1.05 - Biostat Global Consulting - 2022-12-16
 # ******************************************************************************
 # Change log
 
@@ -26,6 +26,8 @@
 # 2022-10-13  1.04      Caitlin Clary   Change ifelse to if_else in multidose
 #                                       section of RI_RECORDS_SOUGHT_FOR_ALL == 1
 #                                       to avoid pivot type compatibility error
+# 2022-12-16  1.05      Caitlin Clary   Ensure variables are numeric before
+#                                       labeling (all-NA vars default to logical)
 # ******************************************************************************
 
 calculate_MOV_flags <- function(VCP = "calculate_MOV_flags"){
@@ -940,54 +942,54 @@ calculate_MOV_flags <- function(VCP = "calculate_MOV_flags"){
           dat <- dat %>%
             mutate(
               !!credit_var := haven::labelled(
-                !!credit_var,
+                as.numeric(!!credit_var),
                 label = paste0("Would give credit for a valid dose of ",
                                RI_DOSE_LIST[d], " in this visit - ", type[ty])),
               !!elig_var := haven::labelled(
-                !!elig_var,
+                as.numeric(!!elig_var),
                 label = paste0("Eligible for ", RI_DOSE_LIST[d],
                                " in this visit - ", type[ty])),
               !!flag_got_var := haven::labelled(
-                !!flag_got_var,
+                as.numeric(!!flag_got_var),
                 label = paste0("Received ", RI_DOSE_LIST[d],
                                " in this visit - ", type[ty])),
               !!cum_var := haven::labelled(
-                !!cum_var,
+                as.numeric(!!cum_var),
                 label = paste0("Cumulative doses of ", RI_DOSE_LIST[d],
                                " received up-to-and-including this visit - ", type[ty])),
               !!mov_var := haven::labelled(
-                !!mov_var,
+                as.numeric(!!mov_var),
                 label = paste0("Experienced an MOV for ", RI_DOSE_LIST[d],
                                " in this visit - ", type[ty])),
               !!cum_mov_var := haven::labelled(
-                !!cum_mov_var,
+                as.numeric(!!cum_mov_var),
                 label = paste0("Cumulative MOVs for ", RI_DOSE_LIST[d],
                                " thru this visit - ", type[ty])),
               !!cor_mov_var := haven::labelled(
-                !!cor_mov_var,
+                as.numeric(!!cor_mov_var),
                 label = paste0("Experienced a corrected MOV for ",
                                RI_DOSE_LIST[d], " - ", type[ty])),
               !!flag_cor_mov_var := haven::labelled(
-                !!flag_cor_mov_var,
+                as.numeric(!!flag_cor_mov_var),
                 label = paste0("Experienced 1+ corrected MOVs for ",
                                RI_DOSE_LIST[d], " - ", type[ty])),
               !!total_mov_var := haven::labelled(
-                !!total_mov_var,
+                as.numeric(!!total_mov_var),
                 label = paste0("Total MOVs for ", RI_DOSE_LIST[d], " - ", type[ty])),
               !!total_elig_var := haven::labelled(
-                !!total_elig_var,
+                as.numeric(!!total_elig_var),
                 label = paste0("Total visits where eligible to receive ",
                                RI_DOSE_LIST[d], " - ", type[ty])),
               !!flag_had_mov_var := haven::labelled(
-                !!flag_had_mov_var,
+                as.numeric(!!flag_had_mov_var),
                 label = paste0("Had 1+ MOVs for ", RI_DOSE_LIST[d],
                                " in any visit - ", type[ty])),
               !!flag_uncor_mov_var := haven::labelled(
-                !!flag_uncor_mov_var,
+                as.numeric(!!flag_uncor_mov_var),
                 label = paste0("Experienced 1+ uncorrected MOVs for ",
                                RI_DOSE_LIST[d], " in any visit - ", type[ty])),
               !!days_until_cor_var := haven::labelled(
-                !!days_until_cor_var,
+                as.numeric(!!days_until_cor_var),
                 label = paste0("Days b/t 1st MOV & correction: ",
                                RI_DOSE_LIST[d], " - ", type[ty]))
             )
@@ -1001,13 +1003,13 @@ calculate_MOV_flags <- function(VCP = "calculate_MOV_flags"){
         dat <- dat %>%
           mutate(
             !!total_elig_visits_var := haven::labelled(
-              !!total_elig_visits_var,
+              as.numeric(!!total_elig_visits_var),
               label = paste0("Total visits eligible for 1+ doses - ", type[ty])),
             !!total_mov_visits_var := haven::labelled(
-              !!total_mov_visits_var,
+              as.numeric(!!total_mov_visits_var),
               label = paste0("Total visits with MOVs - ", type[ty])),
             !!total_movs_var := haven::labelled(
-              !!total_movs_var,
+              as.numeric(!!total_movs_var),
               label = paste0("Total MOVs - ", type[ty]))
           )
 
@@ -1016,17 +1018,23 @@ calculate_MOV_flags <- function(VCP = "calculate_MOV_flags"){
       dat <- dat %>%
         mutate(
           elig_for_anydose_crude = haven::labelled(
-            elig_for_anydose_crude, label = "Eligible for 1+ doses - crude"),
+            as.numeric(elig_for_anydose_crude),
+            label = "Eligible for 1+ doses - crude"),
           elig_for_anydose_valid = haven::labelled(
-            elig_for_anydose_valid, label = "Eligible for 1+ doses - valid"),
+            as.numeric(elig_for_anydose_valid),
+            label = "Eligible for 1+ doses - valid"),
           mov_for_anydose_crude = haven::labelled(
-            mov_for_anydose_crude, label = "Had MOV for 1+ doses - crude"),
+            as.numeric(mov_for_anydose_crude),
+            label = "Had MOV for 1+ doses - crude"),
           mov_for_anydose_valid = haven::labelled(
-            mov_for_anydose_valid, label = "Had MOV for 1+ doses - valid"),
+            as.numeric(mov_for_anydose_valid),
+            label = "Had MOV for 1+ doses - valid"),
           total_visit_movs_crude = haven::labelled(
-            total_visit_movs_crude, label ="Total visits with MOVs - crude"),
+            as.numeric(total_visit_movs_crude),
+            label ="Total visits with MOVs - crude"),
           total_visit_movs_valid = haven::labelled(
-            total_visit_movs_valid, label = "Total visits with MOVs - valid")
+            as.numeric(total_visit_movs_valid),
+            label = "Total visits with MOVs - valid")
           # NOTE: do not label DOB variable because it causes type issues downstream
           # dob = haven::labelled(
           #   dob, label = "Date of birth")
