@@ -164,7 +164,14 @@ vcqi_to_uwplot <- function(
   }
 
   #DEC 15: add title etc. to the dataset
-  dat <- dat %>% mutate(graphtitle = title, graphcaption = note)
+  dat <- dat %>% mutate(graphtitle = NA, graphcaption = NA)
+  if (!is.null(title)){
+    dat <- dat %>% mutate(graphtitle = title)
+  }
+
+  if (!is.null(note)){
+    dat <- dat %>% mutate(graphcaption = note)
+  }
 
   if (!is.na(savedata)){
     saveRDS(dat, file = paste0(savedata, ".rds"))
@@ -174,8 +181,18 @@ vcqi_to_uwplot <- function(
 
   if (IWPLOT_SHOWBARS == 1){
     extraspace <- max(nchar(dat$text))
-    title <- dat$graphtitle[1]
-    note <- dat$graphcaption[1]
+
+    if (is.na(dat$graphtitle[1])){
+      title <- NULL
+    } else {
+      title <- dat$graphtitle[1]
+    }
+
+    if (is.na(dat$graphcaption[1])){
+      note <- NULL
+    } else {
+      note <- dat$graphcaption[1]
+    }
 
     ggplot(dat, aes(x = as.factor(rowid), y = estimate * 100)) +
       geom_col(fill = "#2b92be") +
