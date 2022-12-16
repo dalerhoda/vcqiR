@@ -60,10 +60,10 @@ VCTC_default_global <- function(){
 
   # *********************************************
 
-  assign("TIMELY_XLABEL_SIZE", 8, envir = .GlobalEnv)
+  assign("TIMELY_XLABEL_SIZE", 10, envir = .GlobalEnv)
   assign("TIMELY_XLABEL_COLOR", "black", envir = .GlobalEnv)
 
-  assign("TIMELY_YLABEL_SIZE", 8, envir = .GlobalEnv)
+  assign("TIMELY_YLABEL_SIZE", 10, envir = .GlobalEnv)
   assign("TIMELY_YLABEL_COLOR", "black", envir = .GlobalEnv)
 
   assign("TIMELY_BARWIDTH", 0.67, envir = .GlobalEnv)
