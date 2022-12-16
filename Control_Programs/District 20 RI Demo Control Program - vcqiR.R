@@ -8,15 +8,12 @@
 # Date          Version Number    Name          What Changed
 # 2022-12-01    1.00              BGC           Original R Version
 #
-# This program is configured to analyze the VCQI demonstration datasets from a
-# fictional coverage survey in the fictional country of Harmonia.  It serves as
-# a template that users may copy to use with new datasets from real surveys.
+# This program is configured to analyze the VCQI District 20 demo datasets. It
+# serves as a template that users may copy to use with new datasets from real
+# surveys.
 #
 # After copying the program, make a set of edits in Blocks RI-B and RI-D and
 # RI-F below in accordance with guidance in the VCQI User's Guide.
-#
-# This program example is described in detail in Chapter 7 of the VCQI User's
-# Guide.
 #
 # You will find the latest versions of VCQI documentation and information about
 # VCQI programs at the VCQI Resources Website:
@@ -39,13 +36,13 @@ cleanup_VCQI_globals()
 # Specify input/output folders and analysis name
 
 # Where should the programs look for datasets?
-VCQI_DATA_FOLDER <- "Q:/- Folders shared outside BGC/BGC Team - WHO Software/Test datasets/2020-10-16"
+VCQI_DATA_FOLDER <- "your path"
 
 # Where should the programs put output?
-VCQI_OUTPUT_FOLDER <- "Q:/PAHO - MISS VCQI in R/Working folder - Cait/Package sandbox"
+VCQI_OUTPUT_FOLDER <- "your path"
 
 # Establish analysis name (used in log file name and Excel file name)
-VCQI_ANALYSIS_NAME <- "RI_Test"
+VCQI_ANALYSIS_NAME <- "District_20_RI"
 
 # Set VCQI_CHECK_INSTEAD_OF_RUN value to 1 to test all metadata and code that
 # makes datasets and calculates derived variables, without running the
@@ -86,16 +83,16 @@ vcqi_log_comment(VCP, 3, "Package",
 # Accepted file types: .rds, .dta, .csv
 
 # Name of datasets that hold RI data
-vcqi_global(VCQI_RI_DATASET, "RI_mdy.dta")
-vcqi_global(VCQI_RIHC_DATASET, "RIHC_mdy.dta")
+vcqi_global(VCQI_RI_DATASET, "VCQI_RI_20.dta")
+vcqi_global(VCQI_RIHC_DATASET, NA)
 
 # Name of dataset that holds cluster metadata
-vcqi_global(VCQI_CM_DATASET, "CM_faux_dataset.dta")
+vcqi_global(VCQI_CM_DATASET, "VCQI_CM_20.dta")
 
 # If you will describe the dataset using DESC_01 then you need to also specify
 # the HH and HM datasets
-vcqi_global(VCQI_HH_DATASET, "HH_faux_dataset.dta")
-vcqi_global(VCQI_HM_DATASET, "HM_faux_dataset.dta")
+vcqi_global(VCQI_HH_DATASET, NA)
+vcqi_global(VCQI_HM_DATASET, NA)
 
 # .........................................................................
 # Parameters to describe RI schedule
@@ -107,48 +104,29 @@ vcqi_global(VCQI_HM_DATASET, "HM_faux_dataset.dta")
 #  http://apps.who.int/immunization_monitoring/globalsummary/schedules
 #
 #  Single-dose antigens will use a parameter named <dose>_min_age_days (required)
-#  Single-dose antigens may use a parameter named <dose>_max_age_days (optional)
+#  Single-dose antigens may  use a parameter named <dose>_max_age_days (optional)
 #  Note: If a dose is not considered valid AFTER a certain age, then specify
 #        that maximum valid age using the _max_age_days parameter.
 #        If the dose is considered late, but still valid, then do not specify
 #        a maximum age.
 
-bcg_min_age_days          <- 0   # birth dose
-hepb_min_age_days         <- 0   # birth dose
-opv0_min_age_days         <- 0   # birth dose
+bcg_min_age_days          <- 0    # birth dose
 
-# Note: In this country, opv0 and hepb0 are only considered valid
-#       if given in the first two weeks of life
-opv0_max_age_days         <- 14  # birth dose
-hepb_max_age_days         <- 14  # birth dose
+penta1_min_age_days       <- 56   # 8 weeks
+opv1_min_age_days         <- 56   # 8 weeks
 
-penta1_min_age_days       <- 42  # 6 weeks
-penta2_min_age_days       <- 70  # 10 weeks
-penta2_min_interval_days  <- 28  # 4 weeks
-pcv1_min_age_days         <- 42  # 6 weeks
-opv1_min_age_days         <- 42  # 6 weeks
-rota1_min_age_days        <- 42  # 6 weeks
+penta2_min_age_days       <- 84   # 12 weeks
+penta2_min_interval_days  <- 28   # 4 weeks
+opv2_min_age_days         <- 84   # 12 weeks
+opv2_min_interval_days    <- 28   # 4 weeks
 
-pcv2_min_age_days         <- 70  # 10 weeks
-pcv2_min_interval_days    <- 28  # 4 weeks
-opv2_min_age_days         <- 70  # 10 weeks
-opv2_min_interval_days    <- 28  # 4 weeks
-rota2_min_age_days        <- 70  # 10 weeks
-rota2_min_interval_days   <- 28  # 4 weeks
 
-penta3_min_age_days       <- 98  # 14 weeks
-penta3_min_interval_days  <- 28  # 4 weeks
-pcv3_min_age_days         <- 98  # 14 weeks
-pcv3_min_interval_days    <- 28  # 4 weeks
-opv3_min_age_days         <- 98  # 14 weeks
-opv3_min_interval_days    <- 28  # 4 weeks
-rota3_min_age_days        <- 98  # 14 weeks
-rota3_min_interval_days   <- 28  # 4 weeks
+penta3_min_age_days       <- 112  # 16 weeks
+penta3_min_interval_days  <- 28   # 4 weeks
+opv3_min_age_days         <- 112  # 16 weeks
+opv3_min_interval_days    <- 28   # 4 weeks
 
-ipv_min_age_days          <- 98  # 14 weeks; may be co-administered w/ OPV
-
-mcv1_min_age_days         <- 270  # 9 months
-yf_min_age_days           <- 270  # 9 months
+mcv_min_age_days          <- 270  # 9 months
 
 # .........................................................................
 # Parameters to describe survey
@@ -162,11 +140,11 @@ yf_min_age_days           <- 270  # 9 months
 
 vcqi_global(EARLIEST_SVY_VACC_DATE_M, 1)
 vcqi_global(EARLIEST_SVY_VACC_DATE_D, 1)
-vcqi_global(EARLIEST_SVY_VACC_DATE_Y, 2013)
+vcqi_global(EARLIEST_SVY_VACC_DATE_Y, 2014)
 
 vcqi_global(LATEST_SVY_VACC_DATE_M, 1)
 vcqi_global(LATEST_SVY_VACC_DATE_D, 1)
-vcqi_global(LATEST_SVY_VACC_DATE_Y, 2015)
+vcqi_global(LATEST_SVY_VACC_DATE_Y, 2017)
 
 # These parameters indicate the eligible age range for survey respondents
 # (age expressed in days)
@@ -182,8 +160,8 @@ vcqi_global(VCQI_RI_MAX_AGE_OF_ELIGIBILITY, 729)
 
 # These are mutually exclusive, so only one of them should be set to 1.
 
-vcqi_global(RI_RECORDS_NOT_SOUGHT, 0)
-vcqi_global(RI_RECORDS_SOUGHT_FOR_ALL, 1)
+vcqi_global(RI_RECORDS_NOT_SOUGHT, 1)
+vcqi_global(RI_RECORDS_SOUGHT_FOR_ALL, 0)
 vcqi_global(RI_RECORDS_SOUGHT_IF_NO_CARD, 0)
 
 # .........................................................................
@@ -197,37 +175,16 @@ vcqi_global(RI_RECORDS_SOUGHT_IF_NO_CARD, 0)
 # globals here may be upper or mixed case; they will be converted to lower case
 # in the software.
 
-vcqi_global(RI_SINGLE_DOSE_LIST, c("BCG", "HEPB", "OPV0", "IPV", "MCV1", "YF"))
+vcqi_global(RI_SINGLE_DOSE_LIST, c("BCG", "MCV"))
 vcqi_global(RI_MULTI_2_DOSE_LIST, c())
-vcqi_global(RI_MULTI_3_DOSE_LIST, c("PENTA", "PCV", "OPV", "ROTA"))
+vcqi_global(RI_MULTI_3_DOSE_LIST, c("PENTA", "OPV"))
 
 # In this example we do not have any two-dose vaccine series to analyze. The
 # RI_MULTI_2_DOSE_LIST is defined as an empty list above - it could also be
 # NULL: vcqi_global(RI_MULTI_2_DOSE_LIST, NULL), or the line defining
 # RI_MULTI_2_DOSE_LIST could be omitted entirely.
 
-# The R VCQI software can handle dose lists with up to 9 doses
-# (RI_MULTI_9_DOSE_LIST)
-
-# .........................................................................
-# Do you want to shift doses?
-# .........................................................................
-
-# This can be done with multi-dose vaccines and/or boosters
-
-# Number of dose series you would like to shift
-# Set to 0 if you do not wish to implement any shifts
-vcqi_global(NUM_DOSE_SHIFTS, 0)
-
-vcqi_global(SHIFTTO_1, c("penta1", "penta2", "penta3")) # List of doses where evidence will be shifted *to*
-vcqi_global(SHIFTFROM_1, c("penta4", "penta5")) # List of doses where evidence will be shifted *from*
-vcqi_global(SHIFTWITHIN_1, 0) # Set to 1 to shift dates in a series down to fill holes in evidence
-vcqi_global(DROPDUP_1, 0) # Set to 1 to convert duplicate dates in a series to missing
-
-vcqi_global(SHIFTTO_2, c("polio1", "polio2", "polio3")) # List of doses where evidence will be shifted *to*
-vcqi_global(SHIFTFROM_2, c("polio4", "polio5")) # List of doses where evidence will be shifted *from*
-vcqi_global(SHIFTWITHIN_2, 0) # Set to 1 to shift dates in a series down to fill holes in evidence
-vcqi_global(DROPDUP_2, 0) # Set to 1 to convert duplicate dates in a series to missing
+# The R VCQI software can handle dose lists with up to 9 doses (RI_MULTI_9_DOSE_LIST)
 
 # .........................................................................
 # Parameters to describe the analysis being requested
@@ -262,8 +219,8 @@ vcqi_global(LEVEL3_NAME_DATASET, paste0(VCQI_DATA_FOLDER, "/level3names.dta"))
 # vcqi_global(VCQI_LEVEL4_SET_LAYOUT, "Q:/My_VCQI_Output/my_level4_layout.rds").
 # See the VCQI User's Guide for more details on creating a layout file.
 
-vcqi_global(VCQI_LEVEL4_SET_VARLIST, c("urban_cluster", "RI20", "RI01"))
-vcqi_global(VCQI_LEVEL4_SET_LAYOUT, paste0(VCQI_DATA_FOLDER, "/Level4_Layout_Test3.dta"))
+vcqi_global(VCQI_LEVEL4_SET_VARLIST, "level3name")
+vcqi_global(VCQI_LEVEL4_SET_LAYOUT, NA)
 
 # User specifies survey::svydesign syntax to describe the complex sample
 # The data argument in survey::svydesign should *not* be specified here
@@ -283,11 +240,11 @@ vcqi_global(VCQI_NUM_DECIMAL_DIGITS, 1)
 # MAKE_PLOTS must be 1 for any plots to be made
 vcqi_global(MAKE_PLOTS, 1)
 
-# Set PLOT_OUTCOMES_IN_TABLE_ORDER to 1 if you want inchworm and unweighted
-# plots to list strata in the same order as the tables; otherwise the strata
-# will be sorted by the outcome and shown in bottom-to-top order of increasing
-# indicator performance
-vcqi_global(PLOT_OUTCOMES_IN_TABLE_ORDER, 0)
+# Set PLOT_OUTCOMES_IN_TABLE_ORDER to 1 if you want inchworm and
+# unweighted plots to list strata in the same order as the tables;
+# otherwise the strata will be sorted by the outcome and shown in
+# bottom-to-top order of increasing indicator performance
+vcqi_global(PLOT_OUTCOMES_IN_TABLE_ORDER, 1)
 
 # Make inchworm/bar plots? Set to 1 for yes.
 vcqi_global(VCQI_MAKE_IW_PLOTS, 1)
@@ -354,7 +311,7 @@ vcqi_global(VCQI_SAVE_UW_PLOT_DATA, 1)
 # end in _database.rds in the VCQI_OUTPUT_FOLDER at the end of the run
 # If you want to save the databases, change the value to 0.
 # (Usually 1)
-vcqi_global(DELETE_VCQI_DATABASES_AT_END, 1)
+vcqi_global(DELETE_VCQI_DATABASES_AT_END, 0)
 
 # If you wish to aggregate files that end
 # in _database.rds into a single dataset, set the
@@ -367,7 +324,7 @@ vcqi_global(AGGREGATE_VCQI_DATABASES, 1)
 # If you wish to keep them for additional analysis or debugging,
 # set the option to 0.
 vcqi_global(DELETE_TEMP_VCQI_DATASETS, 1)
-
+#
 # For RI analysis, there is an optional report on data quality
 # Set this global to 1 to generate that report
 # It appears in its own separate Excel file.
@@ -376,7 +333,7 @@ vcqi_global(VCQI_REPORT_DATA_QUALITY, 0)
 # Set this global to 1 if you would like to create an augmented dataset
 # that merges survey dataset with derived variables calculated by VCQI.
 # Default value is 0 (no)
-vcqi_global(VCQI_MAKE_AUGMENTED_DATASET, 0)
+vcqi_global(VCQI_MAKE_AUGMENTED_DATASET, 1)
 
 # *************************************************
 # Code Block: RI-E             (Do not change) ----
@@ -465,6 +422,9 @@ vcqi_global(ANALYSIS_COUNTER, 1)
 # Most indicators may be run in any order the user wishes, although there are
 # are some restrictions...see the table in the section of Chapter 6 entitled
 # Analysis Counter.
+
+# Over-ride RI_DOSE_LIST with the order we want to see in tables
+vcqi_global(RI_DOSE_LIST, c("bcg", "opv1", "opv2", "opv3", "penta1", "penta2", "penta3", "mcv"))
 
 # .........................................................................
 # Summarize vaccination coverage
@@ -562,9 +522,7 @@ if(stringr::str_to_upper(RI_QUAL_09_VALID_OR_CRUDE) == "CRUDE"){
   vcqi_global(RI_QUAL_09_TO_FOOTNOTE_7, "Note: Early doses are accepted in this analysis; all doses are considered valid doses.")
 }
 
-# This indicator makes plots (1) if any MOV and (2) if corrected. These are
-# sorted in opposite directions, so global SORT_PLOT_LOW_TO_HIGH is set inside
-# RI_QUAL_09_06PO.R rather than here by the user.
+# This indicator makes plots (1) if any MOV and (2) if corrected. These are sorted in opposite directions, so global SORT_PLOT_LOW_TO_HIGH is set inside RI_QUAL_09_06PO.R rather than here by the user.
 
 RI_QUAL_09()
 
@@ -573,23 +531,23 @@ RI_QUAL_09()
 # .........................................................................
 
 # Specify 1 or 2 or 3 here to make charts for every level 1, 2 or 3 stratum.
-RI_VCTC_01_LEVELS <- 3
+RI_VCTC_01_LEVELS <- 1
 # You may also specify a combination like c(1,3)
 # RI_VCTC_01_LEVELS <- c(1,3)
 
 #Specify which doses to show in the chart and the order, from bottom to top
 
-TIMELY_DOSE_ORDER <- c("bcg","hepb","opv0","opv1","opv2","opv3","penta1","penta2","penta3","pcv1","pcv2","pcv3","rota1","rota2","rota3","ipv","mcv1","yf")
+TIMELY_DOSE_ORDER <- c("bcg","opv1","opv2","opv3","penta1","penta2","penta3","mcv")
 
 # Specify the y-coordinates for the bars.  If you want them to be spaced evenly, you may omit this global (leave it empty)
 # In this example, we use irregular spacing to group the different dose series.
-TIMELY_Y_COORDS <- c(10,  20,  30,   43, 50, 57,   73, 80, 87,   103, 110, 117,   133, 140, 147,   160,  170,  180)
+TIMELY_Y_COORDS <- c(10, 23, 30, 37, 50, 57, 64, 77)
 
-# You may customize the VCTC parameters in a .R file and define the full path to
-# the .R file below as VCTC_globals_path. Or you may re-specify them in the
-# control program after VCTC_default_global() is called.
+# You may customize the parameters in the .R file and define the full
+# path to the .R file below as VCTC_globals_path. Or you may re-specify them
+# in code after VCTC_default_global() was called
 
-# Include the user-specified parameters, if you want to customize any settings
+# Include the user-specified parameters, if want to customize any settings
 vcqi_global(VCTC_globals_path, NA)
 
 if (vcqi_object_exists("VCTC_globals_path")){
@@ -600,8 +558,8 @@ if (vcqi_object_exists("VCTC_globals_path")){
 
 # Over-ride one default parameters:
 
-# Because we are spacing the bars about every y=10 units instead of the default
-# y=1 units apart, specify a bar width that is 10X the default.
+# Because we are spacing the bars about every y=10 units instead of the
+# default Y=1, specify a bar width that is 10X the default.
 vcqi_global(TIMELY_BARWIDTH, 6.7)
 
 # Do the calculations and make the charts
