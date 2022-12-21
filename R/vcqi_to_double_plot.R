@@ -21,7 +21,7 @@
 #' @import dplyr
 #' @import stringr
 
-# vcqi_to_double_plot R version 1.03 - Biostat Global Consulting - 2022-12-15
+# vcqi_to_double_plot R version 1.04 - Biostat Global Consulting - 2022-12-21
 # *******************************************************************************
 # Change log
 
@@ -31,6 +31,7 @@
 # 2022-10-19  1.02      Caitlin Clary   Update error message handling, add calls
 #                                       to vcqi_halt_immediately
 # 2022-12-15  1.03      Mia Yu          Add title etc. to the dataset
+# 2022-12-21  1.04      Mia Yu          Add part to update footnote
 # *******************************************************************************
 
 vcqi_to_double_plot <- function(
@@ -249,6 +250,10 @@ vcqi_to_double_plot <- function(
       note <- NULL
     }
   } else {
+    if (IWPLOT_SHOWBARS == 1){
+      note <- gsub("shape is", "bar shows", note, fixed = TRUE)
+    }
+
     if (VCQI_DOUBLE_IWPLOT_CITEXT == 1){
       note <- paste0("Text at right: Point estimates from colored and from gray bars \n ", note)
     }
