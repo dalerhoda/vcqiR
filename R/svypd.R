@@ -15,7 +15,7 @@
 #' @rawNamespace import(rlang, except = c(local_options, with_options))
 #' @import dplyr
 
-# svypd R version 1.04 - Biostat Global Consulting - 2022-11-15
+# svypd R version 1.05 - Biostat Global Consulting - 2023-01-09
 # *******************************************************************************
 # Change log
 
@@ -27,6 +27,7 @@
 #                                       survey.lonely.psu process
 # 2022-11-09  1.03      Caitlin Clary   Add null result sections
 # 2022-11-15  1.04      Caitlin Clary   Export neff
+# 2023-01-09  1.05      Caitlin Clary   Hide zero weight warning from svyciprop
 # *******************************************************************************
 
 svypd <- function(
