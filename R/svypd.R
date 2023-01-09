@@ -152,7 +152,8 @@ svypd <- function(
         # Given survey design, calculate proportion and standard error
 
         params <- survey::svyciprop( # gives same est/se as svymean
-          ~outcome, design = dat, df = degf(dat), na.rm = TRUE)
+          ~outcome, design = dat, df = degf(dat), na.rm = TRUE) %>%
+          suppressWarnings()
 
         phat <- as.numeric(coef(params))
         se <- as.numeric(SE(params))
