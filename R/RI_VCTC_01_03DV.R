@@ -304,7 +304,6 @@ RI_VCTC_01_03DV <- function(VCP = "RI_VCTC_01_03DV"){
             tplott$label[j] <- "All ages"
 
           } else {
-            #TO DO: test here
             #use user defined tiles
             usertile <- get(paste0("TIMELY_CD_",str_to_upper(doselist[d]),"_NTILES"), envir = .GlobalEnv)
             usertile = usertile - 1

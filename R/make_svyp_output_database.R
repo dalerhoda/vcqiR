@@ -120,10 +120,6 @@ make_svyp_output_database <- function(
           truncate = TRUE
         )
 
-        if (ptest$estimate == 1){
-          icctemp <- 0
-        }
-
         if (is.nan(icctemp)){
           icctemp <- NA
         }
