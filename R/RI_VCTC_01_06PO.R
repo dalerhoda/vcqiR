@@ -213,7 +213,7 @@ RI_VCTC_01_06PO <- function(VCP = "RI_VCTC_01_06PO"){
 
         plotdat <- vcqi_read(paste0(VCQI_OUTPUT_FOLDER,"/RI_VCTC_01_",ANALYSIS_COUNTER,"_tplot_",RI_VCTC_01_LEVELS[lvl],"_",llist[l],".rds"))
         breakpoint = plotdat$y + 0.5*TIMELY_BARWIDTH
-        ylabel = plotdat$dose
+        ylabel = str_to_upper(plotdat$dose)
 
         baseplot <- ggplot(data = plotdat) +
           scale_x_continuous(limits = c(0,TIMELY_XSCALE_MAX),expand = c(0, 0),
