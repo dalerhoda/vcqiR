@@ -8,7 +8,7 @@
 #' @importFrom utils glob2rx
 #' @import haven
 
-# aggregate_vcqi_databases R version 1.03 - Biostat Global Consulting - 2022-10-21
+# aggregate_vcqi_databases R version 1.04 - Biostat Global Consulting - 2023-01-18
 # *******************************************************************************
 # Change log
 
@@ -17,6 +17,7 @@
 # 2022-10-07  1.01      Mia Yu          Adapt with QUAL_07B-QUAL_09
 # 2022-10-14  1.02      Mia Yu          Package version
 # 2022-10-21  1.03      Mia Yu          Add variable labels
+# 2023-01-18  1.04      Mia Yu          Drop empty columns
 # *******************************************************************************
 
 aggregate_vcqi_databases <- function(){
@@ -134,9 +135,11 @@ aggregate_vcqi_databases <- function(){
                                                  weighted,".rds"))
 
       if (number == 1){
-        VCQI_aggregated_databases_all <- data.frame(vcqi_db_indicator = NA,vcqi_db_indicator_type = NA,vcqi_db_label = NA,vcqi_db_analysis_counter= NA,vcqi_db_additional_file_info= NA,
-                                                    level= NA,name = NA,level4id = NA,outcome= NA,estimate= NA,n = NA,db_rownum= NA,db_id= NA,db_name =NA,dose = NA,n_eligible = NA,n_mov = NA,
-                                                    n_uncor_mov= NA,n_cor_mov = NA,stderr = NA,cilevel = NA,cill = NA,ciul = NA,lcb= NA, ucb= NA,deff= NA,icc= NA,nwtd= NA,nclusters= NA,nwtd_est= NA)
+        VCQI_aggregated_databases_all <- data.frame(vcqi_db_indicator = NA,vcqi_db_indicator_type = NA,vcqi_db_label = NA,vcqi_db_analysis_counter = NA,vcqi_db_additional_file_info = NA,
+                                                    level = NA,name = NA,level4id = NA,outcome = NA,db_rownum = NA,db_id= NA,db_name =NA,
+                                                    estimate = NA,n = NA,dose = NA,n_eligible = NA,n_mov = NA,n_uncor_mov = NA,n_cor_mov = NA,
+                                                    stderr = NA,cilevel = NA,cill = NA,ciul = NA,lcb = NA, ucb = NA,deff = NA,icc = NA,
+                                                    nwtd = NA,nclusters = NA,nwtd_est = NA)
         VCQI_aggregated_databases_all <- bind_rows(VCQI_aggregated_databases_all,dat)
         VCQI_aggregated_databases_all <- VCQI_aggregated_databases_all[-1,]
         saveRDS(VCQI_aggregated_databases_all, file = paste0(VCQI_OUTPUT_FOLDER,"/VCQI_aggregated_databases_all.rds"))
@@ -153,8 +156,21 @@ aggregate_vcqi_databases <- function(){
     dat <- vcqi_read(paste0(VCQI_OUTPUT_FOLDER, "/VCQI_aggregated_databases_all.rds"))
     dat <- dat %>% arrange(db_id, db_rownum)
 
-    dat <- vcqi_read(paste0(VCQI_OUTPUT_FOLDER, "/VCQI_aggregated_databases_all.rds"))
-    dat <- dat %>% arrange(db_id, db_rownum)
+    colname <- c("estimate","n","dose","n_eligible","n_mov","n_uncor_mov","n_cor_mov",
+                 "stderr","cilevel","cill","ciul","lcb", "ucb","deff","icc","nwtd","nclusters","nwtd_est")
+    dropcol <- NULL
+
+    for (i in seq_along(colname)){
+
+      var <- get(colname[i], dat)
+
+      if (all(is.na(var)) %in% TRUE){
+        dropcol <- c(dropcol, colname[i])
+      }
+
+    } #end of colname i loop
+
+    dat <- dat %>% select(-c(all_of(dropcol)))
 
     dat$db_rownum <- haven::labelled(dat$db_rownum, label = "Row number in original database") %>% suppressWarnings()
     dat$db_id <- haven::labelled(dat$db_id, label = "Unique ID for this database") %>% suppressWarnings()
