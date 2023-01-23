@@ -357,6 +357,7 @@ vcqi_to_double_plot <- function(
   if (IWPLOT_SHOWBARS == 1){
     extraspace <- max(nchar(combined$text))
     group.colors <- c(dat = "#2b92be", dat2 = "lightgrey")
+    group.outline <- c(dat = "#0000ff", dat2 = "lightgrey")
 
     if (is.na(combined$graphtitle[1])){
       title <- NULL
@@ -376,15 +377,17 @@ vcqi_to_double_plot <- function(
       note <- combined$graphcaption[1]
     }
 
-    ggplot(combined, mapping = aes(x = as.factor(rowid),y = estimate * 100,fill = source)) +
+    ggplot(combined, mapping = aes(x = as.factor(rowid),y = estimate * 100,fill = source, color = source)) +
+      theme_bw(base_family = "sans")+
       scale_fill_manual(name = "", values = group.colors, guide = "none") +
-      geom_col(position = position_dodge2(width = 0.5, preserve = "single"),color = "#0000ff") +
-      geom_linerange(aes(ymin = cill * 100, ymax = ciul * 100),
+      scale_colour_manual(name = "", values = group.outline, guide = "none")+
+      geom_col(position = position_dodge2(width = 0.5, preserve = "single"),size=0.3) +
+      geom_linerange(aes(ymin = cill * 100, ymax = ciul * 100),colour = "black",
                      position = position_dodge(.9)) +
       geom_text(aes(x = as.factor(rowid),
         y = 100 + extraspace,
         label = text),
-        size = 3.25,colour = "black",family = "mono") +
+        size = 3.25,colour = "black",family = "sans") +
       coord_flip() +
       labs(y = "Estimated Coverage %",
         x = "",
@@ -396,8 +399,7 @@ vcqi_to_double_plot <- function(
       scale_y_continuous(limits = c(0, 100 + 2*extraspace),
                          breaks = c(0, 25, 50, 75, 100)) +
       theme(plot.caption = element_text(hjust = 0),
-            axis.text.x = element_text(family = "mono", colour = "black")) +
-      theme_bw()
+            text = element_text(family = "sans", colour = "black"))
 
     ggsave(paste0(filename,".png"),width = savew, height = saveh, units = "in")
   }

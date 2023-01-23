@@ -195,12 +195,11 @@ vcqi_to_uwplot <- function(
     }
 
     ggplot(dat, aes(x = as.factor(rowid), y = estimate * 100)) +
+      theme_bw(base_family = "sans")+
       geom_col(fill = "#2b92be",color = "#0000ff") +
       geom_text(aes(x = as.factor(rowid),
                     y = 100 + extraspace,
-                    label = text),
-                colour = "black",
-                family = "mono") +
+                    label = text),colour = "black",family = "sans") +
       coord_flip() +
       labs(y = "Sample Proportion %",
            x = "",
@@ -211,8 +210,7 @@ vcqi_to_uwplot <- function(
       scale_y_continuous(limits = c(0, 100 + 1.75*extraspace),
                          breaks = c(0, 25, 50, 75, 100)) +
       theme(plot.caption = element_text(hjust = 0),
-            axis.text.x = element_text(family = "mono", colour = "black"))+
-      theme_bw()
+            text = element_text(family = "sans", colour = "black"))
 
     ggsave(paste0(filename,".png"),width = savew, height = saveh, units = "in")
   }

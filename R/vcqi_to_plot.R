@@ -252,15 +252,15 @@ vcqi_to_plot <- function(
     }
 
     ggplot(dat, aes(x = as.factor(rowid), y = estimate * 100)) +
-      geom_col(fill = "#2b92be") +
+      theme_bw(base_family = "sans")+
+      geom_col(fill = "#2b92be", color = "#0000ff", size=0.3) +
       geom_errorbar(aes(ymin = cill * 100, ymax = ciul * 100),
                     width = .2,
                     position = position_dodge(.9)) +
       geom_text(aes(
         x = as.factor(rowid),
         y = 100 + 1.25*extraspace,
-        label = text
-      )) +
+        label = text),colour = "black",family = "sans") +
       coord_flip() +
       labs(
         y = "Estimated Coverage %",
@@ -273,8 +273,8 @@ vcqi_to_plot <- function(
       #Note: could find a better way to check the space we need for text
       scale_y_continuous(limits = c(0, 100 + 2.25*extraspace),
                          breaks = c(0, 25, 50, 75, 100)) +
-      theme(plot.caption = element_text(hjust = 0))+
-      theme_bw()
+      theme(plot.caption = element_text(hjust = 0),
+            text = element_text(family = "sans", colour = "black"))
 
     ggsave(paste0(filename, ".png"), width = savew, height = saveh, units = "in")
   }
