@@ -4,10 +4,12 @@
 \alias{make_RI_augmented_dataset}
 \title{Merge RI indicators calculated by VCQI onto the originally provided RI dataset}
 \usage{
-make_RI_augmented_dataset(outpath = NA)
+make_RI_augmented_dataset(outpath = NA, analysiscounter = NA)
 }
 \arguments{
 \item{outpath}{Path where RI indicator datasets are saved (by default the function looks in VCQI_OUTPUT_FOLDER)}
+
+\item{analysiscounter}{The analysiscounter number, must be an integer bigger than 0}
 }
 \value{
 RI_augmented_dataset and vcqi_ads_logfile datasets in VCQI_OUTPUT_FOLDER
