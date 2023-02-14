@@ -361,7 +361,7 @@ RI_VCTC_01_06PO <- function(VCP = "RI_VCTC_01_06PO"){
           textcolor <- get(paste0("TIMELY_TEXTBAR_COLOR_",TIMELY_TEXTBAR_ORDER[e]), envir = .GlobalEnv)
 
           baseplot <- baseplot +
-            geom_text(data = tempdat, mapping = aes(x = xlocation, y = ylocation, label = text),colour = textcolor)+
+            geom_text(data = tempdat, mapping = aes(x = xlocation, y = ylocation+TIMELY_BARWIDTH*0.5, label = text),colour = textcolor)+
             geom_text(data = tempdat, mapping = aes(x = xlocation, y = labellocation, label = textlabel))
         } #end of TIMELY_TEXTBAR_ORDER loop
 

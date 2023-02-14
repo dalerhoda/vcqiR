@@ -196,7 +196,7 @@ vcqi_to_uwplot <- function(
 
     ggplot(dat, aes(x = as.factor(rowid), y = estimate * 100)) +
       theme_bw(base_family = "sans")+
-      geom_col(fill = "#2b92be",color = "#0000ff") +
+      geom_col(fill = "#2b92be",color = "#0000ff", size = 0.03) +
       geom_text(aes(x = as.factor(rowid),
                     y = 100 + extraspace,
                     label = text),colour = "black",family = "sans") +

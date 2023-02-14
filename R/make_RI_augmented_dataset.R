@@ -1,6 +1,7 @@
 #' Merge RI indicators calculated by VCQI onto the originally provided RI dataset
 #'
 #' @param outpath Path where RI indicator datasets are saved (by default the function looks in VCQI_OUTPUT_FOLDER)
+#' @param analysiscounter The analysiscounter number, must be an integer bigger than 0
 #'
 #' @return RI_augmented_dataset and vcqi_ads_logfile datasets in VCQI_OUTPUT_FOLDER
 #'
@@ -34,19 +35,22 @@
 # This program can only be run on RI Indicators that result in a dataset with
 # a single line per person. RI_COVG_05 will not be included.
 
-make_RI_augmented_dataset <- function(outpath = NA){
+make_RI_augmented_dataset <- function(outpath = NA, analysiscounter = NA){
 
   if (is.na(outpath)){
     outpath <- VCQI_OUTPUT_FOLDER
   }
 
-  analysiscounter <- get("ANALYSIS_COUNTER", envir = .GlobalEnv)
-
-  # Check that analysis counter is numeric and > 0
-  if (!is.numeric(type.convert(analysiscounter, as.is = TRUE))){
-    stop("analysiscounter must be a number.")}
-  if (analysiscounter < 1){
-    stop("analysiscounter must be 1 or higher")
+  if (is.na(analysiscounter)){
+    # If analysiscounter not define for the function, set it to be 10
+    analysiscounter <- 10
+  } else {
+    # Check that analysis counter is numeric and > 0
+    if (!is.numeric(type.convert(analysiscounter, as.is = TRUE))){
+      stop("analysiscounter must be a number.")}
+    if (analysiscounter < 1){
+      stop("analysiscounter must be 1 or higher")
+    }
   }
 
   # This program will be used to take the individual indicator datasets to make
@@ -89,6 +93,9 @@ make_RI_augmented_dataset <- function(outpath = NA){
   for (i in seq_along(filelist)){
 
     dat <- vcqi_read(paste0(VCQI_OUTPUT_FOLDER, "/",filelist[i]))
+
+    dat <- haven::zap_label(dat)
+    dat <- haven::zap_labels(dat)
 
     dat <- dat %>% arrange(respid,stratumid,clusterid)
 
@@ -140,6 +147,8 @@ make_RI_augmented_dataset <- function(outpath = NA){
 
   # Merge together with the first file in RI_LIST
   ad_1 <- vcqi_read(paste0(outpath, "/VCQI_ADS_",filelist[1]))
+  ad_1 <- haven::zap_label(ad_1)
+  ad_1 <- haven::zap_labels(ad_1)
   dupname <- names(ad_1)[which(names(ad_1) %in% names(dat))]
   dupname <- dupname[which(!dupname %in% c("RI01", "RI03", "RI11", "RI12"))]
   ad_1 <- ad_1 %>% select(-c(all_of(dupname)))
@@ -161,11 +170,16 @@ make_RI_augmented_dataset <- function(outpath = NA){
   rm(tempdf)
 
   dup <- 0
+  vartodrop <- NULL
 
   for (i in seq_along(filelist)){
 
     if (i > 1){
+
       ad <- vcqi_read(paste0(VCQI_OUTPUT_FOLDER, "/VCQI_ADS_",filelist[i]))
+
+      ad <- haven::zap_label(ad)
+      ad <- haven::zap_labels(ad)
 
       varlist_ad <- names(ad)
 
@@ -190,34 +204,96 @@ make_RI_augmented_dataset <- function(outpath = NA){
               ad <- ad %>% select(-c(all_of(varlist_ad[u])))
 
               tempdf <- data.frame(
-                  variable = varlist_ad[u], dataset = str_sub(filelist[i], end = -5),
-                  analysis_counter = str_sub(filelist[i], start = -5, end = -5),
-                  message = "Variable existed in previous dataset(s) but had no conflicting values,
+                variable = varlist_ad[u], dataset = str_sub(filelist[i], end = -5),
+                analysis_counter = str_sub(filelist[i], start = -5, end = -5),
+                message = "Variable existed in previous dataset(s) but had no conflicting values,
                                    thus variable dropped", new_var_name = "")
 
-                vcqiadsvarlist <- rbind(vcqiadsvarlist, tempdf)
+              vcqiadsvarlist <- rbind(vcqiadsvarlist, tempdf)
 
             } else {
               # If values differ, then the new variable will need to be renamed and added to the varlist
               print("found some differences.")
               dup = dup + 1
 
-              names(ad)[which(names(ad) == varlist_ad[u])] <-
-                paste0(varlist_ad[u],"_ac",str_sub(filelist[i], start = -5, end = -5))
+              # However, it might be the same as a previous variable that has been renamed already.
 
-              rownum <- which(vcqiadsvarlist$variable == varlist_ad[u]
-                              & vcqiadsvarlist$message == "Variable added to varlist from this dataset")
-              ac_before <- as.numeric(vcqiadsvarlist$analysis_counter[rownum])
-              names(dat)[which(names(dat) == varlist_ad[u])] <-
-                paste0(varlist_ad[u],"_ac",ac_before)
-              vcqiadsvarlist$new_var_name[rownum] <- paste0(varlist_ad[u],"_ac",ac_before)
+              if (paste0(varlist_ad[u],"_ac",str_sub(filelist[i], start = -5, end = -5)) %in% names(dat)){
+                comparedat2 <- dat %>% select(respid,clusterid,stratumid,
+                                              all_of(paste0(varlist_ad[u],"_ac",str_sub(filelist[i], start = -5, end = -5)))) %>% arrange(respid)
+                comparevar3 <- get(paste0(varlist_ad[u],"_ac",str_sub(filelist[i], start = -5, end = -5)), comparedat2)
 
-              tempdf <- data.frame(variable = varlist_ad[u], dataset = str_sub(filelist[i], end = -5),
-                                   analysis_counter = str_sub(filelist[i], start = -5, end = -5),
-                                   message = "Variable existed in previous dataset(s) with conflicting values",
-                                   new_var_name = paste0(varlist_ad[u],"_ac",str_sub(filelist[i], start = -5, end = -5)))
+                if (all.equal(comparevar3, comparevar2, check.attributes = FALSE) %in% TRUE){
+                  # If same as a previous variable that has been renamed already.
+                  dup = dup - 1
+                  ad <- ad %>% select(-c(all_of(varlist_ad[u])))
+                  tempdf <- data.frame(
+                    variable = varlist_ad[u], dataset = str_sub(filelist[i], end = -5),
+                    analysis_counter = str_sub(filelist[i], start = -5, end = -5),
+                    message = "Variable existed in previous dataset(s) but had no conflicting values,
+                                   thus variable dropped", new_var_name = "")
+                } else {
 
-              vcqiadsvarlist <- rbind(vcqiadsvarlist, tempdf)
+                  #If the values differ and a renamed variable with same name but different values
+                  #TO DO: open to other new names
+                  names(ad)[which(names(ad) == varlist_ad[u])] <-
+                    paste0(varlist_ad[u],"_ac",str_sub(filelist[i], start = -5, end = -5),"_",str_sub(filelist[i], end = -7))
+
+                  rownum <- which(vcqiadsvarlist$variable == varlist_ad[u]
+                                  & vcqiadsvarlist$message == "Variable added to varlist from this dataset")
+
+                  if (length(rownum) > 1){
+                    rownum <- rownum[length(rownum)]
+                  }
+
+                  ac_before <- as.numeric(vcqiadsvarlist$analysis_counter[rownum])
+                  # Create a new variable with new name and add the original name to a list to drop eventually
+                  vartodrop <- c(vartodrop, varlist_ad[u])
+                  varu <- rlang::sym(varlist_ad[u])
+                  dat <- dat %>% mutate(!!paste0(varlist_ad[u],"_ac",ac_before) := !!varu) %>%
+                    relocate(paste0(varlist_ad[u],"_ac",ac_before),.after = varlist_ad[u])
+
+                  vcqiadsvarlist$new_var_name[rownum] <- paste0(varlist_ad[u],"_ac",ac_before)
+
+                  tempdf <- data.frame(variable = varlist_ad[u], dataset = str_sub(filelist[i], end = -5),
+                                       analysis_counter = str_sub(filelist[i], start = -5, end = -5),
+                                       message = "Variable existed in previous dataset(s) with conflicting values",
+                                       new_var_name = paste0(varlist_ad[u],"_ac",str_sub(filelist[i], start = -5, end = -5)))
+
+                  vcqiadsvarlist <- rbind(vcqiadsvarlist, tempdf)
+
+
+
+                }
+              } else {
+
+                #If the values differ and no renamed variable with same name
+                names(ad)[which(names(ad) == varlist_ad[u])] <-
+                  paste0(varlist_ad[u],"_ac",str_sub(filelist[i], start = -5, end = -5))
+
+                rownum <- which(vcqiadsvarlist$variable == varlist_ad[u]
+                                & vcqiadsvarlist$message == "Variable added to varlist from this dataset")
+
+                if (length(rownum) > 1){
+                  rownum <- rownum[length(rownum)]
+                }
+
+                ac_before <- as.numeric(vcqiadsvarlist$analysis_counter[rownum])
+                # Create a new variable with new name and add the original name to a list to drop eventually
+                vartodrop <- c(vartodrop, varlist_ad[u])
+                varu <- rlang::sym(varlist_ad[u])
+                dat <- dat %>% mutate(!!paste0(varlist_ad[u],"_ac",ac_before) := !!varu) %>%
+                  relocate(paste0(varlist_ad[u],"_ac",ac_before),.after = varlist_ad[u])
+
+                vcqiadsvarlist$new_var_name[rownum] <- paste0(varlist_ad[u],"_ac",ac_before)
+
+                tempdf <- data.frame(variable = varlist_ad[u], dataset = str_sub(filelist[i], end = -5),
+                                     analysis_counter = str_sub(filelist[i], start = -5, end = -5),
+                                     message = "Variable existed in previous dataset(s) with conflicting values",
+                                     new_var_name = paste0(varlist_ad[u],"_ac",str_sub(filelist[i], start = -5, end = -5)))
+
+                vcqiadsvarlist <- rbind(vcqiadsvarlist, tempdf)
+              }
 
             }
 
@@ -245,6 +321,9 @@ make_RI_augmented_dataset <- function(outpath = NA){
 
   } #end of i loop
 
+  dat <- dat %>% select(-c(all_of(vartodrop)))
+  saveRDS(dat,paste0(outpath, "/RI_augmented_dataset.rds"))
+
   saveRDS(vcqiadsvarlist, paste0(outpath, "/vcqi_ads_logfile.rds"))
 
   for (v in seq_along(filelist)){
@@ -252,7 +331,7 @@ make_RI_augmented_dataset <- function(outpath = NA){
   }
 
   print(paste0("VCQI Augmented Dataset Program identified ", dup,
-  " variables that had conflicting values between the VCQI indicator datasets."))
+               " variables that had conflicting values between the VCQI indicator datasets."))
   print("Please reference the log: vcqi_ads_logfile.dta for details.")
   print("VCQI Augmented Dataset was saved as RI_augmented_dataset.rds")
 }
