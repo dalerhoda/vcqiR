@@ -17,7 +17,7 @@
 #' @import dplyr
 #' @rawNamespace import(stats, except = c(filter,lag))
 
-# svyp_ci_calc R version 1.02 - Biostat Global Consulting - 2022-10-31
+# svyp_ci_calc R version 1.03 - Biostat Global Consulting - 2023-02-22
 # *******************************************************************************
 # Change log
 
@@ -25,6 +25,8 @@
 # 2022-08-25  1.00      Caitlin Clary   Original R version
 # 2022-10-12  1.01      Caitlin Clary   More robust Clopper-Pearson defaulting
 # 2022-10-31  1.02      Caitlin Clary   Add error and stop conditions
+# 2023-02-22  1.03      Caitlin Clary   Fix Clopper-Pearson CI mismatch (needed
+#                                       a rowwise() call)
 # *******************************************************************************
 
 svyp_ci_calc <- function(
@@ -40,9 +42,6 @@ svyp_ci_calc <- function(
     adjust = TRUE,
     truncate = TRUE
 ){
-
-  # IN PROGRESS - TO DO finish (check)
-  # browser()
 
   # Check CI method specified
   if(!method %in% c(
@@ -267,11 +266,13 @@ svyp_ci_calc <- function(
 
     ci_df <- ci_df %>%
       mutate(
-         x = phat*neff,
+        x = phat*neff,
         v1 = 2*x,
         v2 = 2*(neff-x+1),
         v3 = 2*(x+1),
-        v4 = 2*(neff-x),
+        v4 = 2*(neff-x)) %>%
+      rowwise() %>%
+      mutate(
         v1 = max(v1, 2e-10),
         v1 = min(v1, 2e+17),
         v2 = max(v2, 2e-10),
@@ -279,7 +280,9 @@ svyp_ci_calc <- function(
         v3 = max(v3, 2e-10),
         v3 = min(v3, 2e+17),
         v4 = max(v4, 2e-10),
-        v4 = min(v4, 2e+17),
+        v4 = min(v4, 2e+17)) %>%
+      ungroup() %>%
+      mutate(
         fao2 = qf(ao2, v1, v2),
         lcb_2sided = (v1*fao2)/(v2 + v1*fao2),
         f1mao2  = qf(1-ao2, v3, v4),
