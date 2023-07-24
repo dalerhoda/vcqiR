@@ -6,13 +6,18 @@
 #'
 #' @import stringr
 
-# RI_VCTC_01_00GC R version 1.01 - Biostat Global Consulting - 2022-11-12
+# RI_VCTC_01_00GC R version 1.02 - Biostat Global Consulting - 2022-12-23
 # *******************************************************************************
 # Change log
 
 # Date 			  Version 	Name			      What Changed
 # 2022-11-07  1.00      Mia Yu          Original R version
 # 2022-11-12  1.01      Mia Yu          Package version
+# 2022-12-23  1.02      Mia Yu          Adde parts for previously skipped global values
+# 2023-07-23  1.03      Mia Yu          If register records were sought and the
+# 										                  user asks to draw the HBR line showing
+#										                    only card availability, gently prompt
+#										                    them to draw the line at had_card_or_register
 # *******************************************************************************
 
 RI_VCTC_01_00GC <- function(VCP = "RI_VCTC_01_00GC"){
@@ -560,13 +565,154 @@ RI_VCTC_01_00GC <- function(VCP = "RI_VCTC_01_00GC"){
       }
     } #end of check
 
-    #NOTE: for now we don't need to check globals to specify the "Showed HBR" line
+    # Look at globals for the TIMELY_FULLY_VXD_NOTE and TIMELY_NOT_VXD_NOTE
 
-    # Now you've looked at everything that could contribute to legend order:
-    # (default tiles, custom doses and the hbr line).
-    # Evaluate the list of order values you have been buliding.
-    # Confirm the list of orders go from 1 up to the max, with no duplicates and without
-    # skipping a value; if there are duplicates or skips, we'll want to issue an error message.
+    # TIMELY_FULLY_VCD_NOTE should be 0 or 1 or blank
+    if (!TIMELY_FULLY_VXD_NOTE %in% c(0,1,NA)){
+      exitflag <- 1
+      errormsgs <- c(errormsgs,
+                     paste0("Global variable TIMELY_FULLY_VXD_NOTE should take values 0 or 1. It is currently ", TIMELY_FULLY_VXD_NOTE))
+      vcqi_log_comment(VCP,1,"Error",
+                       paste0("Global variable TIMELY_FULLY_VXD_NOTE should take values 0 or 1. It is currently ", TIMELY_FULLY_VXD_NOTE))
+    }
+
+    if (TIMELY_FULLY_VXD_NOTE == 0){
+      TIMELY_FULLY_VXD_NOTE_VARIABLE <- NA
+    } else {
+      if (!vcqi_object_exists("TIMELY_FULLY_VXD_NOTE_VARIABLE")){
+        TIMELY_FULLY_VXD_NOTE_VARIABLE <- NA
+      }
+    }
+
+    # TIMELY_FULLY_VXD_NOTE_VARIABLE should be one of the vars available from RI_COVG_03
+    if (TIMELY_FULLY_VXD_NOTE == 1 & !(TIMELY_FULLY_VXD_NOTE_VARIABLE %in% c("fully_vaccinated_crude","fully_vaccinated_valid","fully_vaccinated_by_age1","fully_vxd_for_age_crude","fully_vxd_for_age_valid"))) {
+      exitflag <- 1
+      errormsgs <- c(errormsgs,
+                     paste0("Global TIMELY_FULLY_VXD_NOTE_VARIABLE should take one of these values: fully_vaccinated_crude, fully_vaccinated_valid, fully_vaccinated_by_age1, fully_vxd_for_age_crude, fully_vxd_for_age_valid; It is currently: ", TIMELY_FULLY_VXD_NOTE_VARIABLE))
+      vcqi_log_comment(VCP,1,"Error",
+                       paste0("Global TIMELY_FULLY_VXD_NOTE_VARIABLE should take one of these values: fully_vaccinated_crude, fully_vaccinated_valid, fully_vaccinated_by_age1, fully_vxd_for_age_crude, fully_vxd_for_age_valid; It is currently: ", TIMELY_FULLY_VXD_NOTE_VARIABLE))
+    }
+
+    # TIMELY_NOT_VCD_NOTE should be 0 or 1 or blank
+    if (!TIMELY_NOT_VXD_NOTE %in% c(0,1,NA)){
+      exitflag <- 1
+      errormsgs <- c(errormsgs,
+                     paste0("Global variable TIMELY_NOT_VXD_NOTE should take values 0 or 1. It is currently ", TIMELY_NOT_VXD_NOTE))
+      vcqi_log_comment(VCP,1,"Error",
+                       paste0("Global variable TIMELY_NOT_VXD_NOTE should take values 0 or 1. It is currently ", TIMELY_NOT_VXD_NOTE))
+    }
+
+    if (TIMELY_NOT_VXD_NOTE == 0){
+      TIMELY_NOT_VXD_NOTE_VARIABLE <- NA
+    } else {
+      if (!vcqi_object_exists("TIMELY_NOT_VXD_NOTE_VARIABLE")){
+        TIMELY_NOT_VXD_NOTE_VARIABLE <- NA
+      }
+    }
+
+    # TIMELY_NOT_VXD_NOTE_VARIABLE should be one of the vars available from RI_COVG_03
+    if (TIMELY_NOT_VXD_NOTE == 1 & !(TIMELY_NOT_VXD_NOTE_VARIABLE %in% c("not_vaccinated_crude","not_vaccinated_valid","not_vaccinated_by_age1","not_vxd_for_age_crude","not_vxd_for_age_valid"))) {
+      exitflag <- 1
+      errormsgs <- c(errormsgs,
+                     paste0("Global TIMELY_NOT_VXD_NOTE_VARIABLE should take one of these values: not_vaccinated_crude, not_vaccinated_valid, not_vaccinated_by_age1, not_vxd_for_age_crude, not_vxd_for_age_valid; It is currently: ", TIMELY_NOT_VXD_NOTE_VARIABLE))
+      vcqi_log_comment(VCP,1,"Error",
+                       paste0("Global TIMELY_NOT_VXD_NOTE_VARIABLE should take one of these values: not_vaccinated_crude, not_vaccinated_valid, not_vaccinated_by_age1, not_vxd_for_age_crude, not_vxd_for_age_valid; It is currently: ", TIMELY_NOT_VXD_NOTE_VARIABLE))
+    }
+
+    # Next we will look at globals to specify the 'Showed HBR' line.
+
+    # If TIMELY_HBR_LINE_PLOT is not 1, the user didn't request adding that line, so we do not need to do the following checks
+
+    if (TIMELY_HBR_LINE_PLOT == 1) {
+      # global TIMELY_HBR_LINE_VARIABLE  should be one of the several variables produced by RI_QUAL_01; make it had_card if it is missing but TIMELY_HBR_LINE_PLOT is 1
+      # We need to look at both the card and register values if register was seen
+      checkvars <-
+        (TIMELY_HBR_LINE_VARIABLE %in% c("had_card","had_card_with_dates","had_card_with_dates_or_ticks","had_card_with_flawless_dates"))
+
+      if (RI_RECORDS_SOUGHT_FOR_ALL == 1 | RI_RECORDS_SOUGHT_IF_NO_CARD == 1) {
+        checkvars2 <-
+          (TIMELY_HBR_LINE_VARIABLE %in% c("had_register","had_register_with_dates","had_register_with_dates_or_ticks","had_register_with_flawless_dates","had_card_or_register"))
+        checkvars <- ((checkvars | checkvars2) %in% TRUE)
+      }
+
+      if (!checkvars) {
+        if (!vcqi_object_exists("TIMELY_HBR_LINE_VARIABLE")) {
+          assign("TIMELY_HBR_LINE_VARIABLE", "had_card", envir = .GlobalEnv)
+          print("Global variable TIMELY_HBR_LINE_VARIABLE was not defined. Default value of 'had_card' will be used")
+          vcqi_log_comment(VCP,2,"Warning","Global variable TIMELY_HBR_LINE_VARIABLE was not defined. Default value of 'had_card' will be used")
+        } else {
+          exitflag <- 1
+          errormsgs <- c(errormsgs,
+                         paste0("Global variable TIMELY_HBR_LINE_VARIABLE takes the value ", TIMELY_HBR_LINE_VARIABLE,
+                                "; it should contain the name of one of the variables produced by RI_QUAL_01"))
+          vcqi_log_comment(VCP,1,"Error",paste0("Global variable TIMELY_HBR_LINE_VARIABLE takes the value ",TIMELY_HBR_LINE_VARIABLE,
+                                                "; it should contain the name of one of the variables produced by RI_QUAL_01"))
+          }
+      } #end of if var not qualify
+
+      # global TIMELY_HBR_LINE_WIDTH make it medium if not defined
+
+      if (!vcqi_object_exists("TIMELY_HBR_LINE_WIDTH")) {
+        assign("TIMELY_HBR_LINE_WIDTH", 1, envir = .GlobalEnv)
+        print("Global variable TIMELY_HBR_LINE_WIDTH was not defined; VCQI will use the default value: 1")
+        vcqi_log_comment(VCP,2,"Warning","Global variable TIMELY_HBR_LINE_WIDTH was not defined; VCQI will use the default value: 1")
+      } else if (!is.numeric(TIMELY_HBR_LINE_WIDTH)) {
+        exitflag <- 1
+        errormsgs <- c(errormsgs,
+                       paste0("Global variable TIMELY_HBR_LINE_WIDTH currently takes value ",TIMELY_HBR_LINE_WIDTH,"; it should be a valid size style option"))
+        vcqi_log_comment(VCP,1,"Error",
+                         paste0("Global variable TIMELY_HBR_LINE_WIDTH currently takes value ",TIMELY_HBR_LINE_WIDTH,"; it should be a valid size style option"))
+      } #end of checking TIMELY_HBR_LINE_WIDTH
+
+      # global TIMELY_HBR_LINE_COLOR make it gs8 if not defined
+      if (!vcqi_object_exists("TIMELY_HBR_LINE_COLOR")) {
+        assign("TIMELY_HBR_LINE_COLOR", "grey8", envir = .GlobalEnv)
+        print("Global variable TIMELY_HBR_LINE_COLOR was not defined; VCQI will use the default value: grey8")
+        vcqi_log_comment(VCP,2,"Warning","Global variable TIMELY_HBR_LINE_COLOR was not defined; VCQI will use the default value: grey8")
+      } else if (!(TIMELY_HBR_LINE_COLOR %in% colors()) & !(nchar(TIMELY_HBR_LINE_COLOR) == 7 & substr(TIMELY_HBR_LINE_COLOR, 1, 1) == "#")) {
+        exitflag <- 1
+        errormsgs <- c(errormsgs,
+                       paste0("Global variable TIMELY_HBR_LINE_COLOR currently takes value ",TIMELY_HBR_LINE_COLOR,"; it should be a valid color option."))
+        vcqi_log_comment(VCP,1,"Error",
+                         paste0("Global variable TIMELY_HBR_LINE_COLOR currently takes value ",TIMELY_HBR_LINE_COLOR,"; it should be a valid color option."))
+      } #end of checking TIMELY_HBR_LINE_COLOR
+
+      if (!vcqi_object_exists("TIMELY_HBR_LINE_LABEL_COLOR")) {
+        assign("TIMELY_HBR_LINE_LABEL_COLOR", "grey2", envir = .GlobalEnv)
+        print("Global variable TIMELY_HBR_LINE_LABEL_COLOR was not defined; VCQI will use the default value: grey2")
+        vcqi_log_comment(VCP,2,"Warning","Global variable TIMELY_HBR_LINE_LABEL_COLOR was not defined; VCQI will use the default value: grey2")
+      } else if (!(TIMELY_HBR_LINE_LABEL_COLOR %in% colors()) & !(nchar(TIMELY_HBR_LINE_LABEL_COLOR) == 7 & substr(TIMELY_HBR_LINE_LABEL_COLOR, 1, 1) == "#")) {
+        exitflag <- 1
+        errormsgs <- c(errormsgs,
+                       paste0("Global variable TIMELY_HBR_LINE_LABEL_COLOR currently takes value ",TIMELY_HBR_LINE_LABEL_COLOR,"; it should be a valid color option."))
+        vcqi_log_comment(VCP,1,"Error",
+                         paste0("Global variable TIMELY_HBR_LINE_LABEL_COLOR currently takes value ",TIMELY_HBR_LINE_LABEL_COLOR,"; it should be a valid color option."))
+      } #end of checking TIMELY_HBR_LINE_LABEL_COLOR
+
+      # global TIMELY_HBR_LINE_PATTERN make it 'shortdash' if not defined
+      # NOTE: for now only allowing these types
+
+      if (!vcqi_object_exists("TIMELY_HBR_LINE_PATTERN")) {
+        assign("TIMELY_HBR_LINE_PATTERN", "dashed", envir = .GlobalEnv)
+        print("Global variable TIMELY_HBR_LINE_PATTERN was not defined; VCQI will use the default value: dashed")
+        vcqi_log_comment(VCP,2,"Warning","Global variable TIMELY_HBR_LINE_PATTERN was not defined; VCQI will use the default value: dashed")
+      } else if ((!TIMELY_HBR_LINE_PATTERN %in% c("solid","dashed","dotted","dotdash","longdash","twodash")) & (!TIMELY_HBR_LINE_PATTERN %in% c(1:6))) {
+        exitflag <- 1
+        errormsgs <- c(errormsgs,
+                       paste0("Global variable TIMELY_HBR_LINE_PATTERN currently takes value ",TIMELY_HBR_LINE_PATTERN,"; it should be a valid linetype option."))
+        vcqi_log_comment(VCP,1,"Error",
+                         paste0("Global variable TIMELY_HBR_LINE_PATTERN currently takes value ",TIMELY_HBR_LINE_PATTERN,"; it should be a valid linetype option."))
+      } #end of checking TIMELY_HBR_LINE_PATTERN
+
+      # global TIMELY_HBR_LINE_LABEL must be defined
+
+      if (!vcqi_object_exists("TIMELY_HBR_LINE_LABEL")) {
+        exitflag <- 1
+        errormsgs <- c(errormsgs,"Global variable TIMELY_HBR_LINE_LABEL needs to be populated since global variable TIMELY_HBR_LINE_PLOT is 1")
+        vcqi_log_comment(VCP,1,"Error","Global variable TIMELY_HBR_LINE_LABEL needs to be populated since global variable TIMELY_HBR_LINE_PLOT is 1")
+      } #end of checking TIMELY_HBR_LINE_LABEL
+
+    } #end of TIMELY_HBR_LINE_PLOT == 1
 
     # *********************************************
 
@@ -828,6 +974,25 @@ RI_VCTC_01_00GC <- function(VCP = "RI_VCTC_01_00GC"){
 
     # Number of doses in timeliness plot
     assign("TIMELY_N_DOSES",length(TIMELY_DOSE_ORDER), envir = .GlobalEnv)
+
+    if (vcqi_object_exists("TIMELY_N_CUSTOMIZED_DOSES")){
+      assign(TIMELY_N_CUSTOMIZED_DOSES, length(TIMELY_N_CUSTOMIZED_DOSES))
+    }
+
+    if (!vcqi_object_exists("TIMELY_TEXTBAR_LABEL_Y_SPACE")){
+      vcqi_global(TIMELY_TEXTBAR_LABEL_Y_SPACE,TIMELY_BARWIDTH)
+    }
+
+    # If the user is drawing a line on the VCTC related only to card availability, but register records were sought in the survey,
+    # gently prompt them to maybe draw the line at had_card_or_register.
+
+    if (RI_RECORDS_NOT_SOUGHT == 0 & TIMELY_HBR_LINE_VARIABLE != "had_card_or_register"){
+      print(paste0("Global variable TIMELY_HBR_LINE_VARIABLE takes value ",TIMELY_HBR_LINE_VARIABLE,
+                   " but RI_RECORDS_NOT_SOUGHT is 0, so consider changing it to had_card_or_register."))
+      vcqi_log_comment(VCP,2,"Warning",
+                       paste0("Global variable TIMELY_HBR_LINE_VARIABLE takes value ",TIMELY_HBR_LINE_VARIABLE,
+                              " but RI_RECORDS_NOT_SOUGHT is 0, so consider changing it to had_card_or_register."))
+    }
 
   } #end of exitflag == 0
 

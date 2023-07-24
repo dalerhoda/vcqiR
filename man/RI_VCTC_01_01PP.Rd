@@ -10,7 +10,7 @@ RI_VCTC_01_01PP(VCP = "RI_VCTC_01_01PP")
 \item{VCP}{VCQI current program name to be logged, default to be the function name}
 }
 \value{
-A dataset (RI_VCTC_01_<ANALYSIS_COUNTER>)
+A dataset (RI_VCTC_01B_<ANALYSIS_COUNTER>)
 }
 \description{
 Pre-process dataset for RI_VCTC_01

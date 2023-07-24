@@ -6,9 +6,9 @@
 #' @export
 #'
 #' @examples
-#' VCTC_default_global_updated()
+#' VCTC_global_same_legend_for_all()
 
-# VCTC_default_global_updated R version 1.03 - Biostat Global Consulting - 2023-07-18
+# VCTC_global_same_legend_for_all R version 1.03 - Biostat Global Consulting - 2023-07-18
 # *******************************************************************************
 # Change log
 
@@ -20,9 +20,9 @@
 #                                       is generated to match Stata
 # *******************************************************************************
 
-# Based on default globals_for_timeliness_plots in Stata VCQI
+# Based on globals_for_timeliness_plots - same_legend_for_all_doses in Stata VCQI
 
-VCTC_default_global_updated <- function(){
+VCTC_global_same_legend_for_all <- function(){
   # DT means 'default tiles'
   # CD means 'customized doses'
 
@@ -70,9 +70,9 @@ VCTC_default_global_updated <- function(){
   assign("TIMELY_YLABEL_SIZE", 10, envir = .GlobalEnv)
   assign("TIMELY_YLABEL_COLOR", "black", envir = .GlobalEnv)
 
-  # Because we are spacing the bars about every y=10 units instead of the
-  # default Y=1, specify a bar width that is 2/3 of that.
-  vcqi_global(TIMELY_BARWIDTH,6.7)
+  # Because we are spacing the bars about every y=10 units instead of the default
+  # y=1 units apart, specify a bar width that is 10X the default.
+  vcqi_global(TIMELY_BARWIDTH, 6.7)
 
   assign("TIMELY_CI_LCOLOR", "grey8", envir = .GlobalEnv)
   #This controls the width of the error bar; recommended range is 3-6
@@ -161,7 +161,6 @@ VCTC_default_global_updated <- function(){
     assign("TIMELY_HBR_LINE_LABEL", "<-- Showed HBR or FBR", envir = .GlobalEnv)
     assign("TIMELY_ABBREV_CAPTION_LINE1", "Abbreviations: HBR- home-based record; FBR- facility-based record", envir = .GlobalEnv)
   }
-
 
   # *********************************************
   # Summarize the % fully vxd and not vxd in a VCTC footnote

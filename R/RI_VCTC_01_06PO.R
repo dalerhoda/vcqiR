@@ -11,13 +11,15 @@
 #' @import survey
 #' @import tidyselect
 
-# RI_VCTC_01_06PO R version 1.01 - Biostat Global Consulting - 2022-11-11
+# RI_VCTC_01_06PO R version 1.02 - Biostat Global Consulting - 2023-07-21
 # *******************************************************************************
 # Change log
 
 # Date 			  Version 	Name			      What Changed
 # 2022-11-08  1.00      Mia Yu          Original R version
 # 2022-11-11  1.01      Mia Yu          Package version
+# 2022-12-22  1.02      Mia Yu          Add parts for previously skipped objects
+# 2023-07-21  1.03      Mia Yu          Put abbreviations on two lines and match Stata
 # *******************************************************************************
 
 RI_VCTC_01_06PO <- function(VCP = "RI_VCTC_01_06PO"){
@@ -197,19 +199,71 @@ RI_VCTC_01_06PO <- function(VCP = "RI_VCTC_01_06PO"){
         } #end of TIMELY_TEXTBAR_ORDER e loop
 
         # Estimate the % of respondents with HBRs if the user has asked for it
-        # NOTE: skipped TIMELY_HBR_LINE_PLOT for now
+        if (TIMELY_HBR_LINE_PLOT == 1){
+          ptest <- svypd(
+            svydf = datdesign, # NOT tempdatdesign - subset *inside* svypd
+            var = TIMELY_HBR_LINE_VARIABLE,
+            subset_condition = paste0("level",RI_VCTC_01_LEVELS[lvl],"id == ", llist[l]),
+            ci_level = 95,
+            ci_method = VCQI_CI_METHOD,
+            adjust = TRUE,
+            truncate = TRUE
+          )
+
+          x_hbr <- ptest$estimate*100
+          hbrlabelnum <- sprintf(paste0("%.",TIMELY_TEXTBAR_COVG_DEC_DIGITS,"f"), ptest$estimate*100)
+          showlabel1 <- paste0(TIMELY_HBR_LINE_LABEL, " (",hbrlabelnum,"%)")
+          hbrlabelx <- x_hbr + nchar(showlabel1)/2
+        }
 
         # Estimate the % of respondents fully vaccinated if the user has asked for it
-        # NOTE: skipped TIMELY_FULLY_VXD_LINE_PLOT for now
+        if (TIMELY_FULLY_VXD_NOTE == 1){
+          ptest <- svypd(
+            svydf = datdesign, # NOT tempdatdesign - subset *inside* svypd
+            var = TIMELY_FULLY_VXD_NOTE_VARIABLE,
+            subset_condition = paste0("level",RI_VCTC_01_LEVELS[lvl],"id == ", llist[l]),
+            ci_level = 95,
+            ci_method = VCQI_CI_METHOD,
+            adjust = TRUE,
+            truncate = TRUE
+          )
 
-        # Estimate the % of respondents fully vaccinated if the user has asked for it
-        # NOTE: skipped TIMELY_FULLY_VXD_NOTE for now
+          fvptext <- sprintf(paste0("%.",TIMELY_TEXTBAR_COVG_DEC_DIGITS,"f"), ptest$estimate*100)
+          fvlltext <- sprintf(paste0("%.",TIMELY_TEXTBAR_COVG_DEC_DIGITS,"f"), ptest$cill*100)
+          fvultext <- sprintf(paste0("%.",TIMELY_TEXTBAR_COVG_DEC_DIGITS,"f"), ptest$ciul*100)
 
-        # Estimate the % of respondents not vaccinated if the user has asked for it
-        # NOTE: skipped TIMELY_NOT_VXD_LINE_PLOT for now
+          fvnotetext1 <- paste0("Fully vaccinated: ", fvptext, "% (95% CI: ", fvlltext, " - ", fvultext, "%).")
+
+          if (TIMELY_FULLY_VXD_NOTE_SUPPRESS_CI == 1){
+            fvnotetext1 <- paste0("Fully vaccinated: ", fvptext, "%.")
+          }
+          fvnotetext2 <- TIMELY_FULLY_VXD_DOSELIST_TEXT
+        }
 
         # Estimate the % of respondents not vaccinated if the user has asked for it
         # NOTE: skipped TIMELY_NOT_VXD_NOTE for now
+        if (TIMELY_NOT_VXD_NOTE == 1){
+          ptest <- svypd(
+            svydf = datdesign, # NOT tempdatdesign - subset *inside* svypd
+            var = TIMELY_NOT_VXD_NOTE_VARIABLE,
+            subset_condition = paste0("level",RI_VCTC_01_LEVELS[lvl],"id == ", llist[l]),
+            ci_level = 95,
+            ci_method = VCQI_CI_METHOD,
+            adjust = TRUE,
+            truncate = TRUE
+          )
+
+          nvptext <- sprintf(paste0("%.",TIMELY_TEXTBAR_COVG_DEC_DIGITS,"f"), ptest$estimate*100)
+          nvlltext <- sprintf(paste0("%.",TIMELY_TEXTBAR_COVG_DEC_DIGITS,"f"), ptest$cill*100)
+          nvultext <- sprintf(paste0("%.",TIMELY_TEXTBAR_COVG_DEC_DIGITS,"f"), ptest$ciul*100)
+
+          nvnotetext1 <- paste0("Not vaccinated: ", nvptext, "% (95% CI: ", nvlltext, " - ", nvultext, "%).")
+
+          if (TIMELY_NOT_VXD_NOTE_SUPPRESS_CI == 1){
+            nvnotetext1 <- paste0("Not vaccinated: ", nvptext, "%.")
+          }
+          nvnotetext2 <- TIMELY_NOT_VXD_DOSELIST_TEXT
+        }
 
         plotdat <- vcqi_read(paste0(VCQI_OUTPUT_FOLDER,"/RI_VCTC_01_",ANALYSIS_COUNTER,"_tplot_",RI_VCTC_01_LEVELS[lvl],"_",llist[l],".rds"))
         breakpoint = plotdat$y + 0.5*TIMELY_BARWIDTH
@@ -222,6 +276,49 @@ RI_VCTC_01_06PO <- function(VCP = "RI_VCTC_01_06PO"){
                              breaks = breakpoint,
                              labels = ylabel,
                              expand = c(0, 0))
+
+        if (TIMELY_HBR_LINE_PLOT == 1){
+
+          baseplot <- baseplot + geom_vline(aes(xintercept = x_hbr), colour = TIMELY_HBR_LINE_COLOR,
+                                            linetype = TIMELY_HBR_LINE_PATTERN, linewidth = TIMELY_HBR_LINE_WIDTH) +
+            geom_text(mapping = aes(x = hbrlabelx, y = 5, label = showlabel1), colour = TIMELY_HBR_LINE_LABEL_COLOR)
+
+        }
+
+        #TODO: double check the logic here
+        TIMELY_PLOT_NOTE <- NULL
+
+        if (vcqi_object_exists("TIMELY_TEXTBAR_ORDER")){
+          captiontext <- NULL
+          ecount <- 1
+
+          for (e in seq_along(TIMELY_TEXTBAR_ORDER)){
+            if (ecount > 1 & length(captiontext) > 0){
+              captiontext <- paste0(captiontext,"; ")
+            }
+            if (vcqi_object_exists(paste0("TIMELY_TEXTBAR_ABBREV_",TIMELY_TEXTBAR_ORDER[e]))){
+              abbre <- get(paste0("TIMELY_TEXTBAR_ABBREV_",TIMELY_TEXTBAR_ORDER[e]), envir = .GlobalEnv)
+              captiontext <- paste0(captiontext,abbre)
+            }
+            e = e+1
+          }
+        }
+
+        if (vcqi_object_exists("TIMELY_TEXTBAR_ORDER") & TIMELY_HBR_LINE_PLOT == 1){
+          TIMELY_PLOT_NOTE <- paste0(TIMELY_ABBREV_CAPTION_LINE1,"\n",captiontext)
+        } else if (vcqi_object_exists("TIMELY_TEXTBAR_ORDER") & TIMELY_HBR_LINE_PLOT != 1){
+          TIMELY_PLOT_NOTE <- captiontext
+        } else if (!vcqi_object_exists("TIMELY_TEXTBAR_ORDER") & TIMELY_HBR_LINE_PLOT == 1){
+          TIMELY_PLOT_NOTE <- TIMELY_ABBREV_CAPTION_LINE1
+        }
+
+        if (TIMELY_NOT_VXD_NOTE == 1){
+          TIMELY_PLOT_NOTE <- paste0(nvnotetext1, " ", nvnotetext2, "\n", TIMELY_PLOT_NOTE)
+        }
+
+        if (TIMELY_FULLY_VXD_NOTE == 1){
+          TIMELY_PLOT_NOTE <- paste0(fvnotetext1, " ", fvnotetext2, "\n", TIMELY_PLOT_NOTE)
+        }
 
         doselist <- str_to_lower(TIMELY_DOSE_ORDER)
 
@@ -355,13 +452,13 @@ RI_VCTC_01_06PO <- function(VCP = "RI_VCTC_01_06PO"){
           tempdat <- plottextdat %>% select(dose,y,all_of(TIMELY_TEXTBAR_ORDER[e])) %>%
             mutate(xlocation = get(paste0("TIMELY_TEXTBAR_X_",TIMELY_TEXTBAR_ORDER[e]), envir = .GlobalEnv),
                    textlabel = get(paste0("TIMELY_TEXTBAR_LABEL_",TIMELY_TEXTBAR_ORDER[e]), envir = .GlobalEnv),
-                   labellocation = max(TIMELY_Y_COORDS) + 1.5*TIMELY_BARWIDTH)
+                   labellocation = max(TIMELY_Y_COORDS) + 1.5*TIMELY_TEXTBAR_LABEL_Y_SPACE)
           names(tempdat) <- c("dose", "ylocation", "text","xlocation","textlabel","labellocation")
 
           textcolor <- get(paste0("TIMELY_TEXTBAR_COLOR_",TIMELY_TEXTBAR_ORDER[e]), envir = .GlobalEnv)
 
           baseplot <- baseplot +
-            geom_text(data = tempdat, mapping = aes(x = xlocation, y = ylocation+TIMELY_BARWIDTH*0.5, label = text),colour = textcolor)+
+            geom_text(data = tempdat, mapping = aes(x = xlocation, y = ylocation+TIMELY_TEXTBAR_LABEL_Y_SPACE*0.5, label = text),colour = textcolor)+
             geom_text(data = tempdat, mapping = aes(x = xlocation, y = labellocation, label = textlabel))
         } #end of TIMELY_TEXTBAR_ORDER loop
 

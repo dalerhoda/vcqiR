@@ -7,13 +7,14 @@
 #' @import dplyr
 #' @rawNamespace import(rlang, except = c(local_options,with_options))
 
-# RI_COVG_02_06PO R version 1.01 - Biostat Global Consulting - 2022-10-11
+# RI_COVG_02_06PO R version 1.02 - Biostat Global Consulting - 2023-07-23
 # *******************************************************************************
 # Change log
 
 # Date 			  Version 	Name			      What Changed
 # 2022-08-12  1.00      Mia Yu          Original R version
 # 2022-10-11  1.01      Mia Yu          Package version
+# 2023-07-23  1.02      Mia Yu          Use level3name for the opplot name
 # *******************************************************************************
 
 RI_COVG_02_06PO <- function(VCP = "RI_COVG_02_06PO"){
@@ -31,7 +32,7 @@ RI_COVG_02_06PO <- function(VCP = "RI_COVG_02_06PO"){
     filename <- paste0(VCQI_OUTPUT_FOLDER, "/RI_COVG_02_",ANALYSIS_COUNTER,".rds")
     dat <- vcqi_read(filename)
 
-    dat <- select(dat, c(stratumid,HH02))
+    dat <- select(dat, c(stratumid,level3name))
     dat <- distinct(dat)
     dat <- dat %>% arrange(stratumid)
 
@@ -43,7 +44,7 @@ RI_COVG_02_06PO <- function(VCP = "RI_COVG_02_06PO"){
       } else{
         eval(parse_expr(paste0("opp_stratum_id_",i,' = "', dat$stratumid[i],'"')))
       }
-      eval(parse_expr(paste0("opp_stratum_name_",i,' = "', dat$HH02[i],'"')))
+      eval(parse_expr(paste0("opp_stratum_name_",i,' = "', dat$level3name[i],'"')))
     } #end of i loop
     rm(i)
 

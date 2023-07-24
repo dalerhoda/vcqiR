@@ -7,13 +7,14 @@
 #' @import dplyr
 #' @import tidyselect
 
-# RI_COVG_02_01PP R version 1.01 - Biostat Global Consulting - 2022-10-11
+# RI_COVG_02_01PP R version 1.02 - Biostat Global Consulting - 2023-07-18
 # *******************************************************************************
 # Change log
 
 # Date 			  Version 	Name			      What Changed
 # 2022-08-10  1.00      Mia Yu          Original R version
 # 2022-10-11  1.01      Mia Yu          Package version
+# 2023-07-18  1.02      Mia Yu          Keep level3name and match Stata version
 # *******************************************************************************
 
 RI_COVG_02_01PP <- function(VCP = "RI_COVG_02_01PP"){
@@ -34,19 +35,10 @@ RI_COVG_02_01PP <- function(VCP = "RI_COVG_02_01PP"){
     } #end of dose loop
   } #end of type loop
 
-
-  if(!vcqi_object_exists("VCQI_LEVEL4_SET_VARLIST")){
-    dat <- select(dat, c(level1id, level2id, level3id, stratumid, clusterid, respid,
-                         RI01, RI03, RI11, RI12, HH02, HH04, psweight,
-                         all_of(dlist),dob_for_valid_dose_calculations,no_card, age_at_interview))
-  }
-
-  if(vcqi_object_exists("VCQI_LEVEL4_SET_VARLIST")){
-    dat <- select(dat, c(level1id, level2id, level3id, stratumid, clusterid, respid,
-                         RI01, RI03, RI11, RI12, HH02, HH04, psweight,
-                         all_of(VCQI_LEVEL4_SET_VARLIST),all_of(dlist),
-                         dob_for_valid_dose_calculations,no_card, age_at_interview))
-  }
+  dat <- select(dat, c(level1id, level2id, level3id, level3name, stratumid, clusterid, respid,
+                       RI01, RI03, RI11, RI12, HH02, HH04, psweight,
+                       all_of(VCQI_LEVEL4_SET_VARLIST),all_of(dlist),
+                       dob_for_valid_dose_calculations,no_card, age_at_interview))
 
 
   filename <- paste0(VCQI_OUTPUT_FOLDER,"/RI_COVG_02_",ANALYSIS_COUNTER,".rds")

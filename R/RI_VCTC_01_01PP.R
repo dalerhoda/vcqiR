@@ -2,19 +2,21 @@
 #'
 #' @param VCP VCQI current program name to be logged, default to be the function name
 #'
-#' @return A dataset (RI_VCTC_01_<ANALYSIS_COUNTER>)
+#' @return A dataset (RI_VCTC_01B_<ANALYSIS_COUNTER>)
 #'
 #' @import tidyselect
 #' @import dplyr
 #' @import stringr
 
-# RI_VCTC_01_01PP R version 1.01 - Biostat Global Consulting - 2022-11-03
+# RI_VCTC_01_01PP R version 1.02 - Biostat Global Consulting - 2022-12-21
 # *******************************************************************************
 # Change log
 
 # Date 			  Version 	Name			      What Changed
 # 2022-11-03  1.00      Mia Yu          Original R version
 # 2022-11-03  1.01      Mia Yu          Package version
+# 2022-12-21  1.02      Mia Yu          Update to include the horizontal line and
+#                                       note about fully/not vaccinated
 # *******************************************************************************
 
 RI_VCTC_01_01PP <- function(VCP = "RI_VCTC_01_01PP"){
@@ -22,9 +24,20 @@ RI_VCTC_01_01PP <- function(VCP = "RI_VCTC_01_01PP"){
 
   if (VCQI_CHECK_INSTEAD_OF_RUN != 1){
     #Verify RI_COVG_01 & _02 & RI_QUAL_01 ran
-    #NOTE: For now only verify RI_COVG_01 & _02 ran
     check_RI_COVG_01_03DV()
     check_RI_COVG_02_03DV()
+
+    if (TIMELY_FULLY_VXD_NOTE == 1){
+      check_RI_COVG_03_03DV()
+    }
+
+    if (TIMELY_NOT_VXD_NOTE == 1){
+      check_RI_COVG_04_03DV()
+    }
+
+    if (TIMELY_HBR_LINE_PLOT == 1){
+      check_RI_QUAL_01_03DV()
+    }
 
     dat <- vcqi_read(paste0(VCQI_OUTPUT_FOLDER, "/RI_COVG_02_", ANALYSIS_COUNTER,".rds"))
     dat <- haven::zap_label(dat)
@@ -38,7 +51,7 @@ RI_VCTC_01_01PP <- function(VCP = "RI_VCTC_01_01PP"){
     dat <- full_join(dat,dat2,by = "respid")
 
     if (TIMELY_HBR_LINE_PLOT == 1){
-      #NOTE: For now we don't implement this
+
       dat2 <- vcqi_read(paste0(VCQI_OUTPUT_FOLDER, "/RI_QUAL_01_", ANALYSIS_COUNTER,".rds"))
       dupname <- names(dat2)[which(names(dat2) %in% names(dat))]
       dupname <- dupname[which(!dupname %in% c("respid"))]
@@ -47,8 +60,8 @@ RI_VCTC_01_01PP <- function(VCP = "RI_VCTC_01_01PP"){
       dat <- full_join(dat,dat2,by = "respid")
     }
 
-    if (TIMELY_FULLY_VXD_LINE_PLOT == 1 | TIMELY_FULLY_VXD_NOTE == 1){
-      #NOTE: For now we don't implement this
+    if (TIMELY_FULLY_VXD_NOTE == 1){
+
       dat2 <- vcqi_read(paste0(VCQI_OUTPUT_FOLDER, "/RI_COVG_03_", ANALYSIS_COUNTER,".rds"))
       dupname <- names(dat2)[which(names(dat2) %in% names(dat))]
       dupname <- dupname[which(!dupname %in% c("respid"))]
@@ -57,8 +70,8 @@ RI_VCTC_01_01PP <- function(VCP = "RI_VCTC_01_01PP"){
       dat <- full_join(dat,dat2,by = "respid")
     }
 
-    if (TIMELY_NOT_VXD_LINE_PLOT == 1 | TIMELY_NOT_VXD_NOTE == 1){
-      #NOTE: For now we don't implement this
+    if (TIMELY_NOT_VXD_NOTE == 1){
+
       dat2 <- vcqi_read(paste0(VCQI_OUTPUT_FOLDER, "/RI_COVG_04_", ANALYSIS_COUNTER,".rds"))
       dupname <- names(dat2)[which(names(dat2) %in% names(dat))]
       dupname <- dupname[which(!dupname %in% c("respid"))]
@@ -87,10 +100,29 @@ RI_VCTC_01_01PP <- function(VCP = "RI_VCTC_01_01PP"){
       }
     } #end of doselist loop
 
-    #NOTE: TIMELY_HBR_LINE_VARIABLE, TIMELY_FULLY_VXD_LINE_VARIABLE, TIMELY_NOT_VXD_LINE_VARIABLE not included for now since we don't implement it
+    if (TIMELY_HBR_LINE_PLOT == 1){
+      dlist <- c(dlist, TIMELY_HBR_LINE_VARIABLE)
+    }
+
+    if (TIMELY_FULLY_VXD_NOTE == 0){
+      TIMELY_FULLY_VXD_NOTE_VARIABLE <- NULL
+    } else {
+      if (!vcqi_object_exists("TIMELY_FULLY_VXD_NOTE_VARIABLE")){
+        TIMELY_FULLY_VXD_NOTE_VARIABLE <- NULL
+      }
+    }
+
+    if (TIMELY_NOT_VXD_NOTE == 0){
+      TIMELY_NOT_VXD_NOTE_VARIABLE <- NULL
+    } else {
+      if (!vcqi_object_exists("TIMELY_NOT_VXD_NOTE_VARIABLE")){
+        TIMELY_NOT_VXD_NOTE_VARIABLE <- NULL
+      }
+    }
+
     dat <- dat %>% select(level1id,level2id,level3id,level1name,level2name,level3name,
                           stratumid,clusterid,respid,RI01,RI03,RI11,RI12,HH02,HH04,psweight,
-                          all_of(dlist))
+                          all_of(TIMELY_FULLY_VXD_NOTE_VARIABLE),all_of(TIMELY_NOT_VXD_NOTE_VARIABLE),all_of(dlist))
 
     saveRDS(dat, file = paste0(VCQI_OUTPUT_FOLDER, "/RI_VCTC_01_", ANALYSIS_COUNTER, ".rds"))
 

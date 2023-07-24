@@ -1,4 +1,4 @@
-#' Assign default values for global variables used in RI_VCTC_01
+#' Assign default and some customized values for global variables used in RI_VCTC_01
 #'
 #' @return Values in the global environment
 #'
@@ -6,23 +6,19 @@
 #' @export
 #'
 #' @examples
-#' VCTC_default_global_updated()
+#' VCTC_global_modified_legend_for_bcg_hepb0()
 
-# VCTC_default_global_updated R version 1.03 - Biostat Global Consulting - 2023-07-18
+# VCTC_global_modified_legend_for_bcg_hepb0 R version 1.00 - Biostat Global Consulting - 2023-07-18
 # *******************************************************************************
 # Change log
 
 # Date 			  Version 	Name			      What Changed
-# 2022-11-08  1.00      Mia Yu          Original R version
-# 2022-11-14  1.01      Mia Yu          Package version
-# 2023-01-08  1.02      Mia Yu          Added new globals
-# 2023-07-18  1.03      Mia Yu          Added CI to default, change the way the note
-#                                       is generated to match Stata
+# 2023-07-18  1.00      Mia Yu          Original R version
 # *******************************************************************************
 
-# Based on default globals_for_timeliness_plots in Stata VCQI
+# Based on globals_for_timeliness_plots - modified_legend_for_bcg_and_hepb0 in Stata VCQI
 
-VCTC_default_global_updated <- function(){
+VCTC_global_modified_legend_for_bcg_hepb0 <- function(){
   # DT means 'default tiles'
   # CD means 'customized doses'
 
@@ -70,9 +66,9 @@ VCTC_default_global_updated <- function(){
   assign("TIMELY_YLABEL_SIZE", 10, envir = .GlobalEnv)
   assign("TIMELY_YLABEL_COLOR", "black", envir = .GlobalEnv)
 
-  # Because we are spacing the bars about every y=10 units instead of the
-  # default Y=1, specify a bar width that is 2/3 of that.
-  vcqi_global(TIMELY_BARWIDTH,6.7)
+  # Because we are spacing the bars about every y=10 units instead of the default
+  # y=1 units apart, specify a bar width that is 10X the default.
+  vcqi_global(TIMELY_BARWIDTH, 6.7)
 
   assign("TIMELY_CI_LCOLOR", "grey8", envir = .GlobalEnv)
   #This controls the width of the error bar; recommended range is 3-6
@@ -82,9 +78,94 @@ VCTC_default_global_updated <- function(){
   assign("TIMELY_PLOT_WIDTH",15, envir = .GlobalEnv)
   assign("TIMELY_PLOT_HEIGHT",8, envir = .GlobalEnv)
 
-  #The order of the legend
-  #With default setting only:
-  assign("TIMELY_LEGEND_ORDER", c("DT_1","DT_2","DT_3","DT_4","DT_5"), envir = .GlobalEnv)
+  # *********************************************
+  #
+  # Specify parameters for customized doses
+  # Note that some of these parameters over-ride the defaults set above
+  #
+  #
+  # Specify customized tile and legend definitions.
+  #
+  # These serve as examples.  Users may update the custom definitions either
+  # in this .R file or in their control program.
+
+  # Define customized tiles for BCG & HEPB0
+  assign("TIMELY_CD_LIST", c("bcg", "hepb0"), envir = .GlobalEnv)
+  # customized definitions for BCG & HEPB0
+  # Note that the dose names appear in all of the customized parameters below
+  assign("TIMELY_CD_BCG_NTILES", 5, envir = .GlobalEnv) # BCG still has 5 tiles
+  # First tile is for given <= target age (0 days) plus 5 days
+  assign("TIMELY_CD_BCG_UB_1", 5, envir = .GlobalEnv)
+  # Second is for given < 2 months late
+  assign("TIMELY_CD_BCG_UB_2", 56, envir = .GlobalEnv)
+  # Third is for given 2+ months late but within a year
+  assign("TIMELY_CD_BCG_UB_3", 365, envir = .GlobalEnv)
+  # Fourth is for doses given after age 1 year
+  assign("TIMELY_CD_BCG_UB_4", 100000, envir = .GlobalEnv)
+
+  #use a dark green for this special BCG timely category
+  assign("TIMELY_CD_BCG_COLOR_1", "#336633", envir = .GlobalEnv)
+  assign("TIMELY_CD_BCG_COLOR_2", "#FF99FF", envir = .GlobalEnv)
+  assign("TIMELY_CD_BCG_COLOR_3", "#FF5CFF", envir = .GlobalEnv)
+  #very late BCG shows in a BLACK bar
+  assign("TIMELY_CD_BCG_COLOR_4", "black", envir = .GlobalEnv)
+  assign("TIMELY_CD_BCG_COLOR_5", "#FFEBFF", envir = .GlobalEnv)
+
+  assign("TIMELY_CD_BCG_LCOLOR_1", "lightgrey", envir = .GlobalEnv)
+  assign("TIMELY_CD_BCG_LCOLOR_2", "lightgrey", envir = .GlobalEnv)
+  assign("TIMELY_CD_BCG_LCOLOR_3", "lightgrey", envir = .GlobalEnv)
+  assign("TIMELY_CD_BCG_LCOLOR_4", "lightgrey", envir = .GlobalEnv)
+  assign("TIMELY_CD_BCG_LCOLOR_5", "lightgrey", envir = .GlobalEnv)
+
+  assign("TIMELY_CD_BCG_LABEL_1", "BCG by day 5", envir = .GlobalEnv)
+  assign("TIMELY_CD_BCG_LABEL_2", "< 2 Months Late", envir = .GlobalEnv)
+  assign("TIMELY_CD_BCG_LABEL_3", "2+ Months Late", envir = .GlobalEnv)
+  assign("TIMELY_CD_BCG_LABEL_4", "After 1 Year (BCG only)", envir =
+           .GlobalEnv)
+
+  assign("TIMELY_CD_BCG_LABEL_5", "Timing Unknown", envir = .GlobalEnv)
+  assign("TIMELY_CD_BCG_LEGEND_LABEL_1", "BCG by Day 5", envir = .GlobalEnv)
+  assign("TIMELY_CD_BCG_LEGEND_LABEL_2", "< 2 Months Late", envir = .GlobalEnv)
+  assign("TIMELY_CD_BCG_LEGEND_LABEL_3", "2+ Months Late", envir = .GlobalEnv)
+  assign("TIMELY_CD_BCG_LEGEND_LABEL_4", "BCG After 1 Year", envir =
+           .GlobalEnv)
+  assign("TIMELY_CD_BCG_LEGEND_LABEL_5", "Timing Unknown", envir = .GlobalEnv)
+
+  # ********************************************************************************
+  # Parameters for HEPB0 tiles
+  assign("TIMELY_CD_HEPB0_NTILES", 4, envir = .GlobalEnv)
+  # HEPB0 is timely if given on day 0 or 1
+  assign("TIMELY_CD_HEPB0_UB_1", 2, envir = .GlobalEnv)
+  # < 2 months late
+  assign("TIMELY_CD_HEPB0_UB_2", 56, envir = .GlobalEnv)
+  # 2+ months late
+  assign("TIMELY_CD_HEPB0_UB_3", 1000, envir = .GlobalEnv)
+  #use yet another green for HEPB0 timely
+  assign("TIMELY_CD_HEPB0_COLOR_1", "#BCDDBC", envir = .GlobalEnv)
+  assign("TIMELY_CD_HEPB0_COLOR_2", "#FF99FF", envir = .GlobalEnv)
+  assign("TIMELY_CD_HEPB0_COLOR_3", "#FF5CFF", envir = .GlobalEnv)
+  assign("TIMELY_CD_HEPB0_COLOR_4", "#FFEBFF", envir = .GlobalEnv)
+
+  assign("TIMELY_CD_HEPB0_LCOLOR_1", "lightgrey", envir = .GlobalEnv)
+  assign("TIMELY_CD_HEPB0_LCOLOR_2", "lightgrey", envir = .GlobalEnv)
+  assign("TIMELY_CD_HEPB0_LCOLOR_3", "lightgrey", envir = .GlobalEnv)
+  assign("TIMELY_CD_HEPB0_LCOLOR_4", "lightgrey", envir = .GlobalEnv)
+
+  assign("TIMELY_CD_HEPB0_LABEL_1", "Timely (within 1 day)", envir = .GlobalEnv)
+  assign("TIMELY_CD_HEPB0_LABEL_2", "< 2 Months Late", envir = .GlobalEnv)
+  assign("TIMELY_CD_HEPB0_LABEL_3", "2+ Months Late", envir = .GlobalEnv)
+  assign("TIMELY_CD_HEPB0_LABEL_4", "Timing Unknown", envir = .GlobalEnv)
+
+  assign("TIMELY_CD_HEPB0_LEGEND_LABEL_1", "HEPB0 by Day 1", envir = .GlobalEnv)
+  assign("TIMELY_CD_HEPB0_LEGEND_LABEL_2", "< 2 Months Late", envir =
+           .GlobalEnv)
+  assign("TIMELY_CD_HEPB0_LEGEND_LABEL_3", "2+ Months Late", envir = .GlobalEnv)
+  assign("TIMELY_CD_HEPB0_LEGEND_LABEL_4", "Timing Unknown", envir = .GlobalEnv)
+
+  #Legend order with customized doses:
+  assign("TIMELY_LEGEND_ORDER",
+         c("DT_1","CD_BCG_1","CD_HEPB0_1","DT_2","DT_3","DT_4","DT_5","CD_BCG_4"),
+         envir = .GlobalEnv)
 
   # *********************************************
   #
@@ -161,7 +242,6 @@ VCTC_default_global_updated <- function(){
     assign("TIMELY_HBR_LINE_LABEL", "<-- Showed HBR or FBR", envir = .GlobalEnv)
     assign("TIMELY_ABBREV_CAPTION_LINE1", "Abbreviations: HBR- home-based record; FBR- facility-based record", envir = .GlobalEnv)
   }
-
 
   # *********************************************
   # Summarize the % fully vxd and not vxd in a VCTC footnote
