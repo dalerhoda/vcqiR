@@ -15,6 +15,7 @@
 # 2022-09-20  1.00      Mia Yu          Original R version
 # 2022-10-11  1.01      Mia Yu          Package version
 # 2022-10-24  1.02      Mia Yu          Add vcqi_halt_immediately
+# 2023-07-18  1.03      Caitlin Clary   Pass age_at_interview to RI_QUAL_07B_#
 # *******************************************************************************
 
 RI_QUAL_07B_01PP <- function(VCP = "RI_QUAL_07B_01PP"){
@@ -44,7 +45,7 @@ RI_QUAL_07B_01PP <- function(VCP = "RI_QUAL_07B_01PP"){
 
   dat2 <- vcqi_read(paste0(VCQI_OUTPUT_FOLDER, "/RI_with_ids.rds"))
   dat2 <- dat2 %>% select(
-    respid, clusterid, stratumid, psweight, level1id, level1name, level2id,
+    respid, age_at_interview, clusterid, stratumid, psweight, level1id, level1name, level2id,
     level2name, level3id, level3name, all_of(VCQI_LEVEL4_SET_VARLIST))
 
   # Merge back on variables needed in the _GO program

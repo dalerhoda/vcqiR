@@ -12,8 +12,9 @@
 
 # Date 			  Version 	Name			      What Changed
 # 2022-09-29  1.00      Caitlin Clary   Original R version
-# 2022-10-11  1.01      Mia Yu          Add parts that remove temprary global
-# 2022-10-11  1.02      Mia YU          Pakcage version
+# 2022-10-11  1.01      Mia Yu          Add parts that remove temporary global
+# 2022-10-11  1.02      Mia YU          Package version
+# 2023-07-17  1.03      Caitlin Clary
 # ******************************************************************************
 
 RI_QUAL_07B_05TOST <- function(VCP = "RI_QUAL_07B_05TOST"){
@@ -46,7 +47,7 @@ RI_QUAL_07B_05TOST <- function(VCP = "RI_QUAL_07B_05TOST"){
       tablename = tb,
       dbfilename = paste0(indicator, "_", ac, "_", dn, "_database.rds"),
       variable = "estimate", replacevar = NA, noannotate = TRUE,
-      label = paste0("Would have valid ", str_to_upper(dn), " if no MOVs (%)")
+      label = paste0("Would have valid ", str_to_upper(dn), " if no MOSVs and no early doses (%)")
     )
 
     make_table_column(
@@ -69,7 +70,7 @@ RI_QUAL_07B_05TOST <- function(VCP = "RI_QUAL_07B_05TOST"){
   export_table_to_excel(indicator = indicator, brief = FALSE)
 
   rm(list = c("TO_RI_QUAL_07B", "TO_RI_QUAL_07B_columnlabel",
-               "TO_RI_QUAL_07B_formatnum","TO_RI_QUAL_07B_colformat"), envir = .GlobalEnv) %>% suppressWarnings()
+               "TO_RI_QUAL_07B_formatnum", "TO_RI_QUAL_07B_colformat"), envir = .GlobalEnv) %>% suppressWarnings()
   rm(TO_RI_QUAL_07B_CN, envir = .GlobalEnv) %>% suppressWarnings()
 
   vcqi_log_comment(VCP, 5, "Flow", "Exiting")
