@@ -9,7 +9,7 @@
 #' @import dplyr
 #' @import haven
 
-# RI_QUAL_09_04GO R version 1.03 - Biostat Global Consulting - 2022-10-18
+# RI_QUAL_09_04GO R version 1.04 - Biostat Global Consulting - 2023-07-21
 # *******************************************************************************
 # Change log
 
@@ -18,6 +18,7 @@
 # 2022-10-07  1.01      Mia Yu          Fix label dataset
 # 2022-10-13  1.02      Mia Yu          Package version
 # 2022-10-18  1.03      Mia Yu          Add variable labels
+# 2023-07-21  1.04      Caitlin Clary   Update labels (MOV -> MOSV)
 # *******************************************************************************
 
 RI_QUAL_09_04GO <- function(VCP = "RI_QUAL_09_04GO"){
@@ -34,10 +35,11 @@ RI_QUAL_09_04GO <- function(VCP = "RI_QUAL_09_04GO"){
 
     go <- NULL
 
-    filename <- paste0("RI_QUAL_09_",ANALYSIS_COUNTER,"_",MOV_OUTPUT_DOSE_LIST[d],"_database.rds")
+    filename <- paste0("RI_QUAL_09_", ANALYSIS_COUNTER, "_",
+                       MOV_OUTPUT_DOSE_LIST[d], "_database.rds")
 
     if (!vcqi_object_exists("VCQI_DATABASES")){VCQI_DATABASES <- NULL}
-    vcqi_global(VCQI_DATABASES,c(VCQI_DATABASES,filename))
+    vcqi_global(VCQI_DATABASES, c(VCQI_DATABASES, filename))
 
     l <- 4
     for (j in 1:nrow(level4_layout)){
@@ -50,41 +52,65 @@ RI_QUAL_09_04GO <- function(VCP = "RI_QUAL_09_04GO"){
         # Count respondents meeting the level4 condition(s)
         subdat <- subset(dat, eval(rlang::parse_expr(condition)))
 
-        hadmov <- get(paste0("child_had_mov_",MOV_OUTPUT_DOSE_LIST[d],"_",vc),subdat)
+        hadmov <- get(paste0("child_had_mov_", MOV_OUTPUT_DOSE_LIST[d], "_", vc), subdat)
         n1 = length(hadmov[which(!is.na(hadmov))])
         n2 = length(hadmov[which(hadmov %in% 1)])
 
-        uncormov <- get(paste0("child_had_uncor_mov_",MOV_OUTPUT_DOSE_LIST[d],"_",vc),subdat)
+        uncormov <- get(paste0("child_had_uncor_mov_", MOV_OUTPUT_DOSE_LIST[d], "_", vc), subdat)
         n3 = length(uncormov[which(uncormov %in% 1)])
 
-        cormov <- get(paste0("child_had_cor_mov_",MOV_OUTPUT_DOSE_LIST[d],"_",vc),subdat)
+        cormov <- get(paste0("child_had_cor_mov_", MOV_OUTPUT_DOSE_LIST[d], "_", vc), subdat)
         n4 = length(cormov[which(cormov %in% 1)])
 
         gotemp <- data.frame(
-          level = l, level4id = j, level4name = l4name, outcome = paste0("Percent of respondents with MOV for ", str_to_upper(MOV_OUTPUT_DOSE_LIST[d])),
-          dose = str_to_upper(MOV_OUTPUT_DOSE_LIST[d]), n_eligible = n1, n_mov = n2, n_uncor_mov = n3, n_cor_mov = n4
+          level = l,
+          level4id = j,
+          level4name = l4name,
+          outcome = paste0("Percent of respondents with MOSV for ",
+                           str_to_upper(MOV_OUTPUT_DOSE_LIST[d])),
+          dose = str_to_upper(MOV_OUTPUT_DOSE_LIST[d]),
+          n_eligible = n1,
+          n_mov = n2,
+          n_uncor_mov = n3,
+          n_cor_mov = n4
         )
-        go <- rbind(go,gotemp)
+        go <- rbind(go, gotemp)
 
-      } #end of data_row
+      } # end of data_row
 
       if (rowtype == "BLANK_ROW"){
         gotemp <- data.frame(
-          level = l, level4id = j, level4name = "BLANK_ROW", outcome = paste0("Percent of respondents with MOV for ", str_to_upper(MOV_OUTPUT_DOSE_LIST[d])),
-          dose = str_to_upper(MOV_OUTPUT_DOSE_LIST[d]), n_eligible = NA, n_mov = NA, n_uncor_mov = NA, n_cor_mov = NA
+          level = l,
+          level4id = j,
+          level4name = "BLANK_ROW",
+          outcome = paste0("Percent of respondents with MOSV for ",
+                           str_to_upper(MOV_OUTPUT_DOSE_LIST[d])),
+          dose = str_to_upper(MOV_OUTPUT_DOSE_LIST[d]),
+          n_eligible = NA,
+          n_mov = NA,
+          n_uncor_mov = NA,
+          n_cor_mov = NA
         )
         go <- rbind(go,gotemp)
-      } #end of blank_row
+      } # end of blank_row
 
       if (rowtype == "LABEL_ONLY"){
         gotemp <- data.frame(
-          level = l, level4id = j, level4name = l4name, outcome = paste0("Percent of respondents with MOV for ", str_to_upper(MOV_OUTPUT_DOSE_LIST[d])),
-          dose = str_to_upper(MOV_OUTPUT_DOSE_LIST[d]), n_eligible = NA, n_mov = NA, n_uncor_mov = NA, n_cor_mov = NA
+          level = l,
+          level4id = j,
+          level4name = l4name,
+          outcome = paste0("Percent of respondents with MOSV for ",
+                           str_to_upper(MOV_OUTPUT_DOSE_LIST[d])),
+          dose = str_to_upper(MOV_OUTPUT_DOSE_LIST[d]),
+          n_eligible = NA,
+          n_mov = NA,
+          n_uncor_mov = NA,
+          n_cor_mov = NA
         )
         go <- rbind(go,gotemp)
-      } #end of label_only
+      } # end of label_only
 
-    } #end of j loop
+    } # end of j loop
 
     saveRDS(go, file = paste0(VCQI_OUTPUT_FOLDER,"/",filename))
 
@@ -106,11 +132,12 @@ RI_QUAL_09_04GO <- function(VCP = "RI_QUAL_09_04GO"){
     go$name <- haven::labelled(go$name, label = "Stratum name for table output") %>% suppressWarnings()
     go$outcome <- haven::labelled(go$outcome, label = "Outcome") %>% suppressWarnings()
     go$dose <- haven::labelled(go$dose, label = "Dose") %>% suppressWarnings()
-    go$n_eligible <- haven::labelled(go$n_eligible,
-                                     label = "Number of respondents with vx dates when age-eligible for the dose") %>% suppressWarnings()
-    go$n_mov <- haven::labelled(go$n_mov, label = "Number of missed opportunities (MOVs)") %>% suppressWarnings()
-    go$n_uncor_mov <- haven::labelled(go$n_uncor_mov, label = "Number of uncorrected MOVs") %>% suppressWarnings()
-    go$n_cor_mov <- haven::labelled(go$n_cor_mov, label = "Number of corrected MOVs") %>% suppressWarnings()
+    go$n_eligible <- haven::labelled(
+      go$n_eligible,
+      label = "Number of respondents with vx dates when age-eligible for the dose") %>% suppressWarnings()
+    go$n_mov <- haven::labelled(go$n_mov, label = "Number of missed opportunities (MOSVs)") %>% suppressWarnings()
+    go$n_uncor_mov <- haven::labelled(go$n_uncor_mov, label = "Number of uncorrected MOSVs") %>% suppressWarnings()
+    go$n_cor_mov <- haven::labelled(go$n_cor_mov, label = "Number of corrected MOSVs") %>% suppressWarnings()
 
     saveRDS(go, file = paste0(VCQI_OUTPUT_FOLDER,"/",filename))
 
@@ -121,7 +148,9 @@ RI_QUAL_09_04GO <- function(VCP = "RI_QUAL_09_04GO"){
   go <- NULL
 
   if (!vcqi_object_exists("VCQI_DATABASES")){VCQI_DATABASES <- NULL}
-  vcqi_global(VCQI_DATABASES,c(VCQI_DATABASES,paste0("RI_QUAL_09_",ANALYSIS_COUNTER,"_anydose_database.rds")))
+  vcqi_global(
+    VCQI_DATABASES,
+    c(VCQI_DATABASES, paste0("RI_QUAL_09_", ANALYSIS_COUNTER, "_anydose_database.rds")))
 
   l <- 4
   for (j in 1:nrow(level4_layout)){
@@ -145,7 +174,7 @@ RI_QUAL_09_04GO <- function(VCP = "RI_QUAL_09_04GO"){
       n4 = length(cormov[which(cormov %in% 1)])
 
       gotemp <- data.frame(
-        level = l, level4id = j, level4name = l4name, outcome = "Percent of respondents with MOV for any dose",
+        level = l, level4id = j, level4name = l4name, outcome = "Percent of respondents with MOSV for any dose",
         dose = "ALLDOSES", n_eligible = n1, n_mov = n2, n_uncor_mov = n3, n_cor_mov = n4
       )
       go <- rbind(go,gotemp)
@@ -154,7 +183,7 @@ RI_QUAL_09_04GO <- function(VCP = "RI_QUAL_09_04GO"){
 
     if (rowtype == "BLANK_ROW"){
       gotemp <- data.frame(
-        level = l, level4id = j, level4name = "BLANK_ROW", outcome = "Percent of respondents with MOV for any dose",
+        level = l, level4id = j, level4name = "BLANK_ROW", outcome = "Percent of respondents with MOSV for any dose",
         dose = "ALLDOSES", n_eligible = NA, n_mov = NA, n_uncor_mov = NA, n_cor_mov = NA
       )
       go <- rbind(go,gotemp)
@@ -162,7 +191,7 @@ RI_QUAL_09_04GO <- function(VCP = "RI_QUAL_09_04GO"){
 
     if (rowtype == "LABEL_ONLY"){
       gotemp <- data.frame(
-        level = l, level4id = j, level4name = l4name, outcome = "Percent of respondents with MOV for any dose",
+        level = l, level4id = j, level4name = l4name, outcome = "Percent of respondents with MOSV for any dose",
         dose = "ALLDOSES", n_eligible = NA, n_mov = NA, n_uncor_mov = NA, n_cor_mov = NA
       )
       go <- rbind(go,gotemp)
@@ -192,11 +221,11 @@ RI_QUAL_09_04GO <- function(VCP = "RI_QUAL_09_04GO"){
   go$dose <- haven::labelled(go$dose, label = "Dose") %>% suppressWarnings()
   go$n_eligible <- haven::labelled(go$n_eligible,
                                    label = "Number of respondents with vx dates when age-eligible for the dose") %>% suppressWarnings()
-  go$n_mov <- haven::labelled(go$n_mov, label = "Number of missed opportunities (MOVs)") %>% suppressWarnings()
-  go$n_uncor_mov <- haven::labelled(go$n_uncor_mov, label = "Number of uncorrected MOVs") %>% suppressWarnings()
-  go$n_cor_mov <- haven::labelled(go$n_cor_mov, label = "Number of corrected MOVs") %>% suppressWarnings()
+  go$n_mov <- haven::labelled(go$n_mov, label = "Number of missed opportunities (MOSVs)") %>% suppressWarnings()
+  go$n_uncor_mov <- haven::labelled(go$n_uncor_mov, label = "Number of uncorrected MOSVs") %>% suppressWarnings()
+  go$n_cor_mov <- haven::labelled(go$n_cor_mov, label = "Number of corrected MOSVs") %>% suppressWarnings()
 
-  saveRDS(go, file = paste0(VCQI_OUTPUT_FOLDER,"/RI_QUAL_09_",ANALYSIS_COUNTER,"_anydose_database.rds"))
+  saveRDS(go, file = paste0(VCQI_OUTPUT_FOLDER,"/RI_QUAL_09_", ANALYSIS_COUNTER, "_anydose_database.rds"))
 
   vcqi_log_comment(VCP, 5, "Flow", "Exiting")
 

@@ -13,6 +13,8 @@
 # Date 			  Version 	Name			      What Changed
 # 2022-09-28  1.00      Caitlin Clary   Original R version
 # 2022-10-11  1.01      Mia Yu          Package version
+# 2023-07-17  1.02      Caitlin Clary   Update label from "if no MOVs" to "if no
+#                                       MOSVs and no early doses"
 # ******************************************************************************
 
 RI_QUAL_07B_04GO <- function(VCP = "RI_QUAL_07B_04GO"){
@@ -23,7 +25,7 @@ RI_QUAL_07B_04GO <- function(VCP = "RI_QUAL_07B_04GO"){
     make_svyp_output_database(
       variable = paste0("got_hypo_", MOV_OUTPUT_DOSE_LIST[d]),
       estlabel = paste0("Would have valid ", stringr::str_to_upper(MOV_OUTPUT_DOSE_LIST[d]),
-                        " if no MOVs (%)"),
+                        " if no MOSVs and no early doses (%)"),
       vid = MOV_OUTPUT_DOSE_LIST[d],
       measureid = "RI_QUAL_07B")
   }

@@ -10,7 +10,7 @@
 #' @rawNamespace import(rlang, except = c(local_options,with_options))
 #' @import haven
 
-# RI_QUAL_07B_03DV R version 1.03 - Biostat Global Consulting - 2022-10-18
+# RI_QUAL_07B_03DV R version 1.04 - Biostat Global Consulting - 2023-07-14
 # ******************************************************************************
 # Change log
 
@@ -21,6 +21,15 @@
 #                                       "no non-missing" warnings
 # 2022-10-11  1.02      Mia Yu          Package version
 # 2022-10-18  1.03      Mia Yu          Add variable labels
+# 2023-07-14  1.04      Caitlin Clary   For later doses in a multi-dose series
+#                                       it's only necessary that the age be >=
+#                                       min age for dose 1 and the interval be
+#                                       >= the minimum interval. Corrected
+#                                       earlier mistake that age be >= the
+#                                       minimum for the later dose.
+# 2023-07-17  1.05      Caitlin Clary   Outcome missing if the child was not old
+#                                       enough for the dose (to correspond with
+#                                       RI_COVG_02 denominator)
 # ******************************************************************************
 
 RI_QUAL_07B_03DV <- function(VCP = "RI_QUAL_07B_03DV"){
@@ -46,7 +55,7 @@ RI_QUAL_07B_03DV <- function(VCP = "RI_QUAL_07B_03DV"){
   # NOTE: RI_QUAL_07B_03DV loops over all doses...update if needed
 
   # Single doses
-  if(vcqi_object_exists("RI_SINGLE_DOSE_LIST")){
+  if (vcqi_object_exists("RI_SINGLE_DOSE_LIST")){
     for(d in seq_along(RI_SINGLE_DOSE_LIST)){
 
       dn <- RI_SINGLE_DOSE_LIST[d] %>% stringr::str_to_lower()
@@ -68,7 +77,9 @@ RI_QUAL_07B_03DV <- function(VCP = "RI_QUAL_07B_03DV"){
         mutate(
           !!got_hypo_sum := ifelse(!!got_hypo_sum > 1, 0, !!got_hypo_sum),
           !!got_hypo_sum := ifelse(psweight %in% 0 | is.na(psweight), NA, !!got_hypo_sum),
-          !!got_hypo := !!got_hypo_sum
+          !!got_hypo := !!got_hypo_sum,
+          # 2023-07-17 update
+          !!got_hypo := ifelse(age_at_interview < minage, NA, !!got_hypo)
         ) %>% select(-!!got_hypo_sum)
 
     } # end d loop
@@ -82,7 +93,7 @@ RI_QUAL_07B_03DV <- function(VCP = "RI_QUAL_07B_03DV"){
     )
   }) %>% do.call(rbind, .)
 
-  if(!is.null(multi)){
+  if (!is.null(multi)){
     multi <- lapply(seq_along(multi$doselist), function(x) data.frame(
       dose = str_to_lower(get(multi$doselist[x])),
       doselist = multi$doselist[x]
@@ -96,6 +107,12 @@ RI_QUAL_07B_03DV <- function(VCP = "RI_QUAL_07B_03DV"){
 
       for(i in seq_along(di)){
 
+        # Minimum age for first dose in series. For later doses in a series,
+        # it's only necessary that (a) the age be >= the minimum for *Dose 1* &
+        # (b) the interval be >= the minimum interval.
+        minage_dose1 <- get(paste0(dn, di[1], "_min_age_days"), envir = .GlobalEnv)
+
+        # Minimum age for current dose
         minage <- get(paste0(dn, di[i], "_min_age_days"), envir = .GlobalEnv)
 
         got_hypo <- rlang::sym(paste0("got_hypo_", dn, di[i]))
@@ -103,12 +120,13 @@ RI_QUAL_07B_03DV <- function(VCP = "RI_QUAL_07B_03DV"){
         num_days_temp <- rlang::sym(paste0("num_days_since_", dn, di[i], "_temp"))
         num_days <- rlang::sym(paste0("num_days_since_", dn, di[i]))
 
-        if(i == 1){
+        if (i == 1){
           dat <- dat %>%
             group_by(respid) %>%
             mutate(
               !!got_hypo := ifelse(
-                !is.na(age_at_visit) & psweight > 0 & !is.na(psweight) & age_at_visit >= minage,
+                !is.na(age_at_visit) & psweight > 0 &
+                  !is.na(psweight) & age_at_visit >= minage_dose1,
                 1, 0),
               !!got_hypo_sum := cumsum(!!got_hypo)
             ) %>%
@@ -129,7 +147,9 @@ RI_QUAL_07B_03DV <- function(VCP = "RI_QUAL_07B_03DV"){
               !!got_hypo_sum := ifelse(!!got_hypo_sum > 1, 0, !!got_hypo_sum),
               # Make sure sum is missing when weight is 0 or missing
               !!got_hypo_sum := ifelse(psweight %in% 0 | is.na(psweight), NA, !!got_hypo_sum),
-              !!got_hypo := !!got_hypo_sum
+              !!got_hypo := !!got_hypo_sum,
+              # 2023-07-17 update
+              !!got_hypo := ifelse(age_at_interview < minage, NA, !!got_hypo)
             ) %>% select(-!!got_hypo_sum, -!!num_days_temp)
         } else {
 
@@ -141,7 +161,7 @@ RI_QUAL_07B_03DV <- function(VCP = "RI_QUAL_07B_03DV"){
             mutate(
               !!got_hypo := ifelse(
                 !is.na(age_at_visit) & psweight > 0 & !is.na(psweight) &
-                  age_at_visit >= minage & !!num_days_since_prev >= minint,
+                  age_at_visit >= minage_dose1 & !!num_days_since_prev >= minint,
                 1, 0),
               !!got_hypo_sum := cumsum(!!got_hypo)
             ) %>%
