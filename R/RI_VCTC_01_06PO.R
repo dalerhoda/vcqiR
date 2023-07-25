@@ -11,7 +11,7 @@
 #' @import survey
 #' @import tidyselect
 
-# RI_VCTC_01_06PO R version 1.02 - Biostat Global Consulting - 2023-07-21
+# RI_VCTC_01_06PO R version 1.03 - Biostat Global Consulting - 2023-07-21
 # *******************************************************************************
 # Change log
 
@@ -19,7 +19,7 @@
 # 2022-11-08  1.00      Mia Yu          Original R version
 # 2022-11-11  1.01      Mia Yu          Package version
 # 2022-12-22  1.02      Mia Yu          Add parts for previously skipped objects
-# 2023-07-21  1.03      Mia Yu          Put abbreviations on two lines and match Stata
+# 2023-07-21  1.03      Mia Yu          Put abbreviations on two lines
 # *******************************************************************************
 
 RI_VCTC_01_06PO <- function(VCP = "RI_VCTC_01_06PO"){
