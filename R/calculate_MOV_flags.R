@@ -14,7 +14,7 @@
 #' @examples
 #' calculate_MOV_flags()
 
-# calculate_MOV_flags R version 1.05 - Biostat Global Consulting - 2022-12-16
+# calculate_MOV_flags R version 1.06 - Biostat Global Consulting - 2023-07-14
 # ******************************************************************************
 # Change log
 
@@ -28,6 +28,9 @@
 #                                       to avoid pivot type compatibility error
 # 2022-12-16  1.05      Caitlin Clary   Ensure variables are numeric before
 #                                       labeling (all-NA vars default to logical)
+# 2023-07-14  1.06      Caitlin Clary   When RI_RECORDS_SOUGHT_FOR_ALL = 1, no
+#                                       longer mix and match card and register
+#                                       within a single child's record
 # ******************************************************************************
 
 calculate_MOV_flags <- function(VCP = "calculate_MOV_flags"){
@@ -60,9 +63,10 @@ calculate_MOV_flags <- function(VCP = "calculate_MOV_flags"){
 
       # If RI_RECORDS_NOT_SOUGHT, we just use data from the cards.
 
-      # If RI_RECORDS_SOUGHT_IF_NO_CARD then for MOV purposes we copy register
-      # dates to the card fields and calculate everything with the card variables.
+      # Otherwise, for MOV purposes we copy register dates to the card fields
+      # and calculate everything with the card variables.
 
+      # The following paragraph is no longer true as of 2023-07-14:
       # If RI_RECORDS_SOUGHT_FOR_ALL then when there is no card, copy the register
       # record to the card fields, and when there is both a card and an HC record,
       # then fill missing dates on the card from register for:
@@ -93,7 +97,7 @@ calculate_MOV_flags <- function(VCP = "calculate_MOV_flags"){
         # No action required
       }
 
-      if (RI_RECORDS_SOUGHT_IF_NO_CARD == 1){
+      if (RI_RECORDS_NOT_SOUGHT == 0){
         for (d in seq_along(RI_DOSE_LIST)){
 
           eval(parse_expr(paste0("dat <- mutate(dat,", RI_DOSE_LIST[d],
@@ -107,115 +111,118 @@ calculate_MOV_flags <- function(VCP = "calculate_MOV_flags"){
                                  RI_DOSE_LIST[d],"_card_tick))")))
 
         } # end of dose loop
-      } # end of RI_RECORDS_SOUGHT_IF_NO_CARD
+      } # end of if (RI_RECORDS_NOT_SOUGHT == 0)
 
-      if (RI_RECORDS_SOUGHT_FOR_ALL == 1){
+      # Below section removed 2023-07-14 - we no longer mix and match card and
+      # register dates within a single child's record
 
-        if(vcqi_object_exists("RI_SINGLE_DOSE_LIST")){
-          single_dose <- str_to_lower(RI_SINGLE_DOSE_LIST)
-
-          for (d in seq_along(single_dose)){
-
-            eval(parse_expr(paste0("dat <- mutate(dat,", single_dose[d],
-                                   "_card_date = if_else(no_card %in% 1,",
-                                   single_dose[d], "_register_date,",
-                                   single_dose[d],"_card_date))")))
-
-            eval(parse_expr(paste0("dat <- mutate(dat,", single_dose[d],
-                                   "_card_tick = if_else(no_card %in% 1,",
-                                   single_dose[d], "_register_tick,",
-                                   single_dose[d], "_card_tick))")))
-
-            if ("moveit" %in% names(dat)){dat <- select(dat, -moveit)}
-
-            # Use register data if there's a date on register and not card or
-            # if there are no dates, but there's a tick on register and not card
-            carddate <- rlang::sym(paste0(single_dose[d], "_card_date"))
-            regdate <- rlang::sym(paste0(single_dose[d], "_register_date"))
-            cardtick <- rlang::sym(paste0(single_dose[d], "_card_tick"))
-            regtick <- rlang::sym(paste0(single_dose[d], "_register_tick"))
-
-            dat <- dat %>%
-              mutate(
-                moveit = if_else(
-                  (is.na(!!carddate) & !is.na(!!regdate)) |
-                    (is.na(!!carddate) & is.na(!!regdate) &
-                       !is.na(!!regtick) & !(!!cardtick %in% 1)),
-                  1, 0))
-
-            eval(parse_expr(paste0("dat <- mutate(dat,", single_dose[d],
-                                   "_card_date = if_else(moveit %in% 1,",
-                                   single_dose[d], "_register_date,",
-                                   single_dose[d], "_card_date))")))
-
-            eval(parse_expr(paste0("dat <- mutate(dat,", single_dose[d],
-                                   "_card_tick = if_else(moveit %in% 1,",
-                                   single_dose[d], "_register_tick,",
-                                   single_dose[d],"_card_tick))")))
-
-            dat <- select(dat, -moveit)
-
-          } # end of single dose loop
-        }
-
-        #rm(carddate, regdate, cardtick, regtick) %>% suppressWarnings()
-
-        # Multi-dose: use register data where appropriate
-
-        if(!is.null(multi)){
-          for(d in 1:nrow(multi)){
-
-            dn <- multi$dose[d]
-            di <- seq(1, multi$dosecount[d], by = 1)
-
-            # Use register data if there are more dates in the register for the
-            # series than appear on the card
-
-            # Grab register variables:
-            reg_vars <- dat %>% select(c(paste0(dn, di, "_register_date"))) %>%
-              mutate(across(everything(), ~ if_else(!is.na(.x), 1, 0))) %>%
-              mutate(
-                temp_register_dates = rowSums(.[, 1:length(.)], na.rm = TRUE)
-              ) %>% select(temp_register_dates)
-
-            # Grab card variables:
-            card_vars <- dat %>% select(c(paste0(dn, di, "_card_date"))) %>%
-              mutate(across(everything(), ~ if_else(!is.na(.x), 1, 0))) %>%
-              mutate(
-                temp_card_dates = rowSums(.[, 1:length(.)], na.rm = TRUE)
-              ) %>% select(temp_card_dates)
-
-            dat$temp_register_dates <- reg_vars$temp_register_dates
-            dat$temp_card_dates <- card_vars$temp_card_dates
-
-            dat <- dat %>%
-              mutate(
-                moveit = if_else(temp_register_dates > temp_card_dates, 1, 0)
-              )
-
-            for(i in seq_along(di)){
-
-              dat <- dat %>%
-                mutate(
-                  !!paste0(dn, di[i], "_card_date") := if_else(
-                    moveit %in% 1,
-                    !!rlang::sym(paste0(dn, di[i], "_register_date")),
-                    !!rlang::sym(paste0(dn, di[i], "_card_date"))),
-                  !!paste0(dn, di[i], "_card_tick") := if_else(
-                    moveit %in% 1,
-                    !!rlang::sym(paste0(dn, di[i], "_register_tick")),
-                    !!rlang::sym(paste0(dn, di[i], "_card_tick")))
-                )
-            }
-          } # end multidose (d) loop
-
-          # Drop temporary variables
-          dat <- dat %>%
-            select(-temp_register_dates, -temp_card_dates, -moveit)
-
-        } # end if(!is.null(multi))
-
-      } # end of RI_RECORDS_SOUGHT_FOR_ALL
+      # if (RI_RECORDS_SOUGHT_FOR_ALL == 1){
+      #
+      #   if(vcqi_object_exists("RI_SINGLE_DOSE_LIST")){
+      #     single_dose <- str_to_lower(RI_SINGLE_DOSE_LIST)
+      #
+      #     for (d in seq_along(single_dose)){
+      #
+      #       eval(parse_expr(paste0("dat <- mutate(dat,", single_dose[d],
+      #                              "_card_date = if_else(no_card %in% 1,",
+      #                              single_dose[d], "_register_date,",
+      #                              single_dose[d],"_card_date))")))
+      #
+      #       eval(parse_expr(paste0("dat <- mutate(dat,", single_dose[d],
+      #                              "_card_tick = if_else(no_card %in% 1,",
+      #                              single_dose[d], "_register_tick,",
+      #                              single_dose[d], "_card_tick))")))
+      #
+      #       if ("moveit" %in% names(dat)){dat <- select(dat, -moveit)}
+      #
+      #       # Use register data if there's a date on register and not card or
+      #       # if there are no dates, but there's a tick on register and not card
+      #       carddate <- rlang::sym(paste0(single_dose[d], "_card_date"))
+      #       regdate <- rlang::sym(paste0(single_dose[d], "_register_date"))
+      #       cardtick <- rlang::sym(paste0(single_dose[d], "_card_tick"))
+      #       regtick <- rlang::sym(paste0(single_dose[d], "_register_tick"))
+      #
+      #       dat <- dat %>%
+      #         mutate(
+      #           moveit = if_else(
+      #             (is.na(!!carddate) & !is.na(!!regdate)) |
+      #               (is.na(!!carddate) & is.na(!!regdate) &
+      #                  !is.na(!!regtick) & !(!!cardtick %in% 1)),
+      #             1, 0))
+      #
+      #       eval(parse_expr(paste0("dat <- mutate(dat,", single_dose[d],
+      #                              "_card_date = if_else(moveit %in% 1,",
+      #                              single_dose[d], "_register_date,",
+      #                              single_dose[d], "_card_date))")))
+      #
+      #       eval(parse_expr(paste0("dat <- mutate(dat,", single_dose[d],
+      #                              "_card_tick = if_else(moveit %in% 1,",
+      #                              single_dose[d], "_register_tick,",
+      #                              single_dose[d],"_card_tick))")))
+      #
+      #       dat <- select(dat, -moveit)
+      #
+      #     } # end of single dose loop
+      #   }
+      #
+      #   #rm(carddate, regdate, cardtick, regtick) %>% suppressWarnings()
+      #
+      #   # Multi-dose: use register data where appropriate
+      #
+      #   if(!is.null(multi)){
+      #     for(d in 1:nrow(multi)){
+      #
+      #       dn <- multi$dose[d]
+      #       di <- seq(1, multi$dosecount[d], by = 1)
+      #
+      #       # Use register data if there are more dates in the register for the
+      #       # series than appear on the card
+      #
+      #       # Grab register variables:
+      #       reg_vars <- dat %>% select(c(paste0(dn, di, "_register_date"))) %>%
+      #         mutate(across(everything(), ~ if_else(!is.na(.x), 1, 0))) %>%
+      #         mutate(
+      #           temp_register_dates = rowSums(.[, 1:length(.)], na.rm = TRUE)
+      #         ) %>% select(temp_register_dates)
+      #
+      #       # Grab card variables:
+      #       card_vars <- dat %>% select(c(paste0(dn, di, "_card_date"))) %>%
+      #         mutate(across(everything(), ~ if_else(!is.na(.x), 1, 0))) %>%
+      #         mutate(
+      #           temp_card_dates = rowSums(.[, 1:length(.)], na.rm = TRUE)
+      #         ) %>% select(temp_card_dates)
+      #
+      #       dat$temp_register_dates <- reg_vars$temp_register_dates
+      #       dat$temp_card_dates <- card_vars$temp_card_dates
+      #
+      #       dat <- dat %>%
+      #         mutate(
+      #           moveit = if_else(temp_register_dates > temp_card_dates, 1, 0)
+      #         )
+      #
+      #       for(i in seq_along(di)){
+      #
+      #         dat <- dat %>%
+      #           mutate(
+      #             !!paste0(dn, di[i], "_card_date") := if_else(
+      #               moveit %in% 1,
+      #               !!rlang::sym(paste0(dn, di[i], "_register_date")),
+      #               !!rlang::sym(paste0(dn, di[i], "_card_date"))),
+      #             !!paste0(dn, di[i], "_card_tick") := if_else(
+      #               moveit %in% 1,
+      #               !!rlang::sym(paste0(dn, di[i], "_register_tick")),
+      #               !!rlang::sym(paste0(dn, di[i], "_card_tick")))
+      #           )
+      #       }
+      #     } # end multidose (d) loop
+      #
+      #     # Drop temporary variables
+      #     dat <- dat %>%
+      #       select(-temp_register_dates, -temp_card_dates, -moveit)
+      #
+      #   } # end if(!is.null(multi))
+      #
+      # } # end of RI_RECORDS_SOUGHT_FOR_ALL
 
       # Now set the card tick variable to yes if the card date is missing and
       # the tick is not set, but the history is set...for MOV flags, we treat
