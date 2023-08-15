@@ -45,7 +45,26 @@ cleanup_VCQI_globals <- function(){
     "i",
     "level4_layout",
     "vhi_log",
-    "VCQI_DOB_PREFER_DOC"
+    "VCQI_DOB_PREFER_DOC",
+    "bold_left",
+    "bold_right",
+    "col_header",
+    "italic_left",
+    "italic_left_indented3",
+    "italic_right",
+    "regular_left",
+    "regular_right",
+    "table_footnote",
+    "table_header",
+    "table_subtitle",
+    "table_title",
+    "shaded_left",
+    "shaded_right",
+    "use_basic_fmtids",
+    "suppress_cis",
+    "TIMELY_ABBREV_CAPTION_LINE1",
+    "TO_DESC_02_CN",
+    "TO_DESC_03_CN"
   ), envir = .GlobalEnv) %>% suppressWarnings()
 
   # Remove VCQI objects by pattern:
@@ -58,8 +77,21 @@ cleanup_VCQI_globals <- function(){
   rm(list = ls(pattern = '^LEVEL.+_NAME_DATASET', envir = .GlobalEnv), envir = .GlobalEnv)
   rm(list = ls(pattern = '^LEVEL.+_ORDER_DATASET', envir = .GlobalEnv), envir = .GlobalEnv)
   rm(list = ls(pattern = '^RI_MULTI_.+_DOSE_LIST$', envir = .GlobalEnv), envir = .GlobalEnv)
+  rm(list = ls(pattern = '^DESC_02_', envir = .GlobalEnv), envir = .GlobalEnv)
+  rm(list = ls(pattern = '^DESC02_', envir = .GlobalEnv), envir = .GlobalEnv)
+  rm(list = ls(pattern = '^DESC_03_', envir = .GlobalEnv), envir = .GlobalEnv)
+  rm(list = ls(pattern = '^pct', envir = .GlobalEnv), envir = .GlobalEnv)
+  rm(list = ls(pattern = '^n', envir = .GlobalEnv), envir = .GlobalEnv)
+  rm(list = ls(pattern = '^nwtd', envir = .GlobalEnv), envir = .GlobalEnv)
   rm(list = ls(pattern = '^RI_COVG_01_', envir = .GlobalEnv), envir = .GlobalEnv)
   rm(list = ls(pattern = '^RI_COVG_02_', envir = .GlobalEnv), envir = .GlobalEnv)
+  rm(list = ls(pattern = '^RI_COVG_03_', envir = .GlobalEnv), envir = .GlobalEnv)
+  rm(list = ls(pattern = '^RI_DOSES_', envir = .GlobalEnv), envir = .GlobalEnv)
+  rm(list = ls(pattern = '^RI_COVG_04_', envir = .GlobalEnv), envir = .GlobalEnv)
+  rm(list = ls(pattern = '^RI_CONT_01_', envir = .GlobalEnv), envir = .GlobalEnv)
+  rm(list = ls(pattern = '^RI_CONT_01B_', envir = .GlobalEnv), envir = .GlobalEnv)
+  rm(list = ls(pattern = '^RI_QUAL_01_', envir = .GlobalEnv), envir = .GlobalEnv)
+  rm(list = ls(pattern = '^RI_QUAL_02_', envir = .GlobalEnv), envir = .GlobalEnv)
   rm(list = ls(pattern = '^RI_QUAL_07B_', envir = .GlobalEnv), envir = .GlobalEnv)
   rm(list = ls(pattern = '^RI_QUAL_08_', envir = .GlobalEnv), envir = .GlobalEnv)
   rm(list = ls(pattern = '^RI_QUAL_09_', envir = .GlobalEnv), envir = .GlobalEnv)

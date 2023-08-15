@@ -81,7 +81,9 @@ aggregate_vcqi_databases <- function(){
       # Create a local with these new vars to pass through to determine if weighted/unweighted/other
       strcount <- 10
       if(grepl("RI_ACC_", VCQI_AGGREGATED_DATABASES[f])) {strcount = strcount - 1}
-      if ((substr(VCQI_AGGREGATED_DATABASES[f],1,11) == "RI_QUAL_07B" | (substr(VCQI_AGGREGATED_DATABASES[f], 1, 3) == "SIA")) %in% TRUE){
+      if (((substr(VCQI_AGGREGATED_DATABASES[f],1,11) == "RI_QUAL_07B")
+           | (substr(VCQI_AGGREGATED_DATABASES[f],1,11) == "RI_CONT_01B")
+           | (substr(VCQI_AGGREGATED_DATABASES[f], 1, 3) == "SIA")) %in% TRUE){
         strcount <- 11
       }
 

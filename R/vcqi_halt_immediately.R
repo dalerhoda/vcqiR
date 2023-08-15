@@ -101,15 +101,16 @@ vcqi_halt_immediately <- function(
 
     if(vcqi_object_value("DELETE_TEMP_VCQI_DATASETS", 1)){
       #datasetlist <- c(TT_TEMP_DATASETS, RI_TEMP_DATASETS, SIA_TEMP_DATASETS, MISC_TEMP_DATASETS)
-
+      if (!vcqi_object_exists("RI_TEMP_DATASETS")){
+        RI_TEMP_DATASETS <- NULL
+      }
       #For now we only have RI programs
       datasetlist <- RI_TEMP_DATASETS
 
-      for (d in seq_along(datasetlist)){
-        vcqi_log_comment(VCP, 3, "Cleanup",
+      for (d in seq_along(datasetlist)) {
+        vcqi_log_comment(VCP,3,"Cleanup",
                          paste0("Erasing temp dataset ", datasetlist[d]))
-
-        if (stringr::str_detect(datasetlist[d], ".rds")){
+        if (stringr::str_detect(datasetlist[d], ".rds")) {
           file.remove(paste0(VCQI_OUTPUT_FOLDER, "/", datasetlist[d]))
         } else {
           file.remove(paste0(VCQI_OUTPUT_FOLDER, "/", datasetlist[d], ".rds"))
