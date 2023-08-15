@@ -183,8 +183,8 @@ vcqi_global(VCQI_RI_MAX_AGE_OF_ELIGIBILITY, 729)
 # These are mutually exclusive, so only one of them should be set to 1.
 
 vcqi_global(RI_RECORDS_NOT_SOUGHT, 0)
-vcqi_global(RI_RECORDS_SOUGHT_FOR_ALL, 1)
-vcqi_global(RI_RECORDS_SOUGHT_IF_NO_CARD, 0)
+vcqi_global(RI_RECORDS_SOUGHT_FOR_ALL, 0)
+vcqi_global(RI_RECORDS_SOUGHT_IF_NO_CARD, 1)
 
 # .........................................................................
 # Which doses should be included in the analysis?
@@ -466,6 +466,94 @@ vcqi_global(ANALYSIS_COUNTER, 1)
 # are some restrictions...see the table in the section of Chapter 6 entitled
 # Analysis Counter.
 
+# --------------------------------------------------------------------------
+# Summarize responses to some multiple-choice questions using DESC_02
+# --------------------------------------------------------------------------
+
+# Is the card an original or replacement?  (simple unweighted sample proportion)
+vcqi_global(DESC_02_DATASET,"RI")
+vcqi_global(DESC_02_VARIABLES,"RI30")
+vcqi_global(DESC_02_WEIGHTED,"NO")
+vcqi_global(DESC_02_DENOMINATOR,"RESPONDED")
+
+vcqi_global(DESC_02_TO_TITLE, "Is the card an original or replacement?")
+# No subtitle.
+vcqi_global(DESC_02_TO_SUBTITLE,NA)
+# Remember that DESC_02 automatically assigns three footnotes, so if you
+# want to include another, start with the number 4.
+# We are not using it here, but clear it out in case it was used earlier.
+vcqi_global(DESC_02_TO_FOOTNOTE_4,NA)
+DESC_02(cleanup = TRUE)
+
+# Did you have to pay for replacement?
+vcqi_global(DESC_02_DATASET,"RI")
+vcqi_global(DESC_02_VARIABLES,"RI31")
+vcqi_global(DESC_02_WEIGHTED,"NO")
+vcqi_global(DESC_02_DENOMINATOR,"RESPONDED")
+
+vcqi_global(DESC_02_TO_TITLE, "Did you have to pay for replacement?")
+# No subtitle or additional footnotes
+vcqi_global(DESC_02_TO_SUBTITLE,NA)
+vcqi_global(DESC_02_TO_FOOTNOTE_4,NA)
+DESC_02(cleanup = TRUE)
+
+# Where does your child usually receive vaccinations?
+vcqi_global(DESC_02_DATASET,"RI")
+vcqi_global(DESC_02_VARIABLES,"RI103")
+vcqi_global(DESC_02_WEIGHTED,"YES")
+vcqi_global(DESC_02_DENOMINATOR,"ALL")
+
+# Make subtotals for local and for 'outside'
+vcqi_global(DESC_02_N_SUBTOTALS	,2)
+vcqi_global(DESC_02_SUBTOTAL_LEVELS_1, c(1, 2, 3))
+vcqi_global(DESC_02_SUBTOTAL_LABEL_1, "Local")
+vcqi_global(DESC_02_SUBTOTAL_LEVELS_2, c(4, 5, 6))
+vcqi_global(DESC_02_SUBTOTAL_LABEL_2, "Outside (Not local)")
+#No subtitle or additional footnotes
+vcqi_global(DESC_02_TO_TITLE, "Where does your child usually receive vaccinations?")
+vcqi_global(DESC_02_TO_SUBTITLE,NA)
+vcqi_global(DESC_02_TO_FOOTNOTE_4,NA)
+DESC_02(cleanup = TRUE)
+
+# Who was the child who had an abscess?
+vcqi_global(DESC_02_DATASET,"RI")
+vcqi_global(DESC_02_VARIABLES,"RI119")
+vcqi_global(DESC_02_WEIGHTED,"NO")
+vcqi_global(DESC_02_DENOMINATOR,"RESPONDED")
+# The label on outcome #6 is "Other, Please Specify"
+# Use the relabel options to re-label it simply "Other"
+vcqi_global(DESC_02_N_RELABEL_LEVELS, 2)
+vcqi_global(DESC_02_RELABEL_LEVEL_1, 6)
+vcqi_global(DESC_02_RELABEL_LABEL_1, "Other")
+vcqi_global(DESC_02_RELABEL_LEVEL_2, NA)
+vcqi_global(DESC_02_RELABEL_LABEL_2, "Missing")
+vcqi_global(DESC_02_TO_TITLE, "Who was the child who had an abscess?")
+# No subtitle or additional footnotes
+vcqi_global(DESC_02_TO_SUBTITLE,NA)
+vcqi_global(DESC_02_TO_FOOTNOTE_4,NA)
+DESC_02(cleanup = TRUE)
+
+# --------------------------------------------------------------------------
+# Now demonstrate using DESC_03 on a multiple-choice question
+# where the respondent can select all answers that apply
+# --------------------------------------------------------------------------
+
+vcqi_global(DESC_03_DATASET, "RI")
+vcqi_global(DESC_03_SHORT_TITLE, "Vx_Msgs")
+vcqi_global(DESC_03_VARIABLES, c("RI127", "RI128", "RI129", "RI130", "RI131", "RI132", "RI133"))
+vcqi_global(DESC_03_WEIGHTED, "YES")
+vcqi_global(DESC_03_DENOMINATOR, "ALL")
+vcqi_global(DESC_03_SELECTED_VALUE, 1)
+# The label on RI133 is "Other, please specify"; use the so-called
+# MISSING options to re-label it simply "Other"
+vcqi_global(DESC_03_TO_TITLE, "What messages have you heard about vaccination?")
+vcqi_global(DESC_03_TO_SUBTITLE,NA)
+
+vcqi_global(DESC_03_N_RELABEL_LEVELS, 1)
+vcqi_global(DESC_03_RELABEL_LEVEL_1, "RI133")
+vcqi_global(DESC_03_RELABEL_LABEL_1, "7. Other")
+
+DESC_03(cleanup = TRUE)
 # .........................................................................
 # Summarize vaccination coverage
 # .........................................................................
@@ -489,6 +577,81 @@ vcqi_global(RI_COVG_02_TO_FOOTNOTE_2, "Note: This measure is a population estima
 vcqi_global(SORT_PLOT_LOW_TO_HIGH, 1) # 1 means show strata w/ low outcomes at bottom and high at top; 0 is the opposite
 
 RI_COVG_02()
+
+# Estimate proportion of respondents fully vaccinated
+vcqi_global(RI_DOSES_TO_BE_FULLY_VACCINATED, c("BCG", "MCV1", "YF", "PENTA1", "PENTA2", "PENTA3", "OPV1", "OPV2", "OPV3"))
+
+vcqi_global(RI_COVG_03_TO_TITLE, "Fully Vaccinated")
+vcqi_global(RI_COVG_03_TO_SUBTITLE, NA)
+vcqi_global(RI_COVG_03_TO_FOOTNOTE_1,  "Abbreviations: CI=Confidence Interval; LCB=Lower Confidence Bound; UCB=Upper Confidence Bound; DEFF=Design Effect; ICC=Intracluster Correlation Coefficient")
+vcqi_global(RI_COVG_03_TO_FOOTNOTE_2,  "Note: This measure is a population estimate that incorporates survey weights.  The CI, LCB and UCB are calculated with software that take the complex survey design into account.")
+vcqi_global(RI_COVG_03_TO_FOOTNOTE_3,  paste0("Note: To be fully vaccinated, the child must have received: ",str_flatten(RI_DOSES_TO_BE_FULLY_VACCINATED, collapse = " ")))
+vcqi_global(SORT_PLOT_LOW_TO_HIGH, 1) # 1 means show strata w/ low outcomes at bottom and high at top; 0 is the opposite
+
+RI_COVG_03()
+
+# Estimate proportion of respondents not vaccinated
+# (This measure also uses the global macro RI_DOSES_TO_BE_FULLY_VACCINATED)
+
+vcqi_global(RI_COVG_04_TO_TITLE, "Not Vaccinated")
+vcqi_global(RI_COVG_04_TO_SUBTITLE, NA)
+vcqi_global(RI_COVG_04_TO_FOOTNOTE_1,  "Abbreviations: CI=Confidence Interval; LCB=Lower Confidence Bound; UCB=Upper Confidence Bound; DEFF=Design Effect; ICC=Intracluster Correlation Coefficient")
+vcqi_global(RI_COVG_04_TO_FOOTNOTE_2,  "Note: This measure is a population estimate that incorporates survey weights.  The CI, LCB and UCB are calculated with software that take the complex survey design into account.")
+vcqi_global(RI_COVG_04_TO_FOOTNOTE_3,  paste0("Note: To be counted as not vaccinated, the child must not have received any of these doses: ", str_flatten(RI_DOSES_TO_BE_FULLY_VACCINATED, collapse = " ")))
+vcqi_global(SORT_PLOT_LOW_TO_HIGH, 0) # 1 means show strata w/ low outcomes at bottom and high at top; 0 is the opposite
+
+RI_COVG_04()
+
+# --------------------------------------------------------------------------
+# Calculate issues with continuity (dropout) for three dose pairs:
+# 1. Dropout from Penta1 to Penta3
+# 2. Dropout from OPV1 to OPV3
+# 3. Dropout from Penta3 to MCV1
+# --------------------------------------------------------------------------
+
+vcqi_global(RI_CONT_01_DROPOUT_LIST, c("PENTA1", "PENTA3", "OPV1", "OPV3", "PENTA3", "MCV1"))
+
+vcqi_global(RI_CONT_01_TO_TITLE, "Dropout")
+vcqi_global(RI_CONT_01_TO_SUBTITLE, NA)
+vcqi_global(RI_CONT_01_TO_FOOTNOTE_1, "Note: This measure is an unweighted summary of a proportion from the survey sample.")
+vcqi_global(SORT_PLOT_LOW_TO_HIGH,0)# 1 means show strata w/ low outcomes at bottom and high at top; 0 is the opposite
+
+RI_CONT_01()
+
+vcqi_global(RI_CONT_01B_DROPOUT_LIST, c("PENTA1", "PENTA3", "OPV1", "OPV3", "PENTA3", "MCV1"))
+
+vcqi_global(RI_CONT_01B_TO_TITLE, "Dropout")
+vcqi_global(RI_CONT_01B_TO_SUBTITLE, NA)
+vcqi_global(RI_CONT_01B_TO_FOOTNOTE_1, "Abbreviations: CI=Confidence Interval; LCB=Lower Confidence Bound; UCB=Upper Confidence Bound; DEFF=Design Effect; ICC=Intracluster Correlation Coefficient")
+vcqi_global(RI_CONT_01B_TO_FOOTNOTE_2, "Note: This measure is a population estimate that incorporates survey weights.  The CI, LCB and UCB are calculated with software that take the complex survey design into account")
+vcqi_global(SORT_PLOT_LOW_TO_HIGH,0)# 1 means show strata w/ low outcomes at bottom and high at top; 0 is the opposite
+
+RI_CONT_01B()
+
+
+# --------------------------------------------------------------------------
+# Indicators characterizing the quality of the vaccination program
+# --------------------------------------------------------------------------
+
+# Estimate proportion who have a card with vaccination dates on it
+
+vcqi_global(RI_QUAL_01_TO_TITLE, "RI Card Availability")
+vcqi_global(RI_QUAL_01_TO_SUBTITLE, NA)
+vcqi_global(RI_QUAL_01_TO_FOOTNOTE_1,  "Abbreviations: CI=Confidence Interval; LCB=Lower Confidence Bound; UCB=Upper Confidence Bound; DEFF=Design Effect; ICC=Intracluster Correlation Coefficient")
+vcqi_global(RI_QUAL_01_TO_FOOTNOTE_2,  "Note: This measure is a population estimate that incorporates survey weights.  The CI, LCB and UCB are calculated with software that take the complex survey design into account.")
+vcqi_global(SORT_PLOT_LOW_TO_HIGH, 1)# 1 means show strata w/ low outcomes at bottom and high at top; 0 is the opposite
+
+RI_QUAL_01()
+
+# Estimate proportion who ever had a vaccination card
+
+vcqi_global(RI_QUAL_02_TO_TITLE, "Ever Received RI Card")
+vcqi_global(RI_QUAL_02_TO_SUBTITLE, NA)
+vcqi_global(RI_QUAL_02_TO_FOOTNOTE_1, "Abbreviations: CI=Confidence Interval; LCB=Lower Confidence Bound; UCB=Upper Confidence Bound; DEFF=Design Effect; ICC=Intracluster Correlation Coefficient")
+vcqi_global(RI_QUAL_02_TO_FOOTNOTE_2, "Note: This measure is a population estimate that incorporates survey weights.  The CI, LCB and UCB are calculated with software that take the complex survey design into account.")
+vcqi_global(SORT_PLOT_LOW_TO_HIGH, 1) # 1 means show strata w/ low outcomes at bottom and high at top; 0 is the opposite
+
+RI_QUAL_02()
 
 # .........................................................................
 # Missed Opportunities for Simultaneous Vaccination (MOV)
@@ -573,36 +736,40 @@ RI_QUAL_09()
 # .........................................................................
 
 # Specify 1 or 2 or 3 here to make charts for every level 1, 2 or 3 stratum.
-RI_VCTC_01_LEVELS <- 3
+RI_VCTC_01_LEVELS <- 1
 # You may also specify a combination like c(1,3)
 # RI_VCTC_01_LEVELS <- c(1,3)
 
 #Specify which doses to show in the chart and the order, from bottom to top
 
-TIMELY_DOSE_ORDER <- c("bcg","hepb","opv0","opv1","opv2","opv3","penta1","penta2","penta3","pcv1","pcv2","pcv3","rota1","rota2","rota3","ipv","mcv1","yf")
+TIMELY_DOSE_ORDER <- c("bcg", "hepb", "opv0", "opv1", "penta1", "pcv1", "rota1", "opv2", "penta2", "pcv2", "rota2",
+                       "opv3", "penta3", "pcv3", "rota3", "ipv", "mcv1", "yf")
 
 # Specify the y-coordinates for the bars.  If you want them to be spaced evenly, you may omit this global (leave it empty)
 # In this example, we use irregular spacing to group the different dose series.
-TIMELY_Y_COORDS <- c(10,  20,  30,   43, 50, 57,   73, 80, 87,   103, 110, 117,   133, 140, 147,   160,  170,  180)
+TIMELY_Y_COORDS <- c(10, 17, 24,  34, 41, 48, 55,  65, 72, 79, 86,  96, 103, 110, 117, 124,  134, 141)
 
-# You may customize the VCTC parameters in a .R file and define the full path to
-# the .R file below as VCTC_globals_path. Or you may re-specify them in the
-# control program after VCTC_default_global() is called.
+# Run the .do file that defines the default parameters.
+# VCQI first runs the program that lists default parameter values.
+# Then it runs a copy that has any user changes.  You may customize the
+# entries in the .do file itself or you may re-specify them in code
+# below the include statements.
 
-# Include the user-specified parameters, if you want to customize any settings
+# Include the default parameters
+# (You may want to skip this if you have customized the parameters)
+# In many cases one of the four following files will give you what you want.
+
+# But if not, you can include user-specified parameters, if present
 vcqi_global(VCTC_globals_path, NA)
 
 if (vcqi_object_exists("VCTC_globals_path")){
   source(file = VCTC_globals_path)
 } else {
-  VCTC_default_global()
+  VCTC_global_same_legend_for_all()
+  #VCTC_global_modified_legend_for_bcg()
+  #VCTC_global_modified_legend_for_bcg_hepb()
+  #VCTC_global_modified_legend_for_bcg_hepb0()
 }
-
-# Over-ride one default parameters:
-
-# Because we are spacing the bars about every y=10 units instead of the default
-# y=1 units apart, specify a bar width that is 10X the default.
-vcqi_global(TIMELY_BARWIDTH, 6.7)
 
 # Do the calculations and make the charts
 RI_VCTC_01()
@@ -615,7 +782,7 @@ RI_VCTC_01()
 # Make augmented dataset for additional analysis purposes if user requests it.
 if(vcqi_object_value("VCQI_MAKE_AUGMENTED_DATASET", 1) &
    !vcqi_object_value("VCQI_CHECK_INSTEAD_OF_RUN", 1)){
-  make_RI_augmented_dataset(outpath = NA)
+  make_RI_augmented_dataset_v2(outpath = NA)
 }
 
 # Close the datasets that hold the results of hypothesis tests and put them into

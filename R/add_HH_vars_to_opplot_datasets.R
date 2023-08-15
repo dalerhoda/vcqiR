@@ -10,7 +10,7 @@
 #' @importFrom utils glob2rx
 #' @import haven
 
-# add_HH_vars_to_opplot_datasets R version 1.02 - Biostat Global Consulting - 2022-10-18
+# add_HH_vars_to_opplot_datasets R version 1.03 - Biostat Global Consulting - 2023-08-03
 # *******************************************************************************
 # Change log
 
@@ -18,6 +18,10 @@
 # 2022-09-12  1.00      Mia Yu          Original R version
 # 2022-10-12  1.01      Mia Yu          Package version
 # 2022-10-18  1.02      Mia Yu          Add variable labels
+# 2023-08-03  1.03      Mia Yu          It's possible that some opplot datasets
+#                                       may have been processed in an earlier
+#                                       control program run in this folder.
+#                                       If so, simply skip over them.
 # *******************************************************************************
 
 add_HH_vars_to_opplot_datasets <- function(VCP = "add_HH_vars_to_opplot_datasets"){
@@ -62,79 +66,82 @@ add_HH_vars_to_opplot_datasets <- function(VCP = "add_HH_vars_to_opplot_datasets
 
         dat <- vcqi_read(paste0(VCQI_OUTPUT_FOLDER,"/Plots_OP/",dlist[d]))
 
-        vartodrop <- c(paste0(surveytype, "01"),
-                       paste0(surveytype, "02"),
-                       paste0(surveytype, "03"),
-                       paste0(surveytype, "04"),
-                       "HH01", "HH03", "HH02", "HH04") # added "HH02", "HH04" here 2022-11-03 (CBC)
-        vartodrop <- vartodrop[which(vartodrop %in% names(dat))]
+        if (!"opplot_filename" %in% names(dat)){
+          vartodrop <- c(paste0(surveytype, "01"),
+                         paste0(surveytype, "02"),
+                         paste0(surveytype, "03"),
+                         paste0(surveytype, "04"),
+                         "HH01", "HH03", "HH02", "HH04") # added "HH02", "HH04" here 2022-11-03 (CBC)
+          vartodrop <- vartodrop[which(vartodrop %in% names(dat))]
 
-        dat <- dat %>% select(-all_of(vartodrop))
+          dat <- dat %>% select(-all_of(vartodrop))
 
-        dat2 <- vcqi_read(paste0(VCQI_OUTPUT_FOLDER, "/",
-                                 surveytype, "_with_ids.rds"))
-        dat2 <- dat2 %>%
-          select(clusterid, all_of(c(paste0(surveytype,"01"),
-                                     paste0(surveytype,"03"))))
+          dat2 <- vcqi_read(paste0(VCQI_OUTPUT_FOLDER, "/",
+                                   surveytype, "_with_ids.rds"))
+          dat2 <- dat2 %>%
+            select(clusterid, all_of(c(paste0(surveytype,"01"),
+                                       paste0(surveytype,"03"))))
 
-        dat <- left_join(dat,dat2, by = "clusterid")
+          dat <- left_join(dat,dat2, by = "clusterid")
 
-        dat <- unique(dat)
+          dat <- unique(dat)
 
-        vartodrop <- c("HH01", "HH03")
-        vartodrop <- vartodrop[which(vartodrop %in% names(dat))]
-        dat <- dat %>% select(-all_of(vartodrop))
+          vartodrop <- c("HH01", "HH03")
+          vartodrop <- vartodrop[which(vartodrop %in% names(dat))]
+          dat <- dat %>% select(-all_of(vartodrop))
 
-        names(dat)[which(names(dat) == paste0(surveytype,"01"))] <- "HH01"
-        names(dat)[which(names(dat) == paste0(surveytype,"03"))] <- "HH03"
+          names(dat)[which(names(dat) == paste0(surveytype,"01"))] <- "HH01"
+          names(dat)[which(names(dat) == paste0(surveytype,"03"))] <- "HH03"
 
-        dat2 <- vcqi_read(paste0(VCQI_DATA_FOLDER,"/",VCQI_CM_DATASET)) %>%
-          select(c(HH01,HH02,HH03,HH04))
-        dat <- left_join(dat, dat2, by = c("HH01", "HH03")) %>%
-          unique() %>%
-          relocate(HH02, .after = stratum) %>%
-          relocate(c(HH03, HH04), .after = clusterid)
+          dat2 <- vcqi_read(paste0(VCQI_DATA_FOLDER,"/",VCQI_CM_DATASET)) %>%
+            select(c(HH01,HH02,HH03,HH04))
+          dat <- left_join(dat, dat2, by = c("HH01", "HH03")) %>%
+            unique() %>%
+            relocate(HH02, .after = stratum) %>%
+            relocate(c(HH03, HH04), .after = clusterid)
 
-        dat$clusterid <- haven::labelled(dat$clusterid, label = "VCQI cluster ID (may differ from data cluster ID)") %>% suppressWarnings()
-        dat$HH03 <- haven::labelled(dat$HH03, label = "Cluster ID from dataset (may differ from VCQI cluster ID)") %>% suppressWarnings()
-        dat$HH04 <- haven::labelled(dat$HH04, label = "Cluster name from dataset") %>% suppressWarnings()
+          dat$clusterid <- haven::labelled(dat$clusterid, label = "VCQI cluster ID (may differ from data cluster ID)") %>% suppressWarnings()
+          dat$HH03 <- haven::labelled(dat$HH03, label = "Cluster ID from dataset (may differ from VCQI cluster ID)") %>% suppressWarnings()
+          dat$HH04 <- haven::labelled(dat$HH04, label = "Cluster name from dataset") %>% suppressWarnings()
 
-        # Add metadata
-        dat <- dat %>% mutate(dataset_filename = dlist[d])
-        ncols <- max(str_count(dat$dataset_filename, "_"), na.rm = TRUE) + 1
-        dat <- dat %>%
-          separate(dataset_filename,
-                   into = paste0("snip", 1:ncols),
-                   sep = "_") %>%
-          mutate(vcqi_indicator = paste0(str_to_upper(snip1), "_",
-                                         str_to_upper(snip2), "_",
-                                         snip3)) %>%
-          mutate(vcqi_analysis_counter = snip4) %>%
-          mutate(dataset_filename = dlist[d]) %>%
-          relocate(dataset_filename, .before = snip1)
+          # Add metadata
+          dat <- dat %>% mutate(dataset_filename = dlist[d])
+          ncols <- max(str_count(dat$dataset_filename, "_"), na.rm = TRUE) + 1
+          dat <- dat %>%
+            separate(dataset_filename,
+                     into = paste0("snip", 1:ncols),
+                     sep = "_") %>%
+            mutate(vcqi_indicator = paste0(str_to_upper(snip1), "_",
+                                           str_to_upper(snip2), "_",
+                                           snip3)) %>%
+            mutate(vcqi_analysis_counter = snip4) %>%
+            mutate(dataset_filename = dlist[d]) %>%
+            relocate(dataset_filename, .before = snip1)
 
-        dat$vcqi_analysis_counter <- as.numeric(dat$vcqi_analysis_counter) %>% suppressWarnings()
+          dat$vcqi_analysis_counter <- as.numeric(dat$vcqi_analysis_counter) %>% suppressWarnings()
 
-        dat$dataset_filename <- haven::labelled(dat$dataset_filename, label = "Name of original dataset with OP plot data") %>% suppressWarnings()
-        dat$vcqi_indicator <- haven::labelled(dat$vcqi_indicator, label = "VCQI indicator") %>% suppressWarnings()
-        dat$vcqi_analysis_counter <- haven::labelled(dat$vcqi_analysis_counter, label = "VCQI analysis counter when OP plot was made") %>% suppressWarnings()
+          dat$dataset_filename <- haven::labelled(dat$dataset_filename, label = "Name of original dataset with OP plot data") %>% suppressWarnings()
+          dat$vcqi_indicator <- haven::labelled(dat$vcqi_indicator, label = "VCQI indicator") %>% suppressWarnings()
+          dat$vcqi_analysis_counter <- haven::labelled(dat$vcqi_analysis_counter, label = "VCQI analysis counter when OP plot was made") %>% suppressWarnings()
 
-        dat <- dat %>%
-          mutate(opplot_filename = paste0(
-            str_to_upper(snip1), "_",
-            str_to_upper(snip2),"_",
-            snip3, "_", snip4, "_",
-            snip5, "_", snip6, "_",
-            snip7, "_",
-            str_to_title(substr(snip8, 1, nchar(snip8) - 4)),
-            substring(snip8, nchar(snip8) - 3)))
+          dat <- dat %>%
+            mutate(opplot_filename = paste0(
+              str_to_upper(snip1), "_",
+              str_to_upper(snip2),"_",
+              snip3, "_", snip4, "_",
+              snip5, "_", snip6, "_",
+              snip7, "_",
+              str_to_title(substr(snip8, 1, nchar(snip8) - 4)),
+              substring(snip8, nchar(snip8) - 3)))
 
-        dat <- dat %>% select(-c(starts_with("snip"))) %>% arrange(barorder)
+          dat <- dat %>% select(-c(starts_with("snip"))) %>% arrange(barorder)
 
-        dat$opplot_filename <- haven::labelled(dat$opplot_filename, label = "VCQI OP plot filename") %>% suppressWarnings()
+          dat$opplot_filename <- haven::labelled(dat$opplot_filename, label = "VCQI OP plot filename") %>% suppressWarnings()
 
-        file.remove(paste0(VCQI_OUTPUT_FOLDER,"/Plots_OP/",dlist[d]))
-        saveRDS(dat, file = paste0(VCQI_OUTPUT_FOLDER,"/Plots_OP/",dlist[d]))
+          file.remove(paste0(VCQI_OUTPUT_FOLDER,"/Plots_OP/",dlist[d]))
+          saveRDS(dat, file = paste0(VCQI_OUTPUT_FOLDER,"/Plots_OP/",dlist[d]))
+
+        } # only do this work if it has not been done in an earlier run in this same folder
 
       } # end of checking surveytype
 

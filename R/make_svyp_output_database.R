@@ -186,7 +186,6 @@ make_svyp_output_database <- function(
   # Label variable name "Survey name for table output"
   dat <- dat %>%
     relocate(c(name, level4id, level4name), .after = level) %>%
-    select(-level4name) %>%
     arrange(level, level4id) # Arranging by level4id no longer matches Stata output
 
   dat$level <- haven::labelled(dat$level, label = "Stratum level") %>% suppressWarnings()

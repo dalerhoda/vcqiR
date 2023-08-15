@@ -13,7 +13,7 @@
 #' @examples
 #' check_analysis_metadata()
 #'
-# check_analysis_metadata R version 1.10 - Biostat Global Consulting - 2022-10-24
+# check_analysis_metadata R version 1.11 - Biostat Global Consulting - 2023-07-29
 # *******************************************************************************
 # Change log
 
@@ -36,6 +36,7 @@
 # 2022-10-10  1.08      Caitlin Clary   Package version
 # 2022-10-18  1.09      Caitlin Clary   Added vcqi_halt_immediately call
 # 2022-10-24  1.10      Mia Yu          Added vcqi_halt_immediately after checking programlist
+# 2023-07-29  1.11      Mia Yu          Remove HH14 from missing value check
 # *******************************************************************************
 
 # Note: sections of this program that check FMTID are not implemented (2022-10-07)
@@ -73,7 +74,7 @@ check_analysis_metadata <- function(VCP = "check_analysis_metadata"){
 
   # Check for variables if HH and HM datasets are provided
 
-  HHlist <- c("HH01", "HH03", "HH14")
+  HHlist <- c("HH01", "HH03")
   HMlist <- c("HM01", "HM03", "HM09", "HM22", "HM29")
   hhhm <- c("HH", "HM")
 

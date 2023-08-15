@@ -121,7 +121,6 @@ make_count_output_database <- function(numerator, denominator, estlabel, vid, me
 
   dat <- dat %>%
     relocate(c(name, level4id, level4name), .after = level) %>%
-    select(-level4name) %>%
     arrange(level, level4id) # Arranging by level4id no longer matches Stata output
 
   dat$level <- haven::labelled(dat$level, label = "Stratum level") %>% suppressWarnings()

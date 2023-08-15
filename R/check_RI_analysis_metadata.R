@@ -11,7 +11,7 @@
 #' @examples
 #' check_RI_analysis_metadata()
 
-# check_RI_analysis_metadata R version 1.10 - Biostat Global Consulting - 2022-12-05
+# check_RI_analysis_metadata R version 1.11 - Biostat Global Consulting - 2023-07-23
 # *******************************************************************************
 # Change log
 
@@ -33,6 +33,7 @@
 #                                       from check_interview_date
 # 2022-12-05  1.10      Mia Yu          Added a part to check VCQI_OUTPUT_FOLDER
 #                                       shouldn't be the same as VCQI_DATA_FOLDER
+# 2023-07-23  1.11      Mia Yu          Add the line to make RI_DOSE_list lowercase
 # *******************************************************************************
 
 check_RI_analysis_metadata <- function(VCP = "check_RI_analysis_metadata"){
@@ -40,7 +41,7 @@ check_RI_analysis_metadata <- function(VCP = "check_RI_analysis_metadata"){
   vcqi_log_comment(VCP, 5, "Flow", "Starting")
 
   # Check the generic analysis-related globals
-  check_analysis_metadata()
+  check_analysis_metadata_updated()
 
   # Check the CM dataset
   check_VCQI_CM_metadata()
@@ -120,6 +121,9 @@ check_RI_analysis_metadata <- function(VCP = "check_RI_analysis_metadata"){
         vcqi_log_comment(VCP, 1, "Error", paste0("RI dataset: ", RIfile, " is not in valid format"))
       } else{
 
+        #updated 7/23
+        vcqi_global(RI_DOSE_LIST,str_to_lower(RI_DOSE_LIST))
+
         #Check that RI variables used across all indicators are present
         #and have the correct variable type
         dlist <- NULL
@@ -148,12 +152,20 @@ check_RI_analysis_metadata <- function(VCP = "check_RI_analysis_metadata"){
 
             if (varlist[v] %in% c("RI01", "RI03", "RI11", "RI12")){
               variable2 <- get(varlist[v],dat)
-              if(any(is.na(variable2) | variable2 == "")){
+              if ("character" %in% class(variable2)){
+                if(any(is.na(variable2) | variable2 == "")){
+                  errormsgs <- c(errormsgs,
+                                 paste0(varlist[v], " cannot have a missing value in the RI dataset."))
+                  exitflag <- 1
+                  vcqi_log_comment(VCP, 1, "Error", paste0(varlist[v], " cannot have a missing value in the RI dataset."))
+                }
+              } else if(any(is.na(variable2))){
                 errormsgs <- c(errormsgs,
                                paste0(varlist[v], " cannot have a missing value in the RI dataset."))
                 exitflag <- 1
                 vcqi_log_comment(VCP, 1, "Error", paste0(varlist[v], " cannot have a missing value in the RI dataset."))
               }
+
             }
 
           } else {
@@ -216,12 +228,20 @@ check_RI_analysis_metadata <- function(VCP = "check_RI_analysis_metadata"){
 
               if (varlist[v] %in% c("RIHC01", "RIHC03", "RIHC14", "RIHC15")){
                 variable2 <- get(varlist[v],dat)
-                if(any(is.na(variable2) | variable2 == "")){
+                if ("character" %in% class(variable2)){
+                  if(any(is.na(variable2) | variable2 == "")){
+                    errormsgs <- c(errormsgs,
+                                   paste0(varlist[v], " cannot have a missing value in the RIHC dataset."))
+                    exitflag <- 1
+                    vcqi_log_comment(VCP, 1, "Error", paste0(varlist[v], " cannot have a missing value in the RIHC dataset."))
+                  }
+                } else if(any(is.na(variable2))){
                   errormsgs <- c(errormsgs,
                                  paste0(varlist[v], " cannot have a missing value in the RIHC dataset."))
                   exitflag <- 1
                   vcqi_log_comment(VCP, 1, "Error", paste0(varlist[v], " cannot have a missing value in the RIHC dataset."))
                 }
+
               }
 
             } else{
