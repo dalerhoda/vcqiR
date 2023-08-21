@@ -18,5 +18,5 @@ RI_augmented_dataset and vcqi_ads_logfile datasets in VCQI_OUTPUT_FOLDER
 Merge RI indicators calculated by VCQI onto the originally provided RI dataset
 }
 \examples{
-make_RI_augmented_dataset_updated(outpath = NA)
+make_RI_augmented_dataset_v2(outpath = NA)
 }

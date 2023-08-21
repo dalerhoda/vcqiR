@@ -11,7 +11,7 @@
 #' @import survey
 #' @import tidyselect
 
-# RI_VCTC_01_06PO_updated R version 1.05 - Biostat Global Consulting - 2023-07-25
+# RI_VCTC_01_06PO R version 1.05 - Biostat Global Consulting - 2023-07-25
 # *******************************************************************************
 # Change log
 
@@ -25,7 +25,7 @@
 #                                       left align caption
 # *******************************************************************************
 
-RI_VCTC_01_06PO <- function(VCP = "RI_VCTC_01_06PO_updated"){
+RI_VCTC_01_06PO <- function(VCP = "RI_VCTC_01_06PO"){
   vcqi_log_comment(VCP, 5, "Flow", "Starting")
 
   if (VCQI_CHECK_INSTEAD_OF_RUN != 1){

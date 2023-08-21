@@ -13,7 +13,7 @@
 #' @examples
 #' check_analysis_metadata()
 #'
-# check_analysis_metadata R version 1.11 - Biostat Global Consulting - 2023-07-29
+# check_analysis_metadata R version 1.13 - Biostat Global Consulting - 2023-07-29
 # *******************************************************************************
 # Change log
 
@@ -36,7 +36,9 @@
 # 2022-10-10  1.08      Caitlin Clary   Package version
 # 2022-10-18  1.09      Caitlin Clary   Added vcqi_halt_immediately call
 # 2022-10-24  1.10      Mia Yu          Added vcqi_halt_immediately after checking programlist
-# 2023-07-29  1.11      Mia Yu          Remove HH14 from missing value check
+# 2023-01-10  1.11      Mia Yu          Added part for customized level4 plot settings
+# 2023-02-07  1.12      Mia Yu          Added part for customized level4 Excel cell formats
+# 2023-07-29  1.13      Mia Yu          Remove HH14 from missing value check
 # *******************************************************************************
 
 # Note: sections of this program that check FMTID are not implemented (2022-10-07)
@@ -554,6 +556,234 @@ check_analysis_metadata <- function(VCP = "check_analysis_metadata"){
         errormsgs <- c(errormsgs, "VCQI_LEVEL4_SET_LAYOUT must contain a numeric variable named order and string variables named rowtype, label and condition")
         vcqi_log_comment(VCP, 1, "Error", "VCQI_LEVEL4_SET_LAYOUT must contain a numeric variable named order and string variables named rowtype, label and condition")
       }
+
+      #2023/01/10: add new part to check level4 customized plot related settings
+
+      #check if the all inputs are valid for outlinecolor1_r: valid R color or NA
+      if ("outlinecolor1_r" %in% names(level4_layout)) {
+        outlinecolor1_r <- get("outlinecolor1_r", level4_layout)
+        if (any((!(outlinecolor1_r %in% colors())&!(nchar(outlinecolor1_r) == 7 & substr(outlinecolor1_r, 1, 1) == "#") & !is.na(outlinecolor1_r)& !outlinecolor1_r %in% c(""))) %in% TRUE) {
+          exitflag <- 1
+          #TO DO: update error message and comment
+          errormsgs <-
+            c(errormsgs,"The column outlinecolor1_r only accepts valid R color from colors() or valid hex code or NA")
+          vcqi_log_comment(VCP,1,"Error","The column outlinecolor1_r only accepts valid R color from colors() or valid hex code or NA")
+        }
+      } #end of checking outlinecolor1_r
+
+      #check if the all inputs are valid for outlinecolor2_r: valid R color or NA
+      if ("outlinecolor2_r" %in% names(level4_layout)) {
+        outlinecolor2_r <- get("outlinecolor2_r", level4_layout)
+        if (any((!(outlinecolor2_r %in% colors())&!(nchar(outlinecolor2_r) == 7 & substr(outlinecolor2_r, 1, 1) == "#") & !is.na(outlinecolor2_r)& !outlinecolor2_r %in% c(""))) %in% TRUE) {
+          exitflag <- 1
+          #TO DO: update error message and comment
+          errormsgs <-
+            c(errormsgs,"The column outlinecolor2_r only accepts valid R color from colors() or valid hex code or NA")
+          vcqi_log_comment(VCP,1,"Error","The column outlinecolor2_r only accepts valid R color from colors() or valid hex code or NA")
+        }
+      } #end of checking outlinecolor2_r
+
+      #check if the all inputs are valid for bar_fillcolor1_r: valid R color or NA
+      if ("bar_fillcolor1_r" %in% names(level4_layout)) {
+        bar_fillcolor1_r <- get("bar_fillcolor1_r", level4_layout)
+        if (any((!(bar_fillcolor1_r %in% colors())&!(nchar(bar_fillcolor1_r) == 7 & substr(bar_fillcolor1_r, 1, 1) == "#")& !is.na(bar_fillcolor1_r)& !bar_fillcolor1_r %in% c(""))) %in% TRUE) {
+          exitflag <- 1
+          #TO DO: update error message and comment
+          errormsgs <-c(errormsgs,"The column bar_fillcolor1_r only accepts valid R color from colors() or valid hex code or NA")
+          vcqi_log_comment(VCP,1,"Error","The column bar_fillcolor1_r only accepts valid R color from colors() or valid hex code or NA")
+        }
+      } #end of checking bar_fillcolor1_r
+
+      #check if the all inputs are valid for bar_fillcolor2_r: valid R color or NA
+      if ("bar_fillcolor2_r" %in% names(level4_layout)) {
+        bar_fillcolor2_r <- get("bar_fillcolor2_r", level4_layout)
+        if (any((!(bar_fillcolor2_r %in% colors())&!(nchar(bar_fillcolor2_r) == 7 & substr(bar_fillcolor2_r, 1, 1) == "#")& !is.na(bar_fillcolor2_r)& !bar_fillcolor2_r %in% c(""))) %in% TRUE) {
+          exitflag <- 1
+          #TO DO: update error message and comment
+          errormsgs <-c(errormsgs,"The column bar_fillcolor2_r only accepts valid R color from colors() or valid hex code or NA")
+          vcqi_log_comment(VCP,1,"Error","The column bar_fillcolor2_r only accepts valid R color from colors() or valid hex code or NA")
+        }
+      } #end of checking bar_fillcolor2_r
+
+      #check if the all inputs are valid for shadecolor1_r: valid R color or NA
+      if ("shadecolor1_r" %in% names(level4_layout)) {
+        shadecolor1_r <- get("shadecolor1_r", level4_layout)
+        if (any((!(shadecolor1_r %in% colors())&!(nchar(shadecolor1_r) == 7 & substr(shadecolor1_r, 1, 1) == "#")& !is.na(shadecolor1_r)& !shadecolor1_r %in% c(""))) %in% TRUE) {
+          exitflag <- 1
+          #TO DO: update error message and comment
+          errormsgs <-c( errormsgs,"The column shadecolor1_r only accepts valid R color from colors() or valid hex code or NA")
+          vcqi_log_comment(VCP,1,"Error","The column shadecolor1_r only accepts valid R color from colors() or valid hex code or NA")
+        }
+      } #end of checking shadecolor1_r
+
+      #check if the all inputs are valid for shadecolor2_r: valid R color or NA
+      if ("shadecolor2_r" %in% names(level4_layout)) {
+        shadecolor2_r <- get("shadecolor2_r", level4_layout)
+        if (any((!(shadecolor2_r %in% colors())&!(nchar(shadecolor2_r) == 7 & substr(shadecolor2_r, 1, 1) == "#")& !is.na(shadecolor2_r)& !shadecolor2_r %in% c(""))) %in% TRUE) {
+          exitflag <- 1
+          #TO DO: update error message and comment
+          errormsgs <-c( errormsgs,"The column shadecolor2_r only accepts valid R color from colors() or valid hex code or NA")
+          vcqi_log_comment(VCP,1,"Error","The column shadecolor2_r only accepts valid R color from colors() or valid hex code or NA")
+        }
+      } #end of checking shadecolor2_r
+
+      #chekc if all inputs are valid for addline
+      if ("addline" %in% names(level4_layout)) {
+        addline <- get("addline", level4_layout)
+        if (any(!addline %in% c("below", "above", "both", "", NA))) {
+          exitflag <- 1
+          #TO DO: update error message and comment
+          errormsgs <-c(errormsgs,"The column addline only accepts four possible values: below, above, both or NA")
+          vcqi_log_comment(VCP,1,"Error","The column addline only accepts four possible values: below, above, both or NA")
+        }
+      }#end of checking addline
+
+      #2023-0207 add: check cell format
+      assign("use_basic_fmtids",1, envir = .GlobalEnv)
+      # Import the deafult cell styles
+      vcqi_basic_fmtids()
+
+      if (vcqi_object_exists("FMTIDS")){
+        # First check if the file exists
+        if(file.exists(FMTIDS)){
+          # Second check if all the styles created are R acceptable
+          # Try to source the user-provided file
+          sourcetest <- try(source(FMTIDS),silent = TRUE)
+          # Check if there were any errors triggered by the user-provided file
+          # If there were errors, add a warning message to the VCQI log
+          # If no errors, source the user-provided file
+          if (inherits(sourcetest, "try-error")){
+            exitflag <- 1
+            #TO DO: update error message and comment
+            errormsgs <-c(errormsgs,paste0("FMTIDS file", FMTIDS, " contains invalid cell style. Please check the file"))
+            vcqi_log_comment(VCP,1,"Error",paste0("FMTIDS file", FMTIDS, " contains invalid cell style. Please check the file"))
+
+          } else {
+            # Import the customized formats
+            assign("use_basic_fmtids",0, envir = .GlobalEnv)
+            source(file = FMTIDS)
+
+            # Check if there is repeated id names if columns are defined.
+            defaultid <- c("bold_left", "bold_right", "regular_left", "regular_right", "shaded_left", "shaded_right", "italic_left", "italic_right")
+
+            firstin <- 0
+            otherin <- 0
+            repeat_ids <- NULL
+            if ("fmtid_for_first_column_r" %in% names(level4_layout)){
+              firstin <- 1
+              for (l in 1:nrow(level4_layout)){
+                firstid <- level4_layout$fmtid_for_first_column_r[l]
+                # Check if there is repeated id
+                if (firstid %in% defaultid){
+                  repeat_ids <- c(repeat_ids," ", firstid)
+                }
+
+                # Check if there is not defined id
+                if (firstid != "" & !is.na(firstid) & !is.null(firstid)){
+                  if (!exists(firstid, envir = .GlobalEnv)){
+                    level4_layout$fmtid_for_first_column_r[l] <- "regular_left"
+                    warningmsgs <-c(warningmsgs,paste0("VCQI_LEVEL4_SET_LAYOUT contains the fmtid ", firstid,
+                                                       " which is not defined in the FMTIDS file and cannot be used. It will be replaced with the default value of regular_left"))
+                    vcqi_log_comment(VCP,2,"Warning",paste0("VCQI_LEVEL4_SET_LAYOUT contains the fmtid ", firstid,
+                                                            " which is not defined in the FMTIDS file and cannot be used. It will be replaced with the default value of regular_left"))
+                  }
+                }
+              } #end of l loop
+            } #end of if column defined
+
+            if ("fmtid_for_other_columns_r" %in% names(level4_layout)){
+              otherin <- 1
+              for (l in 1:nrow(level4_layout)){
+                otherid <- level4_layout$fmtid_for_other_columns_r[l]
+                # Check if there is repeated id
+                if (otherid %in% defaultid){
+                  repeat_ids <- c(repeat_ids," ", otherid)
+                }
+                # Check if there is not defined id
+                if (otherid != "" & !is.na(otherid) & !is.null(otherid)){
+                  if (!exists(otherid, envir = .GlobalEnv)){
+                    level4_layout$fmtid_for_other_columns_r[l] <- "regular_right"
+                    warningmsgs <-c(warningmsgs,paste0("VCQI_LEVEL4_SET_LAYOUT contains the fmtid ", otherid,
+                                                       " which is not defined in the FMTIDS file and cannot be used. It will be replaced with the default value of regular_right"))
+                    vcqi_log_comment(VCP,2,"Warning",paste0("VCQI_LEVEL4_SET_LAYOUT contains the fmtid ", otherid,
+                                                            " which is not defined in the FMTIDS file and cannot be used. It will be replaced with the default value of regular_right"))
+                  }
+                }
+              } #end of l loop
+            }#end of if column defined
+
+            # If there's repeated ids, send a message
+            if (!is.null(repeat_ids)){
+              repeat_ids <- str_flatten(repeat_ids)
+              warningmsgs <-c(warningmsgs,paste0("The .R file provided in global FMTIDS contains the default fmtid name(s):", repeat_ids,
+                                                 ". The customized fmtid settings will be used over the default values in vcqi_basic_fmtids function",
+                                                 " which means that the foramt(s) might be applied somewehre else too."))
+              vcqi_log_comment(VCP,2,"Warning",paste0("The .R file provided in global FMTIDS contains the default fmtid name(s):", repeat_ids,
+                                                      ". The customized fmtid settings will be used over the default values in vcqi_basic_fmtids function",
+                                                      " which means that the foramt(s) might be applied somewehre else too."))
+
+            }
+
+            # If columns not defined, send a message
+            if (firstin == 0 & otherin == 0){
+              assign("use_basic_fmtids",1, envir = .GlobalEnv)
+              warningmsgs <- c(warningmsgs,
+                             "Columns fmtid_for_first_column_r or fmtid_for_other_columns_r was not provided in VCQI_LEVEL4_SET_LAYOUT; VCQI will have access to the default formats from function vcqi_basic_fmtids")
+              vcqi_log_comment(VCP,2,"Warning",
+                               "Columns fmtid_for_first_column_r or fmtid_for_other_columns_r was not provided in VCQI_LEVEL4_SET_LAYOUT; VCQI will have access to the default formats from function vcqi_basic_fmtids")
+            }
+
+          } #end successfully imported customized formats.
+
+        } else {
+          #File path is not valid
+          warningmsgs <-c(warningmsgs,paste0("File containing the format ids for VCQI_LEVEL4_SET_LAYOUT provided in global FMTIDS does not exist: ", FMTIDS))
+          vcqi_log_comment(VCP,2,"Warning",paste0("File containing the format ids for VCQI_LEVEL4_SET_LAYOUT provided in global FMTIDS does not exist: ", FMTIDS))
+
+          #change fmtid_for_first_column_r abd fmtid_for_other_columns_r to empty if exist
+          if ("fmtid_for_first_column_r" %in% names(level4_layout)){
+            level4_layout <- level4_layout %>% mutate(fmtid_for_first_column_r = NA)
+          }
+
+          if ("fmtid_for_other_columns_r" %in% names(level4_layout)){
+            level4_layout <- level4_layout %>% mutate(fmtid_for_other_columns_r = NA)
+          }
+
+        }
+      } else {
+
+        notempty <- 0
+        if ("fmtid_for_first_column_r" %in% names(level4_layout)){
+          if (!(all(level4_layout$fmtid_for_first_column_r == "" | is.na(level4_layout$fmtid_for_first_column_r) | is.null(level4_layout$fmtid_for_first_column_r)))){
+            notempty <- 1
+          }
+        }
+
+        if ("fmtid_for_other_columns_r" %in% names(level4_layout)){
+          if (!(all(level4_layout$fmtid_for_other_columns_r == "" | is.na(level4_layout$fmtid_for_other_columns_r) | is.null(level4_layout$fmtid_for_other_columns_r)))){
+            notempty <- 1
+          }
+        }
+
+        # If the user does not define the file but fmtid_for_first_column_r or fmtid_for_other_columns_r is not empty
+        # error out
+        if (notempty == 1){
+          exitflag <- 1
+          #TO DO: update error message and comment
+          errormsgs <-c(errormsgs,"FMTIDS file is not defined but customized format is defined for at least one row.")
+          vcqi_log_comment(VCP,1,"Error","FMTIDS file is not defined but customized format is defined for at least one row.")
+        }
+
+        # If the user does not define the file but fmtid_for_first_column_r or fmtid_for_other_columns_r is not defined or emtpy
+        # Give a message.
+        if (notempty == 0){
+          warningmsgs <- c(warningmsgs,
+                         "A separate user-defined file with format ids for VCQI_LEVEL4_SET_LAYOUT was not provided; VCQI will have access to the default formats from function vcqi_basic_fmtids")
+          vcqi_log_comment(VCP,2,"Warning",
+                           "A separate user-defined file with format ids for VCQI_LEVEL4_SET_LAYOUT was not provided; VCQI will have access to the default formats from function vcqi_basic_fmtids")
+        }
+      } #end of if FMTIDS not defined
+
 
     } else {
       exitflag <- 1

@@ -15,7 +15,7 @@
 #' @import stringr
 #'
 #' @examples
-#' make_RI_augmented_dataset_updated(outpath = NA)
+#' make_RI_augmented_dataset_v2(outpath = NA)
 
 # make_RI_augmented_dataset_v2 R version 1.01 - Biostat Global Consulting - 2023-07-29
 # *******************************************************************************

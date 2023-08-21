@@ -38,7 +38,7 @@ VCTC_global_modified_legend_for_bcg_hepb0 <- function(){
   assign("TIMELY_DT_COLOR_2", "#339933", envir = .GlobalEnv)
   assign("TIMELY_DT_COLOR_3", "#FF99FF", envir = .GlobalEnv)
   assign("TIMELY_DT_COLOR_4", "#FF5CFF", envir = .GlobalEnv)
-  assign("TIMELY_DT_COLOR_5", "#FFEBFF", envir = .GlobalEnv)
+  assign("TIMELY_DT_COLOR_5", "#e0e0e0", envir = .GlobalEnv)
 
   assign("TIMELY_DT_LCOLOR_1", "lightgrey", envir = .GlobalEnv)
   assign("TIMELY_DT_LCOLOR_2", "lightgrey", envir = .GlobalEnv)
@@ -109,7 +109,7 @@ VCTC_global_modified_legend_for_bcg_hepb0 <- function(){
   assign("TIMELY_CD_BCG_COLOR_3", "#FF5CFF", envir = .GlobalEnv)
   #very late BCG shows in a BLACK bar
   assign("TIMELY_CD_BCG_COLOR_4", "black", envir = .GlobalEnv)
-  assign("TIMELY_CD_BCG_COLOR_5", "#FFEBFF", envir = .GlobalEnv)
+  assign("TIMELY_CD_BCG_COLOR_5", "#e0e0e0", envir = .GlobalEnv)
 
   assign("TIMELY_CD_BCG_LCOLOR_1", "lightgrey", envir = .GlobalEnv)
   assign("TIMELY_CD_BCG_LCOLOR_2", "lightgrey", envir = .GlobalEnv)
@@ -144,7 +144,7 @@ VCTC_global_modified_legend_for_bcg_hepb0 <- function(){
   assign("TIMELY_CD_HEPB0_COLOR_1", "#BCDDBC", envir = .GlobalEnv)
   assign("TIMELY_CD_HEPB0_COLOR_2", "#FF99FF", envir = .GlobalEnv)
   assign("TIMELY_CD_HEPB0_COLOR_3", "#FF5CFF", envir = .GlobalEnv)
-  assign("TIMELY_CD_HEPB0_COLOR_4", "#FFEBFF", envir = .GlobalEnv)
+  assign("TIMELY_CD_HEPB0_COLOR_4", "#e0e0e0", envir = .GlobalEnv)
 
   assign("TIMELY_CD_HEPB0_LCOLOR_1", "lightgrey", envir = .GlobalEnv)
   assign("TIMELY_CD_HEPB0_LCOLOR_2", "lightgrey", envir = .GlobalEnv)

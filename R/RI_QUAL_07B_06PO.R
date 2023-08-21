@@ -23,7 +23,7 @@ RI_QUAL_07B_06PO <- function(VCP = "RI_QUAL_07B_06PO"){
 
   if (VCQI_MAKE_IW_PLOTS == 1){
 
-    print(paste0(IWPLOT_TYPE, "s (2 plots per dose)")) # TO DO update # plots per dose
+    print(paste0(IWPLOT_TYPE,"s (2 plots per dose)")) # TO DO update # plots per dose
 
     newpath <- paste0(VCQI_OUTPUT_FOLDER, "/Plots_IW_UW")
     dir.create(newpath, showWarnings = FALSE)
@@ -54,7 +54,7 @@ RI_QUAL_07B_06PO <- function(VCP = "RI_QUAL_07B_06PO"){
                           "_", dn, "_database.rds"),
         filename = paste0(newpath, "/RI_QUAL_07B_", ANALYSIS_COUNTER, "_", plottype, "_", dn),
         datafile = paste0(VCQI_OUTPUT_FOLDER, "/RI_QUAL_07B_", ANALYSIS_COUNTER, ".rds"),
-        title = paste0("RI - Would have Valid ", str_to_upper(dn), " if no MOSVs and no early doses (%)"),
+        title = paste0("RI - Would have Valid ", str_to_upper(dn), " if no MOVs (%)"),
         name = paste0("RI_QUAL_07B_", ANALYSIS_COUNTER, "_iwplot_", dn),
         savedata = savedata)
 
@@ -97,9 +97,9 @@ RI_QUAL_07B_06PO <- function(VCP = "RI_QUAL_07B_06PO"){
                             plottype, "_", dn, "_double"),
           datafile = paste0(VCQI_OUTPUT_FOLDER, "/RI_QUAL_07B_", ANALYSIS_COUNTER, ".rds"),
           datafile2 = paste0(VCQI_OUTPUT_FOLDER, "/RI_COVG_02_", double_ac, ".rds"),
-          title = paste0("RI - Would have Valid ", str_to_upper(dn), " if no MOSVs and no early doses (%)"),
+          title = paste0("RI - Would have Valid ", str_to_upper(dn), " if no MOVs (%)"),
           name = paste0(paste0("RI_QUAL_07B_", ANALYSIS_COUNTER, "_iwplot_", dn, "_double")),
-          note = "Gray shape is valid coverage; colored shape is valid coverage if no MOSVs and no early doses",
+          note = "Gray shape is valid coverage; colored shape is valid coverage if no MOVs",
           savedata = savedata
         )
       }

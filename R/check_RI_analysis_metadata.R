@@ -41,7 +41,7 @@ check_RI_analysis_metadata <- function(VCP = "check_RI_analysis_metadata"){
   vcqi_log_comment(VCP, 5, "Flow", "Starting")
 
   # Check the generic analysis-related globals
-  check_analysis_metadata_updated()
+  check_analysis_metadata()
 
   # Check the CM dataset
   check_VCQI_CM_metadata()

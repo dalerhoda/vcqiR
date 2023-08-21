@@ -21,7 +21,7 @@
 #' @import dplyr
 #' @import stringr
 
-# vcqi_to_double_plot R version 1.04 - Biostat Global Consulting - 2022-12-21
+# vcqi_to_double_plot R version 1.06 - Biostat Global Consulting - 2023-02-03
 # *******************************************************************************
 # Change log
 
@@ -32,6 +32,8 @@
 #                                       to vcqi_halt_immediately
 # 2022-12-15  1.03      Mia Yu          Add title etc. to the dataset
 # 2022-12-21  1.04      Mia Yu          Add part to update footnote
+# 2023-01-12  1.05      Mia Yu          Add parts to allow users customize level4 plots
+# 2023-02-03  1.06      Mia Yu          Updated level4 plots customization
 # *******************************************************************************
 
 vcqi_to_double_plot <- function(
@@ -356,8 +358,6 @@ vcqi_to_double_plot <- function(
 
   if (IWPLOT_SHOWBARS == 1){
     extraspace <- max(nchar(combined$text))
-    group.colors <- c(dat = "#2b92be", dat2 = "lightgrey")
-    group.outline <- c(dat = "#0000ff", dat2 = "lightgrey")
 
     if (is.na(combined$graphtitle[1])){
       title <- NULL
@@ -377,31 +377,151 @@ vcqi_to_double_plot <- function(
       note <- combined$graphcaption[1]
     }
 
-    ggplot(combined, mapping = aes(x = as.factor(rowid),y = estimate * 100,fill = source, color = source)) +
-      theme_bw(base_family = "sans")+
-      scale_fill_manual(name = "", values = group.colors, guide = "none") +
-      scale_colour_manual(name = "", values = group.outline, guide = "none")+
-      geom_col(position = position_dodge2(width = 0.5, preserve = "single"),size=0.3) +
-      geom_linerange(aes(ymin = cill * 100, ymax = ciul * 100),colour = "black",
+    #first bring the columns to the data
+    combined <- combined %>% mutate(order = level4id)
+    combined <- left_join(combined, level4_layout, by = "order")
+    combined <- combined %>% select(-c(order, label, condition, rowtype))
+
+    combined <-
+      combined %>% mutate(oldid = rowid) %>% mutate(rowid = row_number())
+
+    if ("outlinecolor2_r" %in% names(combined)) {
+      combined <-
+        combined %>% mutate(outlinecolor2_r = ifelse((is.na(outlinecolor2_r) | is.null(outlinecolor2_r) | outlinecolor2_r == "") %in% TRUE,
+                                                     "lightgrey" , outlinecolor2_r))
+    } else {
+      combined <- combined %>% mutate(outlinecolor2_r = "lightgrey")
+    }
+
+    if ("outlinecolor1_r" %in% names(combined)) {
+      combined <- combined %>% mutate(outlinecolor = outlinecolor1_r)
+
+      combined <-
+        combined %>% mutate(outlinecolor = ifelse((is.na(outlinecolor) | is.null(outlinecolor) | outlinecolor == "") %in% TRUE,
+                                                     "#0000ff" , outlinecolor))
+      combined <-
+        combined %>% mutate(outlinecolor = ifelse(source == "dat2", outlinecolor2_r, outlinecolor))
+    } else {
+      combined <-
+        combined %>% mutate(outlinecolor = "#0000ff") %>% mutate(outlinecolor = ifelse(source == "dat2", outlinecolor2_r, outlinecolor))
+    }
+
+    if ("bar_fillcolor2_r" %in% names(combined)) {
+      combined <-
+        combined %>% mutate(bar_fillcolor2_r = ifelse((is.na(bar_fillcolor2_r) |is.null(bar_fillcolor2_r) | bar_fillcolor2_r == "") %in% TRUE,
+                                                      "lightgrey" ,bar_fillcolor2_r))
+    } else {
+      combined <-
+        combined %>% mutate(bar_fillcolor2_r = "lightgrey")
+    }
+
+    if ("bar_fillcolor1_r" %in% names(combined)) {
+      combined <- combined %>% mutate(fillcolor = bar_fillcolor1_r)
+
+      combined <-
+        combined %>% mutate(fillcolor = ifelse((is.na(fillcolor) |is.null(fillcolor) | fillcolor == "") %in% TRUE,
+                                                      "#2b92be" ,fillcolor))
+      combined <-
+        combined %>% mutate(fillcolor = ifelse(source == "dat2", bar_fillcolor2_r, fillcolor))
+    } else {
+      combined <-
+        combined %>% mutate(fillcolor = "#2b92be") %>% mutate(fillcolor = ifelse(source == "dat2", bar_fillcolor2_r, fillcolor))
+    }
+
+    gap <-  1
+
+    #change the rowid to have extra space if line added
+    if ("addline" %in% names(combined) | "shadecolor2_r" %in% names(combined)) {
+      combined <- combined %>% mutate(rowid = rowid + oldid)
+      gap <- 3
+    }
+
+    rowindex <- which(combined$source == "dat")
+
+    baseplot <-
+      ggplot(combined, aes(x = rowid, y = estimate * 100)) +
+      theme_bw(base_family = "sans") +
+      theme(panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank())
+
+    for (l in rowindex) {
+      if ("shadecolor2_r" %in% names(combined)) {
+        shade <- "TRUE"
+        shadecolor2_r <- combined$shadecolor2_r[l]
+        if (shadecolor2_r == "" | is.na(shadecolor2_r) | is.null(shadecolor2_r)) {
+          shade <- "FALSE"
+        } else if (((shadecolor2_r %in% combined$bar_fillcolor1_r)| (shadecolor2_r %in% combined$bar_fillcolor2_r)) %in% TRUE) {
+          shadecolor2_r <- "lightgoldenrodyellow"
+          print("For double bar plot, the shade color will be set to gold if it is the same as any bar fill color")
+        }
+      } else {
+        shade <- "FALSE"
+      }
+
+      if ("addline" %in% names(combined)) {
+        addl <- "TRUE"
+        addline <- combined$addline[l]
+        if (addline == "" | is.na(addline) | is.null(addline)) {
+          addl <- "FALSE"
+        }
+      } else {
+        addl <- "FALSE"
+      }
+
+      if (shade == "TRUE") {
+        xminimum <- combined$rowid[l] - 0.9
+        xmaximum <- combined$rowid[l] + 1.9
+        yminloc = 0
+        ymaxloc = 100
+
+        baseplot <- baseplot +
+          geom_rect(aes_string(xmin = xminimum,xmax = xmaximum,ymin = yminloc,ymax = ymaxloc),fill = shadecolor2_r)
+
+      }
+
+      if (addl == "TRUE") {
+
+        xlocation <- combined$rowid[l]
+        yminloc = 0
+        ymaxloc = 100
+
+        if (addline == "below") {
+          baseplot <-
+            baseplot + geom_linerange(aes_string(x = xlocation - 1,ymin = yminloc,ymax = ymaxloc),color = "lightgrey")
+        }
+
+        if (addline == "above") {
+          baseplot <-
+            baseplot + geom_linerange(aes_string(x = xlocation + 2,ymin = yminloc,ymax = ymaxloc),color = "lightgrey")
+        }
+
+        if (addline == "both") {
+          baseplot <- baseplot +
+            geom_linerange(aes_string(x = xlocation + 2,ymin = yminloc,ymax = ymaxloc),color = "lightgrey") +
+            geom_linerange(aes_string(x = xlocation - 1,ymin = yminloc,ymax = ymaxloc),color = "lightgrey")
+        }
+
+      }
+
+    } #end of nrow l loop
+
+    baseplot <- baseplot +
+      geom_col(width = 1,fill = combined$fillcolor,color = combined$outlinecolor,size = 0.3) +
+      geom_linerange(aes(ymin = cill * 100, ymax = ciul * 100),
                      position = position_dodge(.9)) +
-      geom_text(aes(x = as.factor(rowid),
-        y = 100 + extraspace,
-        label = text),
-        size = 3.25,colour = "black",family = "sans") +
+      geom_text(aes(x = rowid,y = 100 + extraspace,label = text),size = 3.25,colour = "black",family = "sans") +
       coord_flip() +
-      labs(y = "Estimated Coverage %",
-        x = "",
-        title = title,
-        subtitle = subtitle,
-        caption = note) +
-      scale_x_discrete(labels = combined$name[!is.na(combined$name)]) +
+      labs(y = "Estimated Coverage %",x = "",title = title,subtitle = subtitle,caption = note) +
+      scale_x_continuous(breaks = combined$rowid[!is.na(combined$name)], labels = combined$name[!is.na(combined$name)]) +
       #Note: could find a better way to check the space we need for text
-      scale_y_continuous(limits = c(0, 100 + 2*extraspace),
+      scale_y_continuous(limits = c(0, 100 + 2 * extraspace),
                          breaks = c(0, 25, 50, 75, 100)) +
       theme(plot.caption = element_text(hjust = 0),
             text = element_text(family = "sans", colour = "black"))
 
-    ggsave(paste0(filename,".png"),width = savew, height = saveh, units = "in")
+    ggsave(plot = baseplot,paste0(filename, ".png"),width = savew,height = saveh,units = "in")
+
+
   }
 
   vcqi_log_comment(VCP, 5, "Flow", "Exiting")

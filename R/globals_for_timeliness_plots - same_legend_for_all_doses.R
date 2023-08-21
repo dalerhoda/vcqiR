@@ -42,7 +42,7 @@ VCTC_global_same_legend_for_all <- function(){
   assign("TIMELY_DT_COLOR_2", "#339933", envir = .GlobalEnv)
   assign("TIMELY_DT_COLOR_3", "#FF99FF", envir = .GlobalEnv)
   assign("TIMELY_DT_COLOR_4", "#FF5CFF", envir = .GlobalEnv)
-  assign("TIMELY_DT_COLOR_5", "#FFEBFF", envir = .GlobalEnv)
+  assign("TIMELY_DT_COLOR_5", "#e0e0e0", envir = .GlobalEnv)
 
   assign("TIMELY_DT_LCOLOR_1", "lightgrey", envir = .GlobalEnv)
   assign("TIMELY_DT_LCOLOR_2", "lightgrey", envir = .GlobalEnv)

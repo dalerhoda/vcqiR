@@ -15,13 +15,14 @@
 #' @examples
 #' make_RI_augmented_dataset(outpath = NA)
 
-# make_RI_augmented_dataset R version 1.01 - Biostat Global Consulting - 2022-11-02
+# make_RI_augmented_dataset R version 1.02 - Biostat Global Consulting - 2023-01-06
 # *******************************************************************************
 # Change log
 
 # Date 			  Version 	Name			      What Changed
 # 2022-11-01  1.00      Mia Yu          Original R version
 # 2022-11-02  1.01      Mia Yu          Package version
+# 2023-01-06  1.02      Mia Yu          Added new indicators
 # *******************************************************************************
 
 # General Notes:
@@ -62,7 +63,8 @@ make_RI_augmented_dataset <- function(outpath = NA, analysiscounter = NA){
   # Set directory to be where the VCQI DATASETS are located
 
   # NOTE: for now we only have these RI programs
-  RILIST <- c("RI_COVG_01","RI_COVG_02","RI_QUAL_07B","RI_QUAL_08","RI_QUAL_09")
+  RILIST <- c("RI_COVG_01","RI_COVG_02","RI_COVG_03","RI_COVG_04","RI_CONT_01",
+              "RI_QUAL_01","RI_QUAL_02","RI_QUAL_07B","RI_QUAL_08","RI_QUAL_09")
 
   # Delete dataset if it already existis
   if(file.exists(paste0(outpath, "/RI_augmented_dataset.rds"))) {
@@ -204,12 +206,12 @@ make_RI_augmented_dataset <- function(outpath = NA, analysiscounter = NA){
               ad <- ad %>% select(-c(all_of(varlist_ad[u])))
 
               tempdf <- data.frame(
-                variable = varlist_ad[u], dataset = str_sub(filelist[i], end = -5),
-                analysis_counter = str_sub(filelist[i], start = -5, end = -5),
-                message = "Variable existed in previous dataset(s) but had no conflicting values,
+                  variable = varlist_ad[u], dataset = str_sub(filelist[i], end = -5),
+                  analysis_counter = str_sub(filelist[i], start = -5, end = -5),
+                  message = "Variable existed in previous dataset(s) but had no conflicting values,
                                    thus variable dropped", new_var_name = "")
 
-              vcqiadsvarlist <- rbind(vcqiadsvarlist, tempdf)
+                vcqiadsvarlist <- rbind(vcqiadsvarlist, tempdf)
 
             } else {
               # If values differ, then the new variable will need to be renamed and added to the varlist

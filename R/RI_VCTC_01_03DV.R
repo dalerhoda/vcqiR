@@ -10,13 +10,14 @@
 #' @rawNamespace import(rlang, except = c(local_options,with_options))
 #' @import survey
 #'
-# RI_VCTC_01_03DV R version 1.01 - Biostat Global Consulting - 2022-11-04
+# RI_VCTC_01_03DV R version 1.02 - Biostat Global Consulting - 2023-07-31
 # *******************************************************************************
 # Change log
 
 # Date 			  Version 	Name			      What Changed
 # 2022-11-03  1.00      Mia Yu          Original R version
 # 2022-11-04  1.01      Mia Yu          Package version
+# 2023-07-31  1.02      Mia Yu          Save VCTC category data
 # *******************************************************************************
 
 RI_VCTC_01_03DV <- function(VCP = "RI_VCTC_01_03DV"){
@@ -106,7 +107,7 @@ RI_VCTC_01_03DV <- function(VCP = "RI_VCTC_01_03DV"){
                                                              1, 0))
 
               if((minage == 0 & j == 1) %in% TRUE) {
-                subdat2 <- subdat %>% mutate(timely_y = 0)
+                subdat2 <- subdat2 %>% mutate(timely_y = 0) # changed made here 2023/07/31
               }
 
               subdat2 <- subdat2 %>% select(respid, timely_y)
@@ -160,6 +161,10 @@ RI_VCTC_01_03DV <- function(VCP = "RI_VCTC_01_03DV"){
               minage <- get(paste0(doselist[d],"_min_age_days"), envir = .GlobalEnv)
               subdat2 <- subdat %>% mutate(timely_y = ifelse(((tempvar1 < (minage + dt_ub)) & !is.na(!!crude)) %in% TRUE,
                                                              1, 0))
+
+              if((minage == 0 & j == 1) %in% TRUE) {
+                subdat2 <- subdat2 %>% mutate(timely_y = 0) # changed made here 2023/07/31
+              }
 
               subdat2 <- subdat2 %>% select(respid, timely_y)
 
@@ -366,6 +371,87 @@ RI_VCTC_01_03DV <- function(VCP = "RI_VCTC_01_03DV"){
       RI_VCTC_01_TEMP_DATASETS <- NULL
     }
     vcqi_global(RI_VCTC_01_TEMP_DATASETS,c(RI_VCTC_01_TEMP_DATASETS, paste0("RI_VCTC_01_",ANALYSIS_COUNTER,"_TO.rds")))
+
+    #notes : "Data are sorted by level and levelid and by bar category order."
+
+    if (!vcqi_object_exists("TIMELY_SAVE_DV_DATASET")){
+      TIMELY_SAVE_DV_DATASET <- 1
+    }
+
+    # Unless the user specifically asks us not to, we save a dataset with dose-specific VCTC categories
+    if (TIMELY_SAVE_DV_DATASET != 0) {
+      dat <- vcqi_read(paste0(VCQI_OUTPUT_FOLDER,"/RI_VCTC_01_",ANALYSIS_COUNTER,".rds"))
+
+      doselist <- str_to_lower(TIMELY_DOSE_ORDER)
+      for (d in seq_along(doselist)){
+        D <- str_to_upper(doselist[d])
+
+        cardage <- rlang::sym(paste0("age_at_",doselist[d],"_card"))
+        dat <- dat %>% mutate(tempvar1 = !!cardage)
+
+        if (RI_RECORDS_NOT_SOUGHT != 1){
+          regage <- rlang::sym(paste0("age_at_",doselist[d],"_register"))
+          dat <- dat %>% rowwise() %>% mutate(tempvar1 = min(!!cardage, !!regage,na.rm = TRUE)) %>%
+            ungroup() %>% suppressWarnings()
+          dat <- dat %>% mutate(tempvar1 = ifelse((tempvar1 == Inf | tempvar1 == -Inf) %in% TRUE, NA, tempvar1))
+        } # end of if RI_RECORDS_NOT_SOUGHT
+
+        # Make missing if not eligible
+        crude <- rlang::sym(paste0("got_crude_",doselist[d],"_to_analyze"))
+        dat <- dat %>% mutate(tempvar1 = ifelse(is.na(!!crude), NA, tempvar1))
+
+        dat <- dat %>% mutate(tempvar2 = NA_character_)
+
+        if (!(TIMELY_DOSE_ORDER[d] %in% TIMELY_CD_LIST)){
+          numtile <- as.numeric(TIMELY_N_DTS) - 1
+
+          for (j in 1:numtile){
+            dt_ub <- get(paste0("TIMELY_DT_UB_",j), envir = .GlobalEnv)
+            dt_label <- get(paste0("TIMELY_DT_LABEL_",j), envir = .GlobalEnv)
+            minage <- get(paste0(doselist[d],"_min_age_days"), envir = .GlobalEnv)
+
+            dat <- dat %>% mutate(tempvar2 = ifelse(((tempvar1 < (minage + dt_ub)) %in% TRUE
+                                                     & !is.na(!!crude))
+                                                    & is.na(tempvar2),
+                                                    dt_label, tempvar2))
+          } #end of numtile j loop
+          dt_label <- get(paste0("TIMELY_DT_LABEL_",TIMELY_N_DTS), envir = .GlobalEnv)
+          dat <- dat %>% mutate(tempvar2 = ifelse(is.na(tempvar2), dt_label, tempvar2))
+
+          dat$tempvar1 <- haven::labelled(dat$tempvar1, label = paste0("VCTC 01 - Age at", doselist[d]))
+          dat$tempvar2 <- haven::labelled(dat$tempvar2, label = paste0("VCTC 01 - category for ", doselist[d]))
+
+          names(dat)[which(names(dat) == "tempvar1")] <- paste0("timely_age_at_",doselist[d])
+          names(dat)[which(names(dat) == "tempvar2")] <- paste0("timely_category_",doselist[d])
+        } else {
+
+          cdt <- get(paste0("TIMELY_CD_",TIMELY_DOSE_ORDER[d],"_NTILES"), envir = .GlobalEnv)
+          numtile <- as.numeric(cdt) - 1
+
+          for (j in 1:numtile){
+            dt_ub <- get(paste0("TIMELY_CD_",TIMELY_DOSE_ORDER[d],"_UB_",j), envir = .GlobalEnv)
+            dt_label <- get(paste0("TIMELY_CD_",TIMELY_DOSE_ORDER[d],"_LABEL_",j), envir = .GlobalEnv)
+            minage <- get(paste0(doselist[d],"_min_age_days"), envir = .GlobalEnv)
+
+            dat <- dat %>% mutate(tempvar2 = ifelse(((tempvar1 < (minage + dt_ub)) %in% TRUE
+                                                     & !is.na(!!crude))
+                                                    & is.na(tempvar2),
+                                                    dt_label, tempvar2))
+          } #end of numtile j loop
+
+          dt_label <- get(paste0("TIMELY_CD_",TIMELY_DOSE_ORDER[d],"_LABEL_",cdt), envir = .GlobalEnv)
+          dat <- dat %>% mutate(tempvar2 = ifelse(is.na(tempvar2), dt_label, tempvar2))
+
+          dat$tempvar1 <- haven::labelled(dat$tempvar1, label = paste0("VCTC 01 - Age at", doselist[d]))
+          dat$tempvar2 <- haven::labelled(dat$tempvar2, label = paste0("VCTC 01 - category for ", doselist[d]))
+
+          names(dat)[which(names(dat) == "tempvar1")] <- paste0("timely_age_at_",doselist[d])
+          names(dat)[which(names(dat) == "tempvar2")] <- paste0("timely_category_",doselist[d])
+        }
+      } # end of doselist d loop
+
+      saveRDS(dat,file = paste0(VCQI_OUTPUT_FOLDER,"/RI_VCTC_01_",ANALYSIS_COUNTER,".rds"))
+    }
 
   }
 

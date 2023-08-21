@@ -6,12 +6,12 @@
 #'
 #' @import stringr
 
-# RI_CONT_01_05TOST R version 1.00 - Biostat Global Consulting - 2022-12-19
+# RI_CONT_01_05TOST R version 1.00 - Biostat Global Consulting - 2023-07-24
 # *******************************************************************************
 # Change log
 
 # Date 			  Version 	Name			      What Changed
-# 2022-12-19  1.00      Mia Yu          Original R package version
+# 2023-07-24  1.00      Mia Yu          Original R package version
 # *******************************************************************************
 
 

@@ -17,7 +17,7 @@
 # 2023-07-23  1.01      Mia Yu          Use level3name for the opplot name
 # *******************************************************************************
 
-RI_QUAL_01_06PO <- function(VCP = "RI_QUAL_01_06PO"){
+RI_QUAL_01_06PO<- function(VCP = "RI_QUAL_01_06PO"){
 
   vcqi_log_comment(VCP, 5, "Flow", "Starting")
 

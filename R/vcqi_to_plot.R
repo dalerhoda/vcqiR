@@ -19,7 +19,7 @@
 #' @import dplyr
 #' @import stringr
 
-# vcqi_to_plot R version 1.03 - Biostat Global Consulting - 2022-12-15
+# vcqi_to_plot R version 1.05 - Biostat Global Consulting - 2023-02-03
 # *******************************************************************************
 # Change log
 
@@ -29,6 +29,8 @@
 # 2022-10-19  1.02      Caitlin Clary   Update error message handling, add calls
 #                                       to vcqi_halt_immediately
 # 2022-12-15  1.03      Mia Yu          Add title etc. to the dataset
+# 2023-01-11  1.04      Mia Yu          Add parts to allow users customize level4 plots
+# 2023-02-03  1.05      Mia Yu          Updated level4 plot customization
 # *******************************************************************************
 
 vcqi_to_plot <- function(
@@ -47,6 +49,8 @@ vcqi_to_plot <- function(
     VCP = "vcqi_to_plot"){
 
   vcqi_log_comment(VCP, 5, "Flow", "Starting")
+
+  #browser()
 
   if (file.exists(database)){
     dat <- vcqi_read(database)
@@ -251,32 +255,112 @@ vcqi_to_plot <- function(
       note <- dat$graphcaption[1]
     }
 
-    ggplot(dat, aes(x = as.factor(rowid), y = estimate * 100)) +
-      theme_bw(base_family = "sans")+
-      geom_col(fill = "#2b92be", color = "#0000ff", size=0.3) +
-      geom_errorbar(aes(ymin = cill * 100, ymax = ciul * 100),
-                    width = .2,
-                    position = position_dodge(.9)) +
-      geom_text(aes(
-        x = as.factor(rowid),
-        y = 100 + 1.25*extraspace,
-        label = text),colour = "black",family = "sans") +
+    #first bring the columns to the data
+    dat <- dat %>% mutate(order = level4id)
+    dat <- left_join(dat, level4_layout, by = "order")
+    dat <- dat %>% select(-c(order, label, condition, rowtype))
+
+    if ("outlinecolor1_r" %in% names(dat)) {
+      dat <- dat %>% mutate(outlinecolor1_r = ifelse((is.na(outlinecolor1_r) | is.null(outlinecolor1_r) | outlinecolor1_r == "") %in% TRUE,
+                                                  "#0000ff" ,outlinecolor1_r))
+
+    } else {
+      dat <- dat %>% mutate(outlinecolor1_r = "#0000ff")
+    }
+
+    if ("bar_fillcolor1_r" %in% names(dat)) {
+      dat <- dat %>% mutate(bar_fillcolor1_r = ifelse((is.na(bar_fillcolor1_r) | is.null(bar_fillcolor1_r) | bar_fillcolor1_r == "") %in% TRUE,
+                                               "#2b92be" ,bar_fillcolor1_r))
+    } else {
+      dat <- dat %>% mutate(bar_fillcolor1_r = "#2b92be")
+    }
+
+    gap <-  1
+
+    #change the rowid to have extra space if line added
+    if ("addline" %in% names(dat) | "shadecolor1_r" %in% names(dat)) {
+      dat <- dat %>% mutate(rowid = rowid * 2)
+      gap <- 2
+    }
+
+    baseplot <- ggplot(dat, aes(x = rowid, y = estimate * 100)) +
+      theme_bw(base_family = "sans") +
+      theme(panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank())
+
+    for (l in 1:nrow(dat)) {
+      if ("shadecolor1_r" %in% names(dat)) {
+        shade <- "TRUE"
+        shadecolor1_r <- dat$shadecolor1_r[l]
+        if (shadecolor1_r == "" | is.na(shadecolor1_r) | is.null(shadecolor1_r)) {
+          shade <- "FALSE"
+        }
+      } else {
+        shade <- "FALSE"
+      }
+
+      if ("addline" %in% names(dat)) {
+        addl <- "TRUE"
+        addline <- dat$addline[l]
+        if (addline == "" | is.na(addline) | is.null(addline)) {
+          addl <- "FALSE"
+        }
+
+      } else {
+        addl <- "FALSE"
+      }
+
+      if (shade == "TRUE") {
+        xminimum <- dat$rowid[l] - 0.9
+        xmaximum <- dat$rowid[l] + 0.9
+        yminloc = 0
+        ymaxloc = 100
+
+        baseplot <- baseplot +
+          geom_rect(aes_string(xmin = xminimum,xmax = xmaximum,ymin = yminloc,ymax = ymaxloc,), fill = shadecolor1_r)
+      }
+
+      if (addl == "TRUE") {
+        xlocation <- dat$rowid[l]
+        yminloc = 0
+        ymaxloc = 100
+
+        if (addline == "below") {
+          baseplot <-
+            baseplot + geom_linerange(aes_string(x = xlocation - 1,ymin = yminloc,ymax = ymaxloc),color = "lightgrey")
+        }
+
+        if (addline == "above") {
+          baseplot <-
+            baseplot + geom_linerange(aes_string(x = xlocation + 1,ymin = yminloc,ymax = ymaxloc),color = "lightgrey")
+        }
+
+        if (addline == "both") {
+          baseplot <- baseplot +
+            geom_linerange(aes_string(x = xlocation + 1,ymin = yminloc,ymax = ymaxloc),color = "lightgrey") +
+            geom_linerange(aes_string(x = xlocation - 1,ymin = yminloc,ymax = ymaxloc),color = "lightgrey")
+        }
+
+      }
+
+    } #end of nrow l loop
+
+    baseplot <- baseplot +
+      geom_col(width = 1, fill = dat$bar_fillcolor1_r, color = dat$outlinecolor1_r, size = 0.3) +
+      geom_errorbar(aes(ymin = cill * 100, ymax = ciul * 100), width = .2, position = position_dodge(.9)) +
+      geom_text(aes( x = rowid, y = 100 + 1.25 * extraspace, label = text), colour = "black", family = "sans") +
       coord_flip() +
-      labs(
-        y = "Estimated Coverage %",
-        x = "",
-        title = title,
-        subtitle = subtitle,
-        caption = note
-      ) +
-      scale_x_discrete(labels = dat$name) +
+      labs(y = "Estimated Coverage %", x = "", title = title, subtitle = subtitle, caption = note) +
+      scale_x_continuous(breaks = seq(min(dat$rowid), max(dat$rowid), by = gap), labels = dat$name) +
       #Note: could find a better way to check the space we need for text
-      scale_y_continuous(limits = c(0, 100 + 2.25*extraspace),
+      scale_y_continuous(limits = c(0, 100 + 2.25 * extraspace),
                          breaks = c(0, 25, 50, 75, 100)) +
       theme(plot.caption = element_text(hjust = 0),
             text = element_text(family = "sans", colour = "black"))
 
-    ggsave(paste0(filename, ".png"), width = savew, height = saveh, units = "in")
+    ggsave(plot = baseplot, paste0(filename, ".png"), width = savew, height = saveh, units = "in")
+
+
   }
 
   vcqi_log_comment(VCP, 5, "Flow", "Exiting")

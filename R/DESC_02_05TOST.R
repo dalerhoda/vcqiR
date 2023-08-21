@@ -6,12 +6,13 @@
 #'
 #' @import stringr
 
-# DESC_02_05TOST R version 1.00 - Biostat Global Consulting - 2023-05-29
+# DESC_02_05TOST R version 1.01 - Biostat Global Consulting - 2023-08-21
 # *******************************************************************************
 # Change log
 
 # Date 			  Version 	Name			      What Changed
 # 2023-05-29  1.00      Mia Yu          Original R package version
+# 2023-08-21  1.01      Mia Yu          Trim the sheet name if too long
 # *******************************************************************************
 
 
@@ -118,7 +119,14 @@ DESC_02_05TOST <- function(VCP = "DESC_02_05TOST"){
         variable = "nwtd", replacevar = NA, noannotate = TRUE)
     }
 
-    export_table_to_excel(indicator = "DESC_02",sheet = paste0("DESC_02_",DESC_02_COUNTER,"_",DESC_02_VARIABLES[d]),brief = FALSE)
+    sheetname <- paste0("DESC_02_",DESC_02_COUNTER,"_",DESC_02_VARIABLES[d])
+    sheet1 <- paste0(sheetname, " ", ANALYSIS_COUNTER)
+    if(str_count(sheet1) > 30){
+      e <- 30-str_count(paste0(" ", ANALYSIS_COUNTER))
+      sheetname <- substr(sheetname, 1, e)
+    }
+
+    export_table_to_excel(indicator = "DESC_02",sheet = sheetname,brief = FALSE)
 
     vid = vid + 1
 

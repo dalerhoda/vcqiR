@@ -10,8 +10,9 @@
 #'
 #' @import dplyr
 #' @import openxlsx
+#' @import stringr
 
-# export_table_to_excel R version 1.05 - Biostat Global Consulting - 2022-10-11
+# export_table_to_excel R version 1.06 - Biostat Global Consulting - 2023-02-07
 # *******************************************************************************
 # Change log
 
@@ -23,6 +24,7 @@
 # 2022-09-13  1.03      Mia Yu          Add parts that delete duplicat sheets
 # 2022-10-09  1.04      Mia Yu          Package version
 # 2022-10-11  1.05      Mia Yu          Update the usage of vcqi_object_exists
+# 2023-02-07  1.06      Mia Yu          Update to implement level4 customized cell style
 # *******************************************************************************
 
 
@@ -44,6 +46,19 @@ export_table_to_excel <- function(indicator, tablename = NULL, sheet = NULL, bri
 
   exporttb <- get(tablename, envir = .GlobalEnv)
   exporttb <- exporttb %>% arrange(level4id) %>% select(-c(level4id))
+
+  #get the cell format from level4_layout
+  cellformat <- level4_layout
+
+  if (!"fmtid_for_first_column_r" %in% names(cellformat)){
+    cellformat <- cellformat %>% mutate(fmtid_for_first_column_r = NA)
+  }
+
+  if (!"fmtid_for_other_columns_r" %in% names(cellformat)){
+    cellformat <- cellformat %>% mutate(fmtid_for_other_columns_r = NA)
+  }
+
+  cellformat <- cellformat %>% select(order,label,rowtype,fmtid_for_first_column_r,fmtid_for_other_columns_r)
 
   colnames <- get(paste0(tablename,"_columnlabel"), envir = .GlobalEnv)
   colnames <- data.frame(t(as.matrix(colnames)))
@@ -81,23 +96,19 @@ export_table_to_excel <- function(indicator, tablename = NULL, sheet = NULL, bri
   writeData(wb, sheet = sheet1, colnames, startCol = 2, startRow = 3, colNames = FALSE)
   writeData(wb, sheet = sheet1, exporttb, startRow = 4, colNames = FALSE)
 
-  # For now, establish four format_ids to use later: regular_lalign, regular_ralign, bold_lalign and col_header
-  regular_lalign <- createStyle(fontName = "Calibri", fontSize = 11, fontColour = "black", halign = "left")
-  bold_lalign    <- createStyle(fontName = "Calibri", fontSize = 11, fontColour = "black", halign = "left", textDecoration = "bold")
-  regular_ralign <- createStyle(fontName = "Calibri", fontSize = 11, fontColour = "black", halign = "right")
-  col_header     <- createStyle(fontName = "Calibri", fontSize = 11, fontColour = "black", halign = "right", wrapText = TRUE)
 
   if (vcqi_object_exists(paste0(indicator,"_TO_TITLE"))){
     title <- get(paste0(indicator,"_TO_TITLE"), envir = .GlobalEnv)
     title <- data.frame(t(as.matrix(title)))
     writeData(wb, sheet = sheet1, title, startRow = 1, colNames = FALSE)
-    addStyle(wb, sheet = sheet1, style = bold_lalign, rows = 1, cols = 1)
+    addStyle(wb, sheet = sheet1, style = table_title, rows = 1, cols = 1)
   }
 
   if (vcqi_object_exists(paste0(indicator,"_TO_SUBTITLE"))){
     subtitle <- get(paste0(indicator,"_TO_SUBTITLE"), envir = .GlobalEnv)
     subtitle <- data.frame(t(as.matrix(subtitle)))
     writeData(wb, sheet = sheet1, subtitle, startRow = 2, colNames = FALSE)
+    addStyle(wb, sheet = sheet1, style = table_subtitle, rows = 2, cols = 1)
   }
 
   footnoterow = startrow+nrows+3
@@ -106,6 +117,7 @@ export_table_to_excel <- function(indicator, tablename = NULL, sheet = NULL, bri
     footnote = get(paste0(indicator,"_TO_FOOTNOTE_",i), envir = .GlobalEnv)
     footnote <- data.frame(t(as.matrix(footnote)))
     writeData(wb, sheet = sheet1, footnote, startRow = footnoterow, colNames = FALSE)
+    addStyle(wb, sheet = sheet1, style = table_footnote, rows = footnoterow, cols = 1)
 
     footnoterow = footnoterow +1
     i = i + 1
@@ -115,14 +127,47 @@ export_table_to_excel <- function(indicator, tablename = NULL, sheet = NULL, bri
   # We expect to update this later with fmtids established by MK's new level 4 fmtid code
 	# For now this is a placeholer to left align the first column and right-align the others
 
-	# Cells in cols 2 - end use format regular_ralign
-  addStyle(wb, sheet = sheet1, style = regular_ralign, rows = startrow:(startrow+nrows), cols = 2:ncols, gridExpand = TRUE)
+	# Cells in cols 2 - end use format regular_right
+  addStyle(wb, sheet = sheet1, style = regular_right, rows = startrow:(startrow+nrows), cols = 2:ncols, gridExpand = TRUE)
   # Format the column headers as right align and text wrapped
   addStyle(wb, sheet = sheet1, style = col_header, rows = 3, cols = 2:ncols, gridExpand = TRUE)
 
-  # Cells in column 1 (in rows below the table title) use format regular_lalign
-  addStyle(wb, sheet = sheet1, style = regular_lalign, rows = 2:(startrow+nrows), cols = 1, gridExpand = TRUE)
+  # Cells in column 1 (in rows below the table title) use format regular_left
+  addStyle(wb, sheet = sheet1, style = regular_left, rows = 2:(startrow+nrows), cols = 1, gridExpand = TRUE)
   setColWidths(wb, sheet = 1, cols = 1, widths = 25)
+
+  # *************************************************
+  # Now go through each row to overwrite with any costumized style
+  if (use_basic_fmtids == 0){
+    for (l in 1:nrow(cellformat)){
+
+      #only go through the line that's not blank row
+      if (cellformat$rowtype[l] != "BLANK_ROW"){
+        rownum <- which(exporttb$name == cellformat$label[l])
+
+        firstid <- cellformat$fmtid_for_first_column_r[l]
+        otherid <- cellformat$fmtid_for_other_columns_r[l]
+
+        #first column
+        if (firstid != "" & !is.na(firstid) & !is.null(firstid)){
+          if (exists(firstid)){
+            firststyle <- get(firstid, envir = .GlobalEnv)
+            addStyle(wb, sheet = sheet1, style = firststyle, rows = rownum+3, cols = 1, gridExpand = TRUE)
+          }
+        }
+
+        #other columns
+        if (otherid != "" & !is.na(otherid) & !is.null(otherid)){
+          if (exists(otherid)){
+            otherstyle <- get(otherid, envir = .GlobalEnv)
+            addStyle(wb, sheet = sheet1, style = otherstyle, rows = rownum+3, cols = 2:ncols, gridExpand = TRUE)
+          }
+        }
+
+      } #end of checking rowtype
+
+    } #end of l loop
+  }
 
   # *************************************************
   # R unique parts that formats numeric variables
@@ -194,20 +239,18 @@ export_table_to_excel <- function(indicator, tablename = NULL, sheet = NULL, bri
     writeData(wb, sheet = sheet2, briefcol, startCol = 2, startRow = 3, colNames = FALSE)
     writeData(wb, sheet = sheet2, brieftb,  startRow = 4, colNames = FALSE)
 
-    simple_lalign <- createStyle(halign = "left")
-    simple_ralign <- createStyle(halign = "right")
-
     if (vcqi_object_exists(paste0(indicator,"_TO_TITLE"))){
       title <- get(paste0(indicator,"_TO_TITLE"), envir = .GlobalEnv)
       title <- data.frame(t(as.matrix(title)))
       writeData(wb, sheet = sheet2, title, startRow = 1, colNames = FALSE)
-      addStyle(wb, sheet = sheet2, style = bold_lalign, rows = 1, cols = 1)
+      addStyle(wb, sheet = sheet2, style = table_title, rows = 1, cols = 1)
     }
 
     if (vcqi_object_exists(paste0(indicator,"_TO_SUBTITLE"))){
       subtitle <- get(paste0(indicator,"_TO_SUBTITLE"), envir = .GlobalEnv)
       subtitle <- data.frame(t(as.matrix(subtitle)))
       writeData(wb, sheet = sheet2, subtitle, startRow = 2, colNames = FALSE)
+      addStyle(wb, sheet = sheet2, style = table_subtitle, rows = 2, cols = 1)
     }
 
     footnoterow = startrow+nrows+3
@@ -216,13 +259,48 @@ export_table_to_excel <- function(indicator, tablename = NULL, sheet = NULL, bri
       footnote = get(paste0(indicator,"_TO_FOOTNOTE_",i), envir = .GlobalEnv)
       footnote <- data.frame(t(as.matrix(footnote)))
       writeData(wb, sheet = sheet2, footnote, startRow = footnoterow, colNames = FALSE)
+      addStyle(wb, sheet = sheet2, style = table_footnote, rows = footnoterow, cols = 1)
 
       footnoterow = footnoterow +1
       i = i + 1
     }
+    # Cells in cols 2 - end use format regular_right
+    addStyle(wb, sheet = sheet2, style = regular_right, rows = startrow:(startrow+nrows), cols = 2:ncols, gridExpand = TRUE)
+    # Format the column headers as right align and text wrapped
+    addStyle(wb, sheet = sheet2, style = col_header, rows = 3, cols = 2:ncols, gridExpand = TRUE)
 
-    addStyle(wb, sheet = sheet2, style = simple_ralign, rows = startrow:(startrow+nrows), cols = 2:ncols, gridExpand = TRUE)
-    addStyle(wb, sheet = sheet2, style = simple_lalign, rows = 2:(startrow+nrows), cols = 1, gridExpand = TRUE)
+    # Cells in column 1 (in rows below the table title) use format regular_left
+    addStyle(wb, sheet = sheet2, style = regular_left, rows = 2:(startrow+nrows), cols = 1, gridExpand = TRUE)
+
+    # *************************************************
+    # Now go through each row to overwrite with any costumized style
+    # if the use_basic_fmtids is set to 0 which means that we have imported customized design
+    if (use_basic_fmtids == 0){
+      for (l in 1:nrow(cellformat)){
+
+        rownum <- which(brieftb$name == cellformat$label[l])
+
+        firstid <- cellformat$fmtid_for_first_column_r[l]
+        otherid <- cellformat$fmtid_for_other_columns_r[l]
+
+        #first column
+        if (firstid != "" & !is.na(firstid) & !is.null(firstid)){
+          if (exists(firstid)){
+            firststyle <- get(firstid, envir = .GlobalEnv)
+            addStyle(wb, sheet = sheet2, style = firststyle, rows = rownum+3, cols = 1, gridExpand = TRUE)
+          }
+        }
+
+        #other columns
+        if (otherid != "" & !is.na(otherid) & !is.null(otherid)){
+          if (exists(otherid)){
+            otherstyle <- get(otherid, envir = .GlobalEnv)
+            addStyle(wb, sheet = sheet2, style = otherstyle, rows = rownum+3, cols = 2:ncols, gridExpand = TRUE)
+          }
+        }
+
+      } #end of l loop
+    } #end of use_basic_fmtids == 0
 
     # *************************************************
     # R unique parts that formats numeric variables

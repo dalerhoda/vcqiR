@@ -4,7 +4,7 @@
 \alias{RI_VCTC_01_06PO}
 \title{Make plots for RI_VCTC_01}
 \usage{
-RI_VCTC_01_06PO(VCP = "RI_VCTC_01_06PO_updated")
+RI_VCTC_01_06PO(VCP = "RI_VCTC_01_06PO")
 }
 \arguments{
 \item{VCP}{VCQI current program name to be logged, default to be the function name}

@@ -7,7 +7,7 @@
 #' @import dplyr
 #' @import stringr
 
-# RI_QUAL_09_06PO R version 1.03 - Biostat Global Consulting - 2023-07-21
+# RI_QUAL_09_06PO R version 1.02 - Biostat Global Consulting - 2022-10-13
 # *******************************************************************************
 # Change log
 
@@ -15,7 +15,6 @@
 # 2022-10-01  1.00      Mia Yu          Original R version
 # 2022-10-07  1.01      Mia Yu          Add parts that record filename and label
 # 2022-10-13  1.02      Mia Yu          Package version
-# 2023-07-21  1.03      Caitlin Clary   Update labels (MOV -> MOSV)
 # *******************************************************************************
 
 RI_QUAL_09_06PO <- function(VCP = "RI_QUAL_09_06PO"){
@@ -81,13 +80,10 @@ RI_QUAL_09_06PO <- function(VCP = "RI_QUAL_09_06PO"){
         savedata <- NA
       }
 
-      vcqi_to_uwplot(
-        database = paste0(
-          VCQI_OUTPUT_FOLDER, "/RI_QUAL_09_", ANALYSIS_COUNTER, "_",
-          MOV_OUTPUT_DOSE_LIST[d], "_plot_database.rds"),
-        title = paste0("RI - Respondents with MOSV for ", str_to_upper(MOV_OUTPUT_DOSE_LIST[d])),
-        name = paste0("RI_QUAL_09_", ANALYSIS_COUNTER, "_uwplot_", MOV_OUTPUT_DOSE_LIST[d]),
-        savedata = savedata)
+      vcqi_to_uwplot(database = paste0(VCQI_OUTPUT_FOLDER,"/RI_QUAL_09_",ANALYSIS_COUNTER,"_",MOV_OUTPUT_DOSE_LIST[d],"_plot_database.rds"),
+                     title = paste0("RI - Respondents with MOV for ", str_to_upper(MOV_OUTPUT_DOSE_LIST[d])),
+                     name = paste0("RI_QUAL_09_",ANALYSIS_COUNTER,"_uwplot_",MOV_OUTPUT_DOSE_LIST[d]),
+                     savedata = savedata)
 
       vcqi_log_comment(VCP, 3, "Comment", paste0("Unweighted proportion plot for ", MOV_OUTPUT_DOSE_LIST[d], " was created and exported."))
 
@@ -100,13 +96,10 @@ RI_QUAL_09_06PO <- function(VCP = "RI_QUAL_09_06PO"){
         savedata <- NA
       }
 
-      vcqi_to_uwplot(
-        database = paste0(
-          VCQI_OUTPUT_FOLDER, "/RI_QUAL_09_", ANALYSIS_COUNTER, "_",
-          MOV_OUTPUT_DOSE_LIST[d], "_corplot_database.rds"),
-        title = paste0("RI - Proportion of MOSVs for ", str_to_upper(MOV_OUTPUT_DOSE_LIST[d])," that were Later Corrected"),
-        name = paste0("RI_QUAL_09_", ANALYSIS_COUNTER, "_uwplot_", MOV_OUTPUT_DOSE_LIST[d], "_cor"),
-        savedata = savedata)
+      vcqi_to_uwplot(database = paste0(VCQI_OUTPUT_FOLDER,"/RI_QUAL_09_",ANALYSIS_COUNTER,"_",MOV_OUTPUT_DOSE_LIST[d],"_corplot_database.rds"),
+                     title = paste0("RI - Proportion of MOVs for ", str_to_upper(MOV_OUTPUT_DOSE_LIST[d])," that were Later Corrected"),
+                     name = paste0("RI_QUAL_09_",ANALYSIS_COUNTER,"_uwplot_",MOV_OUTPUT_DOSE_LIST[d],"_cor"),
+                     savedata = savedata)
 
       vcqi_log_comment(VCP, 3, "Comment", paste0("Unweighted proportion plot for Corrected ", MOV_OUTPUT_DOSE_LIST[d], " was created and exported."))
 
@@ -165,7 +158,7 @@ RI_QUAL_09_06PO <- function(VCP = "RI_QUAL_09_06PO"){
     }
 
     vcqi_to_uwplot(database = paste0(VCQI_OUTPUT_FOLDER,"/RI_QUAL_09_",ANALYSIS_COUNTER,"_anydose_plot_database.rds"),
-                   title = "RI - Respondents with MOSV for Any Dose",
+                   title = "RI - Respondents with MOV for Any Dose",
                    name = paste0("RI_QUAL_09_",ANALYSIS_COUNTER,"_uwplot_anydose"),
                    savedata = savedata)
 
@@ -180,12 +173,10 @@ RI_QUAL_09_06PO <- function(VCP = "RI_QUAL_09_06PO"){
       savedata <- NA
     }
 
-    vcqi_to_uwplot(
-      database = paste0(
-        VCQI_OUTPUT_FOLDER, "/RI_QUAL_09_", ANALYSIS_COUNTER, "_anydose_corplot_database.rds"),
-      title = paste0("RI - Percent of Respondents with MOSVs that had All MOSVs Later Corrected"),
-      name = paste0("RI_QUAL_09_", ANALYSIS_COUNTER, "_uwplot_anydose_cor"),
-      savedata = savedata)
+    vcqi_to_uwplot(database = paste0(VCQI_OUTPUT_FOLDER,"/RI_QUAL_09_",ANALYSIS_COUNTER,"_anydose_corplot_database.rds"),
+                   title = paste0("RI - Proportion of MOVs that had All MOVs Later Corrected"),
+                   name = paste0("RI_QUAL_09_",ANALYSIS_COUNTER,"_uwplot_anydose_cor"),
+                   savedata = savedata)
 
     vcqi_log_comment(VCP, 3, "Comment", "Unweighted proportion plot for any dose corrected was created and exported.")
 

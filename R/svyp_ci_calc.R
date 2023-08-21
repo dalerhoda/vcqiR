@@ -132,7 +132,7 @@ svyp_ci_calc <- function(
       ao2 = (100 - level)/100/2,
       zao2 = qnorm(1 - ao2),
       acc = (zao2^2)/2, # Agresti-Coull c
-      tdfNao2 = qt(1 - ao2, df_N - 1), # Would use for K&G 1998 neff
+      tdfNao2 = ifelse(df_N > 1, qt(1 - ao2, df_N - 1), NA), # Would use for K&G 1998 neff
       tddfao2 = qt(1 - ao2, df)
     )
 

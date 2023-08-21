@@ -6,9 +6,9 @@
 #' @export
 #'
 #' @examples
-#' VCTC_default_global_updated()
+#' VCTC_default_global()
 
-# VCTC_default_global_updated R version 1.03 - Biostat Global Consulting - 2023-07-18
+# VCTC_default_global R version 1.03 - Biostat Global Consulting - 2023-07-18
 # *******************************************************************************
 # Change log
 
@@ -22,7 +22,7 @@
 
 # Based on default globals_for_timeliness_plots in Stata VCQI
 
-VCTC_default_global_updated <- function(){
+VCTC_default_global <- function(){
   # DT means 'default tiles'
   # CD means 'customized doses'
 
@@ -42,7 +42,7 @@ VCTC_default_global_updated <- function(){
   assign("TIMELY_DT_COLOR_2", "#339933", envir = .GlobalEnv)
   assign("TIMELY_DT_COLOR_3", "#FF99FF", envir = .GlobalEnv)
   assign("TIMELY_DT_COLOR_4", "#FF5CFF", envir = .GlobalEnv)
-  assign("TIMELY_DT_COLOR_5", "#FFEBFF", envir = .GlobalEnv)
+  assign("TIMELY_DT_COLOR_5", "#e0e0e0", envir = .GlobalEnv)
 
   assign("TIMELY_DT_LCOLOR_1", "lightgrey", envir = .GlobalEnv)
   assign("TIMELY_DT_LCOLOR_2", "lightgrey", envir = .GlobalEnv)

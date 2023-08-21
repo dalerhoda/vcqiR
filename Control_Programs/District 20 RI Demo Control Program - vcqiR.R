@@ -450,6 +450,80 @@ vcqi_global(SORT_PLOT_LOW_TO_HIGH, 1) # 1 means show strata w/ low outcomes at b
 
 RI_COVG_02()
 
+# Estimate proportion of respondents fully vaccinated
+vcqi_global(RI_DOSES_TO_BE_FULLY_VACCINATED, c("BCG","PENTA1", "PENTA2", "PENTA3", "OPV1", "OPV2", "OPV3", "MCV"))
+
+vcqi_global(RI_COVG_03_TO_TITLE, "Fully Vaccinated")
+vcqi_global(RI_COVG_03_TO_SUBTITLE, NA)
+vcqi_global(RI_COVG_03_TO_FOOTNOTE_1,  "Abbreviations: CI=Confidence Interval; LCB=Lower Confidence Bound; UCB=Upper Confidence Bound; DEFF=Design Effect; ICC=Intracluster Correlation Coefficient")
+vcqi_global(RI_COVG_03_TO_FOOTNOTE_2,  "Note: This measure is a population estimate that incorporates survey weights.  The CI, LCB and UCB are calculated with software that take the complex survey design into account.")
+vcqi_global(RI_COVG_03_TO_FOOTNOTE_3,  paste0("Note: To be fully vaccinated, the child must have received: ",str_flatten(RI_DOSES_TO_BE_FULLY_VACCINATED, collapse = " ")))
+vcqi_global(SORT_PLOT_LOW_TO_HIGH, 1) # 1 means show strata w/ low outcomes at bottom and high at top; 0 is the opposite
+
+RI_COVG_03()
+
+# Estimate proportion of respondents not vaccinated
+# (This measure also uses the global macro RI_DOSES_TO_BE_FULLY_VACCINATED)
+
+vcqi_global(RI_COVG_04_TO_TITLE, "Not Vaccinated")
+vcqi_global(RI_COVG_04_TO_SUBTITLE, NA)
+vcqi_global(RI_COVG_04_TO_FOOTNOTE_1,  "Abbreviations: CI=Confidence Interval; LCB=Lower Confidence Bound; UCB=Upper Confidence Bound; DEFF=Design Effect; ICC=Intracluster Correlation Coefficient")
+vcqi_global(RI_COVG_04_TO_FOOTNOTE_2,  "Note: This measure is a population estimate that incorporates survey weights.  The CI, LCB and UCB are calculated with software that take the complex survey design into account.")
+vcqi_global(RI_COVG_04_TO_FOOTNOTE_3,  paste0("Note: To be counted as not vaccinated, the child must not have received any of these doses: ", str_flatten(RI_DOSES_TO_BE_FULLY_VACCINATED, collapse = " ")))
+vcqi_global(SORT_PLOT_LOW_TO_HIGH, 0) # 1 means show strata w/ low outcomes at bottom and high at top; 0 is the opposite
+
+RI_COVG_04()
+
+# --------------------------------------------------------------------------
+# Calculate issues with continuity (dropout) for three dose pairs:
+# 1. Dropout from Penta1 to Penta3
+# 2. Dropout from OPV1 to OPV3
+# 3. Dropout from Penta3 to MCV1
+# --------------------------------------------------------------------------
+
+vcqi_global(RI_CONT_01_DROPOUT_LIST, c("OPV1", "OPV3", "PENTA1", "PENTA3"))
+
+vcqi_global(RI_CONT_01_TO_TITLE, "Dropout")
+vcqi_global(RI_CONT_01_TO_SUBTITLE, NA)
+vcqi_global(RI_CONT_01_TO_FOOTNOTE_1, "Note: This measure is an unweighted summary of a proportion from the survey sample.")
+vcqi_global(SORT_PLOT_LOW_TO_HIGH,0)# 1 means show strata w/ low outcomes at bottom and high at top; 0 is the opposite
+
+RI_CONT_01()
+
+vcqi_global(RI_CONT_01B_DROPOUT_LIST, c("OPV1", "OPV3", "PENTA1", "PENTA3"))
+
+vcqi_global(RI_CONT_01B_TO_TITLE, "Dropout")
+vcqi_global(RI_CONT_01B_TO_SUBTITLE, NA)
+vcqi_global(RI_CONT_01B_TO_FOOTNOTE_1, "Abbreviations: CI=Confidence Interval; LCB=Lower Confidence Bound; UCB=Upper Confidence Bound; DEFF=Design Effect; ICC=Intracluster Correlation Coefficient")
+vcqi_global(RI_CONT_01B_TO_FOOTNOTE_2, "Note: This measure is a population estimate that incorporates survey weights.  The CI, LCB and UCB are calculated with software that take the complex survey design into account")
+vcqi_global(SORT_PLOT_LOW_TO_HIGH,0)# 1 means show strata w/ low outcomes at bottom and high at top; 0 is the opposite
+
+RI_CONT_01B()
+
+# --------------------------------------------------------------------------
+# Indicators characterizing the quality of the vaccination program
+# --------------------------------------------------------------------------
+
+# Estimate proportion who have a card with vaccination dates on it
+
+vcqi_global(RI_QUAL_01_TO_TITLE, "RI Card Availability")
+vcqi_global(RI_QUAL_01_TO_SUBTITLE, NA)
+vcqi_global(RI_QUAL_01_TO_FOOTNOTE_1,  "Abbreviations: CI=Confidence Interval; LCB=Lower Confidence Bound; UCB=Upper Confidence Bound; DEFF=Design Effect; ICC=Intracluster Correlation Coefficient")
+vcqi_global(RI_QUAL_01_TO_FOOTNOTE_2,  "Note: This measure is a population estimate that incorporates survey weights.  The CI, LCB and UCB are calculated with software that take the complex survey design into account.")
+vcqi_global(SORT_PLOT_LOW_TO_HIGH, 1)# 1 means show strata w/ low outcomes at bottom and high at top; 0 is the opposite
+
+RI_QUAL_01()
+
+# Estimate proportion who ever had a vaccination card
+
+vcqi_global(RI_QUAL_02_TO_TITLE, "Ever Received RI Card")
+vcqi_global(RI_QUAL_02_TO_SUBTITLE, NA)
+vcqi_global(RI_QUAL_02_TO_FOOTNOTE_1, "Abbreviations: CI=Confidence Interval; LCB=Lower Confidence Bound; UCB=Upper Confidence Bound; DEFF=Design Effect; ICC=Intracluster Correlation Coefficient")
+vcqi_global(RI_QUAL_02_TO_FOOTNOTE_2, "Note: This measure is a population estimate that incorporates survey weights.  The CI, LCB and UCB are calculated with software that take the complex survey design into account.")
+vcqi_global(SORT_PLOT_LOW_TO_HIGH, 1) # 1 means show strata w/ low outcomes at bottom and high at top; 0 is the opposite
+
+RI_QUAL_02()
+
 # .........................................................................
 # Missed Opportunities for Simultaneous Vaccination (MOV)
 # .........................................................................
@@ -537,30 +611,27 @@ RI_VCTC_01_LEVELS <- 1
 
 #Specify which doses to show in the chart and the order, from bottom to top
 
-TIMELY_DOSE_ORDER <- c("bcg","opv1","opv2","opv3","penta1","penta2","penta3","mcv")
+TIMELY_DOSE_ORDER <- c("bcg","opv1","penta1","opv2","penta2","opv3","penta3","mcv")
 
 # Specify the y-coordinates for the bars.  If you want them to be spaced evenly, you may omit this global (leave it empty)
 # In this example, we use irregular spacing to group the different dose series.
-TIMELY_Y_COORDS <- c(10, 23, 30, 37, 50, 57, 64, 77)
+TIMELY_Y_COORDS <- c(10, 20,27,  37,44,  54,64,  74)
 
 # You may customize the parameters in the .R file and define the full
 # path to the .R file below as VCTC_globals_path. Or you may re-specify them
 # in code after VCTC_default_global() was called
 
-# Include the user-specified parameters, if want to customize any settings
+# But if not, you can include user-specified parameters, if present
 vcqi_global(VCTC_globals_path, NA)
 
 if (vcqi_object_exists("VCTC_globals_path")){
   source(file = VCTC_globals_path)
 } else {
-  VCTC_default_global()
+  VCTC_global_same_legend_for_all()
+  #VCTC_global_modified_legend_for_bcg()
+  #VCTC_global_modified_legend_for_bcg_hepb()
+  #VCTC_global_modified_legend_for_bcg_hepb0()
 }
-
-# Over-ride one default parameters:
-
-# Because we are spacing the bars about every y=10 units instead of the
-# default Y=1, specify a bar width that is 10X the default.
-vcqi_global(TIMELY_BARWIDTH, 6.7)
 
 # Do the calculations and make the charts
 RI_VCTC_01()
@@ -573,7 +644,7 @@ RI_VCTC_01()
 # Make augmented dataset for additional analysis purposes if user requests it.
 if(vcqi_object_value("VCQI_MAKE_AUGMENTED_DATASET", 1) &
    !vcqi_object_value("VCQI_CHECK_INSTEAD_OF_RUN", 1)){
-  make_RI_augmented_dataset(outpath = NA)
+  make_RI_augmented_dataset_v2(outpath = NA)
 }
 
 # Close the datasets that hold the results of hypothesis tests and put them into

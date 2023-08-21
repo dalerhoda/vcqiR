@@ -6,13 +6,12 @@
 #'
 #' @import stringr
 
-# RI_QUAL_08_06PO R version 1.01 - Biostat Global Consulting - 2023-07-21
+# RI_QUAL_08_06PO R version 1.00 - Biostat Global Consulting - 2022-09-28
 # *******************************************************************************
 # Change log
 
 # Date 			  Version 	Name			      What Changed
 # 2022-09-28  1.00      Mia Yu          Original R version
-# 2023-07-21  1.01      Caitlin Clary   Update labels (MOV -> MOSV)
 # *******************************************************************************
 
 RI_QUAL_08_06PO <- function(VCP = "RI_QUAL_08_06PO"){
@@ -28,40 +27,34 @@ RI_QUAL_08_06PO <- function(VCP = "RI_QUAL_08_06PO"){
       print(MOV_OUTPUT_DOSE_LIST[d])
 
       if (VCQI_SAVE_UW_PLOT_DATA == 1){
-        filestub <- paste0("RI_QUAL_08_", ANALYSIS_COUNTER, "_uwplot_", MOV_OUTPUT_DOSE_LIST[d])
+        filestub <- paste0("RI_QUAL_08_",ANALYSIS_COUNTER,"_uwplot_",MOV_OUTPUT_DOSE_LIST[d])
         savedata <- paste0(newpath,"/",filestub)
-      } else {
+      } else{
         savedata <- NA
       }
 
-      vcqi_to_uwplot(
-        database = paste0(VCQI_OUTPUT_FOLDER, "/RI_QUAL_08_", ANALYSIS_COUNTER,
-                          "_", MOV_OUTPUT_DOSE_LIST[d], "_database.rds"),
-        title = paste0("RI - Visits with MOSV for ", str_to_upper(MOV_OUTPUT_DOSE_LIST[d])),
-        name = paste0("RI_QUAL_08_", ANALYSIS_COUNTER,"_uwplot_", MOV_OUTPUT_DOSE_LIST[d]),
-        savedata = savedata)
+      vcqi_to_uwplot(database = paste0(VCQI_OUTPUT_FOLDER,"/RI_QUAL_08_",ANALYSIS_COUNTER,"_",MOV_OUTPUT_DOSE_LIST[d],"_database.rds"),
+                     title = paste0("RI - Visits with MOV for ", str_to_upper(MOV_OUTPUT_DOSE_LIST[d])),
+                     name = paste0("RI_QUAL_08_",ANALYSIS_COUNTER,"_uwplot_",MOV_OUTPUT_DOSE_LIST[d]),
+                     savedata = savedata)
 
-      vcqi_log_comment(
-        VCP, 3, "Comment",
-        paste0("Unweighted proportion plot for ",
-               MOV_OUTPUT_DOSE_LIST[d], " was created and exported."))
-    } # end of d loop
+      vcqi_log_comment(VCP, 3, "Comment",
+                       paste0("Unweighted proportion plot for ",MOV_OUTPUT_DOSE_LIST[d]," was created and exported."))
+    } #end of d loop
 
     print("Totals...")
 
     if (VCQI_SAVE_UW_PLOT_DATA == 1){
-      filestub <- paste0("RI_QUAL_08_", ANALYSIS_COUNTER, "_uwplot_any")
-      savedata <- paste0(newpath,"/", filestub)
-    } else {
+      filestub <- paste0("RI_QUAL_08_",ANALYSIS_COUNTER,"_uwplot_any")
+      savedata <- paste0(newpath,"/",filestub)
+    } else{
       savedata <- NA
     }
 
-    vcqi_to_uwplot(
-      database = paste0(VCQI_OUTPUT_FOLDER, "/RI_QUAL_08_", ANALYSIS_COUNTER,
-                        "_any_database.rds"),
-      title = "RI - Visits with MOSV for Any Dose",
-      name = paste0("RI_QUAL_08_", ANALYSIS_COUNTER, "_uwplot_any"),
-      savedata = savedata)
+    vcqi_to_uwplot(database = paste0(VCQI_OUTPUT_FOLDER,"/RI_QUAL_08_",ANALYSIS_COUNTER,"_any_database.rds"),
+                   title = "RI - Visits with MOV for Any Dose",
+                   name = paste0("RI_QUAL_08_",ANALYSIS_COUNTER,"_uwplot_any"),
+                   savedata = savedata)
 
     vcqi_log_comment(VCP, 3, "Comment",
                      "Unweighted proportion plot for any dose was created and exported.")
