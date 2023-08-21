@@ -49,7 +49,7 @@
 #' @examples
 #' cleanup_RI_dates_and_ticks()
 
-# cleanup_RI_dates_and_ticks R version 1.10 - Biostat Global Consulting - 2022-10-19
+# cleanup_RI_dates_and_ticks R version 1.11 - Biostat Global Consulting - 2023-08-21
 # *******************************************************************************
 # Change log
 
@@ -69,19 +69,19 @@
 # 2022-10-05  1.08      Mia Yu          Package version
 # 2022-10-18  1.09      Caitlin Clary   Added vcqi_halt_immediately call
 # 2022-10-19  1.10      Mia Yu          Add variable labels and VCQI_DOB_PREFER_DOC part
+# 2023-08-21  1.11      Caitlin Clary   Fill holes in history evidence
 # *******************************************************************************
-
 
 cleanup_RI_dates_and_ticks <- function(VCP = "cleanup_RI_dates_and_ticks"){
   vcqi_log_comment(VCP, 5, "Flow", "Starting")
 
-  if(VCQI_CHECK_INSTEAD_OF_RUN != 1){
+  if (VCQI_CHECK_INSTEAD_OF_RUN != 1){
 
     # Use VCQI_RI_DATASET as defined at the end of check_interview_date
     # Either _preclean or the original RI dataset - either way, saved in VCQI_OUTPUT_FOLDER
     dat <- vcqi_read(paste0(VCQI_OUTPUT_FOLDER, "/", VCQI_RI_DATASET))
 
-    if(RI_RECORDS_SOUGHT_FOR_ALL == 1 | RI_RECORDS_SOUGHT_IF_NO_CARD == 1){
+    if (RI_RECORDS_SOUGHT_FOR_ALL == 1 | RI_RECORDS_SOUGHT_IF_NO_CARD == 1){
 
       dat <- mutate(dat, RIHC01 = RI01, RIHC03 = RI03, RIHC14 = RI11, RIHC15 = RI12)
 
@@ -394,11 +394,20 @@ cleanup_RI_dates_and_ticks <- function(VCP = "cleanup_RI_dates_and_ticks"){
       dat <- dat %>%
         rowwise() %>%
         # use suppressWarnings() because if_else() works by evaluating both the value to return when the condition is met and the value to return when the condition is not met.
-        mutate(mindob = if_else((is.na(dob_card) & is.na(dob_history) & is.na(dob_register)) %in% TRUE, NA_Date_, suppressWarnings(min(dob_card, dob_history, dob_register, na.rm = TRUE)))) %>%
+        mutate(
+          mindob = if_else(
+            (is.na(dob_card) & is.na(dob_history) & is.na(dob_register)) %in% TRUE,
+            NA_Date_,
+            suppressWarnings(min(dob_card, dob_history, dob_register, na.rm = TRUE)))
+        ) %>%
         ungroup() %>%
         mutate(
-          plausible_birthdate = ifelse((is.na(dob_for_valid_dose_calculations) & !is.na(mindob)) %in% TRUE, 1, NA),
-          dob_for_valid_dose_calculations = if_else(is.na(dob_for_valid_dose_calculations), mindob, dob_for_valid_dose_calculations)
+          plausible_birthdate = ifelse(
+            (is.na(dob_for_valid_dose_calculations) & !is.na(mindob)) %in% TRUE,
+            1, NA),
+          dob_for_valid_dose_calculations = if_else(
+            is.na(dob_for_valid_dose_calculations),
+            mindob, dob_for_valid_dose_calculations)
         ) %>%
         select(-mindob)
 
@@ -500,20 +509,47 @@ cleanup_RI_dates_and_ticks <- function(VCP = "cleanup_RI_dates_and_ticks"){
                                 tempvar7 %in% 1, TRUE, FALSE)
           )
 
-        dat$tempvar1 <- haven::labelled(dat$tempvar1,
-                                        label = paste0(RI_DOSE_LIST[v], " date, ", type[s], " -Missing Month")) %>% suppressWarnings()
-        dat$tempvar2 <- haven::labelled(dat$tempvar2,
-                                        label = paste0(RI_DOSE_LIST[v], " date, ", type[s], " -Missing Day")) %>% suppressWarnings()
-        dat$tempvar3 <- haven::labelled(dat$tempvar3,
-                                        label = paste0(RI_DOSE_LIST[v], " date, ", type[s], " -Missing Year")) %>% suppressWarnings()
-        dat$tempvar4 <- haven::labelled(dat$tempvar4,
-                                        label = paste0(RI_DOSE_LIST[v], " date, ", type[s], " -Missing Day Only")) %>% suppressWarnings()
-        dat$tempvar5 <- haven::labelled(dat$tempvar5,
-                                        label = paste0(RI_DOSE_LIST[v], " date, ", type[s], " -Missing Complete Date")) %>% suppressWarnings()
-        dat$tempvar6 <- haven::labelled(dat$tempvar6,
-                                        label = paste0(RI_DOSE_LIST[v], " date, ", type[s], " -Missing Any Date Component")) %>% suppressWarnings()
-        dat$tempvar7 <- haven::labelled(dat$tempvar7,
-                                        label = paste0(RI_DOSE_LIST[v], " date, ", type[s], " -All date components result to nonsense date")) %>% suppressWarnings()
+        dat$tempvar1 <- haven::labelled(
+          dat$tempvar1,
+          label = paste0(RI_DOSE_LIST[v], " date, ", type[s],
+                         " -Missing Month")) %>%
+          suppressWarnings()
+
+        dat$tempvar2 <- haven::labelled(
+          dat$tempvar2,
+          label = paste0(RI_DOSE_LIST[v], " date, ", type[s],
+                         " -Missing Day")) %>%
+          suppressWarnings()
+
+        dat$tempvar3 <- haven::labelled(
+          dat$tempvar3,
+          label = paste0(RI_DOSE_LIST[v], " date, ", type[s],
+                         " -Missing Year")) %>%
+          suppressWarnings()
+
+        dat$tempvar4 <- haven::labelled(
+          dat$tempvar4,
+          label = paste0(RI_DOSE_LIST[v], " date, ", type[s],
+                         " -Missing Day Only")) %>%
+          suppressWarnings()
+
+        dat$tempvar5 <- haven::labelled(
+          dat$tempvar5,
+          label = paste0(RI_DOSE_LIST[v], " date, ", type[s],
+                         " -Missing Complete Date")) %>%
+          suppressWarnings()
+
+        dat$tempvar6 <- haven::labelled(
+          dat$tempvar6,
+          label = paste0(RI_DOSE_LIST[v], " date, ", type[s],
+                         " -Missing Any Date Component")) %>%
+          suppressWarnings()
+
+        dat$tempvar7 <- haven::labelled(
+          dat$tempvar7,
+          label = paste0(RI_DOSE_LIST[v], " date, ", type[s],
+                         " -All date components result to nonsense date")) %>%
+          suppressWarnings()
 
         names(dat)[which(names(dat) == "tempvar1")] <- paste0(RI_DOSE_LIST[v],"_",type[s],"_date_dq_flag01")
         names(dat)[which(names(dat) == "tempvar2")] <- paste0(RI_DOSE_LIST[v],"_",type[s],"_date_dq_flag02")
@@ -658,7 +694,7 @@ cleanup_RI_dates_and_ticks <- function(VCP = "cleanup_RI_dates_and_ticks"){
 
     #If the user requests a report on data quality, issue it now
 
-    if(VCQI_REPORT_DATA_QUALITY == 1) {
+    if (VCQI_REPORT_DATA_QUALITY == 1) {
       #Note: type object gets overwritten in the date_tick_chk programs below but needed downstream so save and restore
       savetypes <- type
 
@@ -741,7 +777,7 @@ cleanup_RI_dates_and_ticks <- function(VCP = "cleanup_RI_dates_and_ticks"){
     if (!vcqi_object_exists("NUM_DOSE_SHIFTS")){vcqi_global(NUM_DOSE_SHIFTS,0)}
     if (NUM_DOSE_SHIFTS >=  1) {
       dat <- shift_RI_dates(NUM_DOSE_SHIFTS, dat = dat)
-      }
+    }
 
     # ************************************************************
 
@@ -756,7 +792,7 @@ cleanup_RI_dates_and_ticks <- function(VCP = "cleanup_RI_dates_and_ticks"){
       )
     }) %>% do.call(rbind, .)
 
-    if(!is.null(dps)){
+    if (!is.null(dps)){
 
       dps <- lapply(seq_along(dps$doselist), function(x) data.frame(
         dose = str_to_lower(get(dps$doselist[x])),
@@ -777,12 +813,18 @@ cleanup_RI_dates_and_ticks <- function(VCP = "cleanup_RI_dates_and_ticks"){
           later = c(1:n())
         ) %>%
         tidyr::expand(earlier, later) %>%
-        filter(earlier < later)
+        filter(earlier < later) %>%
+        # Create some variables used for filling in holes in history evidence
+        mutate(
+          earlier_later_distance = later - earlier,
+          check_prev_flag = ifelse(earlier_later_distance > 1, 1, 0)
+        )
 
       # Create change-to-tick temporary variables
       for(s in seq_along(type)){
         for(i in seq_along(multidoses)){
-          temp <- paste0(multidoses[i], "_", type[s], "_change_to_tick_temp") %>% rlang::sym()
+          temp <- paste0(multidoses[i], "_", type[s], "_change_to_tick_temp") %>%
+            rlang::sym()
 
           dat <- dat %>%
             mutate(!!temp := NA)
@@ -857,6 +899,130 @@ cleanup_RI_dates_and_ticks <- function(VCP = "cleanup_RI_dates_and_ticks"){
         select(-contains("tempvar"),
                -contains("tick_temp"))
 
+
+      # Loop over dose series and fill any holes in history evidence ----
+
+      fill_history <- TRUE
+      if (vcqi_object_exists("DO_NOT_FILL_HISTORY_HOLES")){
+        if (DO_NOT_FILL_HISTORY_HOLES %in% 1){
+          fill_history <- FALSE
+        }
+      }
+
+      if (fill_history == TRUE){
+
+        for(d in seq_along(unique(dps$dose))){
+
+          whichseries <- unique(dps$dose)[d]
+
+          dps_d <- dps %>%
+            filter(dose %in% whichseries)
+
+          # Set temporary flags for doses to change
+          for(j in 1:nrow(dps_d)){
+
+            earlier_dose <- paste0(dps_d$dose[j], dps_d$earlier[j], "_history") %>% rlang::sym()
+            later_dose <- paste0(dps_d$dose[j], dps_d$later[j], "_history") %>% rlang::sym()
+
+            # Flag 24 - history shows later dose received but not earlier dose
+            # Note Stata VCQI uses flag 23 for 2-dose & flag 24 for 3-dose series
+            # while R VCQI uses flag 24 for all multidose series
+
+            temp_changeflag <- paste0(
+              "temp24_", dps_d$dose[j], "_", dps_d$later[j], dps_d$earlier[j],
+              "_history_flag24") %>%
+              rlang::sym()
+
+            dat <- dat %>%
+              mutate(
+                !!temp_changeflag := ifelse(
+                  !!later_dose %in% 1 & !(!!earlier_dose %in% 1), 1, 0),
+              )
+
+            # Check previous flags - e.g. if dose1 history is missing and both
+            # dose2 and dose3 are present, the dose21 flag should be set, *not*
+            # the dose31 flag.
+            if (dps_d$check_prev_flag[j] %in% 1){
+
+              prevflag_laterdoses <- dps_d$later[j] - c(1:(dps_d$earlier_later_distance[j]-1))
+
+              for(k in seq_along(prevflag_laterdoses)){
+                prev_changeflag <- paste0(
+                  "temp24_", dps_d$dose[j], "_", prevflag_laterdoses[k], dps_d$earlier[j],
+                  "_history_flag24") %>%
+                  rlang::sym()
+
+                dat <- dat %>%
+                  mutate(
+                    !!temp_changeflag := ifelse(
+                      !!prev_changeflag %in% 1, 0, !!temp_changeflag),
+                  )
+              } # end k loop for updating flags
+            } # end if
+
+          } # end j loop through dose pairs
+
+          # Summarize info from flags about which history evidence was changed
+          laterdoses <- sort(unique(dps$later))
+          for(k in seq_along(laterdoses)){
+
+            temp <- dat %>%
+              select(contains(paste0("temp24_", whichseries, "_", laterdoses[k]))) %>%
+              mutate(changed = rowSums(., na.rm = TRUE),
+                     changed = ifelse(changed > 0, 1, 0))
+
+            if (nrow(filter(temp, changed %in% 1)) > 0){
+
+              vcqi_log_comment(
+                VCP, 4, "Data",
+                paste0(
+                  "For ", nrow(filter(temp, changed %in% 1)),
+                  " respondents, there was history evidence of ",
+                  stringr::str_to_upper(whichseries), laterdoses[k],
+                  " but not of 1+ earlier doses of ",
+                  stringr::str_to_upper(whichseries),
+                  "; VCQI imputed history evidence for the missing earlier dose(s)."
+                ))
+            }
+          } # end k loop for writing log comments
+
+          # After temp flags are set and log comments written, update history
+          # evidence and set flags for proximate doses to match Stata VCQI flags
+          dps_d_p <- dps_d %>% arrange(dose, desc(later), desc(earlier)) %>%
+            filter(earlier_later_distance %in% 1)
+          for(j in 1:nrow(dps_d_p)){
+
+            earlier_dose <- paste0(dps_d_p$dose[j], dps_d_p$earlier[j], "_history") %>% rlang::sym()
+            later_dose <- paste0(dps_d_p$dose[j], dps_d_p$later[j], "_history") %>% rlang::sym()
+
+            changeflag <- paste0(
+              dps_d_p$dose[j], "_", dps_d_p$later[j], dps_d_p$earlier[j], "_history_flag24") %>%
+              rlang::sym()
+
+            dat <- dat %>%
+              mutate(
+                flag24temp := ifelse(!!later_dose %in% 1 & !(!!earlier_dose %in% 1), 1, 0),
+                !!earlier_dose := ifelse(
+                  !!later_dose %in% 1 & !(!!earlier_dose %in% 1), 1, !!earlier_dose)
+              )
+
+            # Label flag variables
+            dat$flag24temp <- haven::labelled(
+              dat$flag24temp,
+              label = paste0("History shows dose ", dps_d_p$later[j], " but not dose ", dps_d_p$earlier[j]) %>%
+              suppressWarnings()
+            )
+            names(dat)[which(names(dat) == "flag24temp")] <- paste0(
+              dps_d_p$dose[j], "_", dps_d_p$later[j], dps_d_p$earlier[j], "_history_flag24")
+          }
+
+        } # end d loop (dose series, for filling in history evidence)
+
+        # Remove temporary flags
+        dat <- dat %>% select(-contains("temp24"))
+
+      } # end if filling history holes
+
     } # End of if(!is.null(dps))
 
     # Create flags to indicate no card or no register
@@ -923,7 +1089,7 @@ cleanup_RI_dates_and_ticks <- function(VCP = "cleanup_RI_dates_and_ticks"){
           1, has_card_with_dob_and_dosedate)
       )
 
-    #Add variable labels
+    # Add variable labels
 
     dat$age_at_interview <- haven::labelled(dat$age_at_interview, label = "Age at interview (days)") %>% suppressWarnings()
     dat$no_card <- haven::labelled(dat$no_card, label = "No Card with Dates in Dataset") %>% suppressWarnings()
@@ -938,9 +1104,12 @@ cleanup_RI_dates_and_ticks <- function(VCP = "cleanup_RI_dates_and_ticks"){
     for (s in seq_along(type)){
       for (v in seq_along(RI_DOSE_LIST)){
 
-        f <- paste0("dat$", RI_DOSE_LIST[v], "_", type[s],"_date_dq_flag00 <- haven::labelled(dat$",
-                    RI_DOSE_LIST[v], "_", type[s],"_date_dq_flag00, label = '",RI_DOSE_LIST[v], " date, ", type[s],
-                    " -Flag Problem(s) with Date') %>% suppressWarnings()")
+        f <- paste0(
+          "dat$", RI_DOSE_LIST[v], "_", type[s],
+          "_date_dq_flag00 <- haven::labelled(dat$",
+          RI_DOSE_LIST[v], "_", type[s], "_date_dq_flag00,
+          label = '", RI_DOSE_LIST[v], " date, ", type[s],
+          " -Flag Problem(s) with Date') %>% suppressWarnings()")
         eval(parse_expr(f))
 
       }
@@ -1007,13 +1176,14 @@ cleanup_RI_dates_and_ticks <- function(VCP = "cleanup_RI_dates_and_ticks"){
                           "_clean.rds")
     vcqi_global(RI_TEMP_DATASETS, c(RI_TEMP_DATASETS, datasetname))
 
-    if(all(is.na(dat$dob_for_valid_dose_calculations))){
-      vcqi_log_comment(VCP, 2, "Warning", "None of the records in the dataset have a full date of birth, so VCQI will not be able to calculate some RI indicators.")
+    if (all(is.na(dat$dob_for_valid_dose_calculations))){
+      vcqi_log_comment(
+        VCP, 2, "Warning",
+        "None of the records in the dataset have a full date of birth, so VCQI will not be able to calculate some RI indicators.")
       vcqi_global(VCQI_NO_DOBS, 1)
     } else{
       vcqi_global(VCQI_NO_DOBS, 0)
     }
-
   }
 
   vcqi_log_comment(VCP, 5, "Flow", "Exiting")
