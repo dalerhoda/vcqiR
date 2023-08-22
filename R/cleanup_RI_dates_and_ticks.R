@@ -1155,12 +1155,14 @@ cleanup_RI_dates_and_ticks <- function(VCP = "cleanup_RI_dates_and_ticks"){
     # (<VCQI_RI_DATASET>_clean)
 
     dat2 <- dat %>%
-      select(RI01, RI03, RI11, RI12, ends_with("card_date"),
-             no_card, no_register, ends_with("register_date"),
-             dob_for_valid_dose_calculations, age_at_interview,
-             ends_with("history"), has_card_with_dob_and_dosedate,
-             card_date_count, flag_dob_before_dosedate,
-             showed_card_with_dates_after_dob)
+      select(
+        RI01, RI03, RI11, RI12, ends_with("card_date"), ends_with("card_tick"),
+        no_card, no_register, ends_with("register_date"),
+        ends_with("register_tick"), dob_for_valid_dose_calculations,
+        age_at_interview, ends_with("history"), has_card_with_dob_and_dosedate,
+        card_date_count, flag_dob_before_dosedate,
+        showed_card_with_dates_after_dob
+      )
 
     dat <- vcqi_read(paste0(VCQI_OUTPUT_FOLDER, "/", VCQI_RI_DATASET)) %>%
       select(-ends_with("history"))
