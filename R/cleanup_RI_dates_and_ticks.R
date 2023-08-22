@@ -1151,19 +1151,28 @@ cleanup_RI_dates_and_ticks <- function(VCP = "cleanup_RI_dates_and_ticks"){
     datasetname <- paste0(tools::file_path_sans_ext(VCQI_RI_DATASET), "_dqd.rds")
     vcqi_global(RI_TEMP_DATASETS, c(RI_TEMP_DATASETS, datasetname))
 
-    # Merge the new clean variables on to the RI survey dataset, save (<VCQI_RI_DATASET>_clean)
+    # Merge the new clean variables on to the RI survey dataset, save
+    # (<VCQI_RI_DATASET>_clean)
 
-    dat2 <- dat
-    dat <- vcqi_read(paste0(VCQI_OUTPUT_FOLDER, "/", VCQI_RI_DATASET))
+    dat2 <- dat %>%
+      select(RI01, RI03, RI11, RI12, ends_with("card_date"),
+             no_card, no_register, ends_with("register_date"),
+             dob_for_valid_dose_calculations, age_at_interview,
+             ends_with("history"), has_card_with_dob_and_dosedate,
+             card_date_count, flag_dob_before_dosedate,
+             showed_card_with_dates_after_dob)
 
-    colstodrop <- rev(which(names(dat2) %in% names(dat)))
+    dat <- vcqi_read(paste0(VCQI_OUTPUT_FOLDER, "/", VCQI_RI_DATASET)) %>%
+      select(-ends_with("history"))
 
-    for (q in seq_along(colstodrop)){
-      colnumber <- colstodrop[q]
-      if (!(names(dat2)[colnumber] %in% c("RI01", "RI03", "RI11", "RI12"))){
-        dat2 <- dat2[,-colnumber]
-      }
-    }
+    # colstodrop <- rev(which(names(dat2) %in% names(dat)))
+    #
+    # for (q in seq_along(colstodrop)){
+    #   colnumber <- colstodrop[q]
+    #   if (!(names(dat2)[colnumber] %in% c("RI01", "RI03", "RI11", "RI12"))){
+    #     dat2 <- dat2[,-colnumber]
+    #   }
+    # }
 
     dat <- left_join(dat, dat2, by = c("RI01", "RI03", "RI11", "RI12"))
 
