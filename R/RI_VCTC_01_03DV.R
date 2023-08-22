@@ -410,11 +410,20 @@ RI_VCTC_01_03DV <- function(VCP = "RI_VCTC_01_03DV"){
             dt_label <- get(paste0("TIMELY_DT_LABEL_",j), envir = .GlobalEnv)
             minage <- get(paste0(doselist[d],"_min_age_days"), envir = .GlobalEnv)
 
-            dat <- dat %>% mutate(tempvar2 = ifelse(((tempvar1 < (minage + dt_ub)) %in% TRUE
-                                                     & !is.na(!!crude))
-                                                    & is.na(tempvar2),
-                                                    dt_label, tempvar2))
-          } #end of numtile j loop
+            dat <- dat %>%
+              mutate(
+                tempvar2 = ifelse(
+                  ((tempvar1 < (minage + dt_ub)) %in% TRUE
+                   & !is.na(!!crude))
+                  & is.na(tempvar2),
+                  dt_label, tempvar2))
+
+            # If it's a birth dose, it cannot be early
+            if (j %in% 1 & minage %in% 0 & dt_ub %in% 0){
+              dat$tempvar2 <- NA_character_
+            }
+          } # end of numtile j loop
+
           dt_label <- get(paste0("TIMELY_DT_LABEL_",TIMELY_N_DTS), envir = .GlobalEnv)
           dat <- dat %>% mutate(tempvar2 = ifelse(is.na(tempvar2), dt_label, tempvar2))
 
@@ -429,14 +438,25 @@ RI_VCTC_01_03DV <- function(VCP = "RI_VCTC_01_03DV"){
           numtile <- as.numeric(cdt) - 1
 
           for (j in 1:numtile){
-            dt_ub <- get(paste0("TIMELY_CD_",TIMELY_DOSE_ORDER[d],"_UB_",j), envir = .GlobalEnv)
-            dt_label <- get(paste0("TIMELY_CD_",TIMELY_DOSE_ORDER[d],"_LABEL_",j), envir = .GlobalEnv)
+            dt_ub <- get(paste0("TIMELY_CD_", TIMELY_DOSE_ORDER[d] ,"_UB_", j),
+                         envir = .GlobalEnv)
+
+            dt_label <- get(paste0("TIMELY_CD_", TIMELY_DOSE_ORDER[d], "_LABEL_", j),
+                            envir = .GlobalEnv)
+
             minage <- get(paste0(doselist[d],"_min_age_days"), envir = .GlobalEnv)
 
-            dat <- dat %>% mutate(tempvar2 = ifelse(((tempvar1 < (minage + dt_ub)) %in% TRUE
-                                                     & !is.na(!!crude))
-                                                    & is.na(tempvar2),
-                                                    dt_label, tempvar2))
+            dat <- dat %>%
+              mutate(tempvar2 = ifelse(
+                ((tempvar1 < (minage + dt_ub)) %in% TRUE
+                 & !is.na(!!crude))
+                & is.na(tempvar2),
+                dt_label, tempvar2))
+
+            # If it's a birth dose, it cannot be early
+            if (j %in% 1 & minage %in% 0 & dt_ub %in% 0){
+              dat$tempvar2 <- NA_character_
+            }
           } #end of numtile j loop
 
           dt_label <- get(paste0("TIMELY_CD_",TIMELY_DOSE_ORDER[d],"_LABEL_",cdt), envir = .GlobalEnv)
