@@ -106,7 +106,7 @@ RI_VCTC_01_03DV <- function(VCP = "RI_VCTC_01_03DV"){
               subdat2 <- subdat %>% mutate(timely_y = ifelse(((tempvar1 < (minage + dt_ub)) & !is.na(!!crude)) %in% TRUE,
                                                              1, 0))
 
-              if((minage == 0 & j == 1) %in% TRUE) {
+              if (minage %in% 0 & j %in% 1 & dt_ub %in% 0) {
                 subdat2 <- subdat2 %>% mutate(timely_y = 0) # changed made here 2023/07/31
               }
 
@@ -162,7 +162,7 @@ RI_VCTC_01_03DV <- function(VCP = "RI_VCTC_01_03DV"){
               subdat2 <- subdat %>% mutate(timely_y = ifelse(((tempvar1 < (minage + dt_ub)) & !is.na(!!crude)) %in% TRUE,
                                                              1, 0))
 
-              if((minage == 0 & j == 1) %in% TRUE) {
+              if(minage %in% 0 & j %in% 1 & dt_ub %in% 0) {
                 subdat2 <- subdat2 %>% mutate(timely_y = 0) # changed made here 2023/07/31
               }
 
