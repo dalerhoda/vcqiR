@@ -17,7 +17,7 @@
 #' year <- rep(2022,4)
 #' vcqi_mdy(month,date,year)
 
-# VCQI_mdy R version 1.02 - Biostat Global Consulting - 2022-10-28
+# VCQI_mdy R version 1.03 - Biostat Global Consulting - 2023-08-31
 # *******************************************************************************
 # Change log
 
@@ -25,8 +25,9 @@
 # 2022-07-28  1.00      Mia Yu          Original version
 # 2022-10-04  1.01      Mia Yu          Package version
 # 2022-10-28  1.02      Mia Yu          Add part to convert to numeric
+# 2023-08-31  1.03      Caitlin Clary   Pad year to two or four digits depending
+#                                       on input year length
 # *******************************************************************************
-
 
 vcqi_mdy <- function(m,d,y){
   tempm <- as.numeric(m)
@@ -35,7 +36,16 @@ vcqi_mdy <- function(m,d,y){
   tempm <- ifelse(is.na(tempm), 99, tempm)
   tempd <- ifelse(is.na(tempd), 99, tempd)
 
-  suppressWarnings(mdy(paste0(sprintf("%02d", tempm),
-                              sprintf("%02d", tempd),
-                              sprintf("%02d", tempy))))
+  pad_m <- sprintf("%02d", tempm)
+  pad_d <- sprintf("%02d", tempd)
+
+  pad_y2 <- sprintf("%02d", tempy) # Year padded to two digits
+  pad_y4 <- sprintf("%04d", tempy) # Year padded to four digits
+
+  pad_y <- sapply(
+    seq_along(tempy),
+    function(x) ifelse(str_length(tempy[x]) <= 2, pad_y2[x], pad_y4[x]),
+    simplify = TRUE)
+
+  suppressWarnings(mdy(paste0(pad_m, pad_d, pad_y)))
 }

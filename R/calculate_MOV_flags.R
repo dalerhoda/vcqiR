@@ -351,6 +351,8 @@ calculate_MOV_flags <- function(VCP = "calculate_MOV_flags"){
             paste0("got_", multi$dose[s]),
             paste0("got_", multi$dose[s], 1:multi$dosecount[s], "_tick"))}}
 
+      tempvarnames <- tempvarnames[tempvarnames %in% names(dat)]
+
       dat <- dat %>%
         # Order vars using tempvarnames; everything() puts dose_<str> vars at end
         select(all_of(tempvarnames), everything()) %>%

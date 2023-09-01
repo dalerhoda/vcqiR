@@ -3,6 +3,7 @@
 #' @param VCP VCQI current program name to be logged, default to be the function name
 #'
 #' @import dplyr
+#' @import stringr
 #'
 #' @return Log entries; errors if conditions not met
 #'
