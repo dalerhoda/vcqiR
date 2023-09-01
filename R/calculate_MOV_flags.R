@@ -317,6 +317,8 @@ calculate_MOV_flags <- function(VCP = "calculate_MOV_flags"){
           var_i <- NULL
           for(ind in seq_along(di)){var_i <- c(var_i, paste0("got_", dn, di[ind]))}
 
+          var_i <- var_i[var_i %in% names(dat)]
+
           temp <- dat %>% select(contains(var_i))
           vars_to_drop <- names(temp)
           temp <- temp %>%
