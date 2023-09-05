@@ -298,13 +298,32 @@ calculate_MOV_flags <- function(VCP = "calculate_MOV_flags"){
 
       dat <- dat %>%
         pivot_longer(contains("card_date"), names_to = "visitdose",
-                     values_to = "visitdate") %>%
-        filter(!is.na(visitdate)) %>%
+                     values_to = "visitdate")
+
+      datsummary <- dat %>%
+        group_by(visitdose) %>%
+        summarize(n_dates = sum(!is.na(visitdate)))
+
+      no_dates <- datsummary %>%
+        filter(n_dates %in% 0) %>% pull(visitdose)
+
+      dat <- dat %>%
+        # filter(!is.na(visitdate)) %>%
+        filter(!is.na(visitdate) | (is.na(visitdate) & visitdose %in% no_dates)) %>%
         mutate(visitdose = str_replace(visitdose, "_card_date", ""),
                test = 1) %>%
         pivot_wider(names_from = "visitdose",
                     values_from = "test",
                     names_prefix = "got_")
+
+      # Logic for MISS-VCQI - handling the faux "visit" dose, which is handled
+      # differently the two times MISS-VCQI calls calculate_MOV_flags
+      if (any(names(dat) %in% "got_visit")){
+        if ("visit_card_date" %in% no_dates){
+          dat <- dat %>%
+            filter(is.na(got_visit))
+        }
+      }
 
       # For multidose series, grab the got_<dose><#> columns and coalesce, then
       # attach the coalesced column as got_<dose> and drop the got_<dose><#> cols
