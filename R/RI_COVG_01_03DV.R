@@ -122,6 +122,14 @@ RI_COVG_01_03DV <- function(VCP = "RI_COVG_01_03DV"){
       dat <- mutate(dat, got_crude_bcg_by_scar = ifelse((psweight == 0 | is.na(psweight)) %in% TRUE, NA, got_crude_bcg_by_scar))
     }
 
+    dat$tempvar1 <- as.numeric(dat$tempvar1)
+    dat$tempvar2 <- as.numeric(dat$tempvar2)
+    dat$tempvar3 <- as.numeric(dat$tempvar3)
+    dat$tempvar4 <- as.numeric(dat$tempvar4)
+    dat$tempvar5 <- as.numeric(dat$tempvar5)
+    dat$tempvar6 <- as.numeric(dat$tempvar6)
+    dat$tempvar7 <- as.numeric(dat$tempvar7)
+
     dat$tempvar1 <- haven::labelled(dat$tempvar1, label = paste0("Got ", RI_DOSE_LIST[d], ", by card")) %>% suppressWarnings()
     dat$tempvar2 <- haven::labelled(dat$tempvar2, label = paste0("Got ", RI_DOSE_LIST[d], ", by history")) %>% suppressWarnings()
     dat$tempvar3 <- haven::labelled(dat$tempvar3, label = paste0("Got ", RI_DOSE_LIST[d], ", by register")) %>% suppressWarnings()
