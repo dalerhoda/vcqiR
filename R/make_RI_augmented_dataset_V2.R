@@ -26,6 +26,7 @@
 #                                       Changed logic to match the new Stata version
 # 2023-07-29  1.01      Mia Yu          Added code to merge in RI_MOV_flags_to_merge;
 #                                       Added code to include VCTC timely_age_at* and timely_category_* variables
+# 2023-09-29  1.02      Caitlin Clary   Keep psweight in dataset (mirror Stata)
 # *******************************************************************************
 
 # This program creates one RI dataset containing the original RI dataset provided in VCQI
@@ -180,7 +181,10 @@ make_RI_augmented_dataset_v2 <- function(outpath = NA, analysiscounter = 10){
 
   keep <- c("level1id","level2id","level3id", VCQI_LEVEL4_SET_VARLIST)
 
-  dat2 <- vcqi_read(paste0(VCQI_OUTPUT_FOLDER, "/RI_with_ids.rds")) %>% select(all_of(keep),RI01,RI03,RI11,RI12,respid,stratumid,clusterid)
+  dat2 <- vcqi_read(paste0(VCQI_OUTPUT_FOLDER, "/RI_with_ids.rds")) %>%
+    select(all_of(keep), RI01, RI03, RI11, RI12,
+           respid, stratumid, clusterid, psweight)
+
   dupname <- names(dat2)[which(names(dat2) %in% names(dat))]
   dupname <- dupname[which(!dupname %in% c("RI01", "RI03", "RI11", "RI12"))]
   dat2 <- dat2 %>% select(-c(all_of(dupname)))
@@ -274,20 +278,30 @@ make_RI_augmented_dataset_v2 <- function(outpath = NA, analysiscounter = 10){
   }
 
   # We want to merge on the derived variables from calc_mov if the file exists
-  if(file.exists("RI_MOV_flags_to_merge.rds")) {
+  if (file.exists("RI_MOV_flags_to_merge.rds")) {
     dat2 <- vcqi_read("RI_MOV_flags_to_merge.rds")
     keeplist2 <- NULL
-    flags <- c("days_until_cor_*_crude","days_until_cor_*_valid","flag_cor_mov_*_crude","flag_cor_mov_*_valid",
-               "flag_had_mov_*_crude", "flag_had_mov_*_valid", "flag_uncor_mov_*_crude", "flag_uncor_mov_*_valid",
-               "total_elig_*_crude","total_elig_*_valid","total_mov_*_crude", "total_mov_*_valid")
+    flags <- c("days_until_cor_*_crude",
+               "days_until_cor_*_valid",
+               "flag_cor_mov_*_crude",
+               "flag_cor_mov_*_valid",
+               "flag_had_mov_*_crude",
+               "flag_had_mov_*_valid",
+               "flag_uncor_mov_*_crude",
+               "flag_uncor_mov_*_valid",
+               "total_elig_*_crude",
+               "total_elig_*_valid",
+               "total_mov_*_crude",
+               "total_mov_*_valid")
     for (f in seq_along(flags)){
       keeplist2 <- c(keeplist2,grep(glob2rx(flags[f]), names(dat2), value=TRUE))
     }
-    dat2 <- dat2 %>% select(c(respid,total_movs_crude,total_movs_valid,total_elig_visits_crude,
-                              total_elig_visits_valid,total_visit_movs_crude,total_visit_movs_valid,
-                              all_of(keeplist2)))
+    dat2 <- dat2 %>%
+      select(c(respid,total_movs_crude,total_movs_valid,total_elig_visits_crude,
+               total_elig_visits_valid,total_visit_movs_crude,total_visit_movs_valid,
+               all_of(keeplist2)))
 
-    dat <- left_join(dat,dat2,by = "respid")
-    saveRDS(dat,"RI_augmented_dataset_v2.rds")
+    dat <- left_join(dat, dat2, by = "respid")
+    saveRDS(dat, "RI_augmented_dataset_v2.rds")
   }
 }
