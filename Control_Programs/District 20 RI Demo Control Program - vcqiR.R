@@ -25,7 +25,7 @@
 # Code Block: RI-A             (Do not change) ----
 #
 # Load the VCQI package
-library(vcqiR, attach.required = TRUE)
+#library(vcqiR, attach.required = TRUE)
 
 # Start with clear memory
 cleanup_VCQI_globals()
@@ -334,6 +334,11 @@ vcqi_global(VCQI_REPORT_DATA_QUALITY, 0)
 # that merges survey dataset with derived variables calculated by VCQI.
 # Default value is 0 (no)
 vcqi_global(VCQI_MAKE_AUGMENTED_DATASET, 1)
+
+# Specify the language for table and figure text.
+# Current options are ENGLISH, SPANISH, FRENCH, or PORTUGUESE
+
+vcqi_global(OUTPUT_LANGUAGE, "English")
 
 # *************************************************
 # Code Block: RI-E             (Do not change) ----

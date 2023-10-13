@@ -19,7 +19,7 @@
 #' @import dplyr
 #' @import stringr
 
-# vcqi_to_plot R version 1.05 - Biostat Global Consulting - 2023-02-03
+# vcqi_to_plot R version 1.05 - Biostat Global Consulting - 2023-10-02
 # *******************************************************************************
 # Change log
 
@@ -31,6 +31,7 @@
 # 2022-12-15  1.03      Mia Yu          Add title etc. to the dataset
 # 2023-01-11  1.04      Mia Yu          Add parts to allow users customize level4 plots
 # 2023-02-03  1.05      Mia Yu          Updated level4 plot customization
+# 2023-10-02  1.10      Mia Yu          Added globals values for multi-lingual purposes
 # *******************************************************************************
 
 vcqi_to_plot <- function(
@@ -130,9 +131,9 @@ vcqi_to_plot <- function(
     dat <- mutate(
       dat,
       text = paste0(
-        sprintf(paste0("%.", VCQI_NUM_DECIMAL_DIGITS, "f"), lcb*100), " | ",
-        sprintf(paste0("%.", VCQI_NUM_DECIMAL_DIGITS, "f"), estimate*100), "% | ",
-        sprintf(paste0("%.", VCQI_NUM_DECIMAL_DIGITS, "f"), ucb*100))
+        sprintf(paste0("%4.", VCQI_NUM_DECIMAL_DIGITS, "f"), lcb*100), " | ",
+        sprintf(paste0("%4.", VCQI_NUM_DECIMAL_DIGITS, "f"), estimate*100), "% | ",
+        sprintf(paste0("%4.", VCQI_NUM_DECIMAL_DIGITS, "f"), ucb*100))
     )
   }
 
@@ -140,9 +141,9 @@ vcqi_to_plot <- function(
     dat <- mutate(
       dat,
       text = paste0(
-        sprintf(paste0("%.", VCQI_NUM_DECIMAL_DIGITS, "f"), estimate*100),"% (",
-        sprintf(paste0("%.", VCQI_NUM_DECIMAL_DIGITS, "f"), cill*100), ", ",
-        sprintf(paste0("%.", VCQI_NUM_DECIMAL_DIGITS, "f"), ciul*100), ")")
+        sprintf(paste0("%4.", VCQI_NUM_DECIMAL_DIGITS, "f"), estimate*100),"% (",
+        sprintf(paste0("%4.", VCQI_NUM_DECIMAL_DIGITS, "f"), cill*100), ", ",
+        sprintf(paste0("%4.", VCQI_NUM_DECIMAL_DIGITS, "f"), ciul*100), ")")
     )
   }
 
@@ -150,10 +151,10 @@ vcqi_to_plot <- function(
     dat <- mutate(
       dat,
       text = paste0(
-        sprintf(paste0("%.", VCQI_NUM_DECIMAL_DIGITS, "f"), estimate*100), "% (",
-        sprintf(paste0("%.", VCQI_NUM_DECIMAL_DIGITS, "f"), cill*100), ", ",
-        sprintf(paste0("%.", VCQI_NUM_DECIMAL_DIGITS, "f"), ciul*100), ")", " (0, ",
-        sprintf(paste0("%.", VCQI_NUM_DECIMAL_DIGITS, "f"), ucb*100), "]")
+        sprintf(paste0("%4.", VCQI_NUM_DECIMAL_DIGITS, "f"), estimate*100), "% (",
+        sprintf(paste0("%4.", VCQI_NUM_DECIMAL_DIGITS, "f"), cill*100), ", ",
+        sprintf(paste0("%4.", VCQI_NUM_DECIMAL_DIGITS, "f"), ciul*100), ")", " (0, ",
+        sprintf(paste0("%4.", VCQI_NUM_DECIMAL_DIGITS, "f"), ucb*100), "]")
     )
   }
 
@@ -161,10 +162,10 @@ vcqi_to_plot <- function(
     dat <- mutate(
       dat,
       text = paste0(
-        sprintf(paste0("%.", VCQI_NUM_DECIMAL_DIGITS, "f"), estimate*100), "% (",
-        sprintf(paste0("%.", VCQI_NUM_DECIMAL_DIGITS, "f"), cill*100), ", ",
-        sprintf(paste0("%.", VCQI_NUM_DECIMAL_DIGITS, "f"), ciul*100), ")", " [",
-        sprintf(paste0("%.", VCQI_NUM_DECIMAL_DIGITS, "f"), lcb*100), ", 100)")
+        sprintf(paste0("%4.", VCQI_NUM_DECIMAL_DIGITS, "f"), estimate*100), "% (",
+        sprintf(paste0("%4.", VCQI_NUM_DECIMAL_DIGITS, "f"), cill*100), ", ",
+        sprintf(paste0("%4.", VCQI_NUM_DECIMAL_DIGITS, "f"), ciul*100), ")", " [",
+        sprintf(paste0("%4.", VCQI_NUM_DECIMAL_DIGITS, "f"), lcb*100), ", 100)")
     )
   }
 
@@ -172,47 +173,83 @@ vcqi_to_plot <- function(
     dat <- mutate(
       dat,
       text = paste0(
-        sprintf(paste0("%.", VCQI_NUM_DECIMAL_DIGITS, "f"), estimate*100), "% (" ,
-        sprintf(paste0("%.", VCQI_NUM_DECIMAL_DIGITS, "f"), cill*100), ", ",
-        sprintf(paste0("%.", VCQI_NUM_DECIMAL_DIGITS, "f"), ciul*100), ")", " (0, ",
-        sprintf(paste0("%.", VCQI_NUM_DECIMAL_DIGITS, "f"), ucb*100), "]", " [",
-        sprintf(paste0("%.", VCQI_NUM_DECIMAL_DIGITS, "f"), lcb*100), ", 100)")
+        sprintf(paste0("%4.", VCQI_NUM_DECIMAL_DIGITS, "f"), estimate*100), "% (" ,
+        sprintf(paste0("%4.", VCQI_NUM_DECIMAL_DIGITS, "f"), cill*100), ", ",
+        sprintf(paste0("%4.", VCQI_NUM_DECIMAL_DIGITS, "f"), ciul*100), ")", " (0, ",
+        sprintf(paste0("%4.", VCQI_NUM_DECIMAL_DIGITS, "f"), ucb*100), "]", " [",
+        sprintf(paste0("%4.", VCQI_NUM_DECIMAL_DIGITS, "f"), lcb*100), ", 100)")
     )
+  }
+
+  #   cistring6 contains 2sided-95%-lower-limit - p - 2sided-95%-upper-limit  N=N
+  #   (where N is ESS for ESS and N for DATASET)
+  # 	(and the estimates do not have info after decimal place, per Nigeria 2016 MICS/NICS report protocol)
+  if (VCQI_IWPLOT_CITEXT == 6){
+
+    dat <- dat %>% mutate(text = paste0(
+      sprintf("%2.0f", cill * 100),
+      " - ",
+      sprintf("%2.0f", estimate * 100),
+      " - ",
+      sprintf("%2.0f", ciul * 100))) %>%
+      mutate(text = ifelse(cill*100 < 9.5, paste0(" ", text),text)) %>%
+      mutate(text = ifelse((neff < 1000 & neff > 99) %in% TRUE,
+                              paste0(text," ",language_string(language_use = language_use, str = "OS_48"),
+                                     "= ",prettyNum(round(neff),big.mark=",")),text)) %>%
+      mutate(text = ifelse((neff <= 99) %in% TRUE,
+                           paste0(text," ",language_string(language_use = language_use, str = "OS_48"),
+                                  "=  ",prettyNum(round(neff),big.mark=",")),text)) %>%
+      mutate(text = ifelse((neff >= 1000) %in% TRUE,
+                           paste0(text," ",language_string(language_use = language_use, str = "OS_48"),
+                                  "=",prettyNum(round(neff),big.mark=",")),text)) %>%
+      mutate(text = ifelse((neff < 50 & neff > 25) %in% TRUE, paste0(text," (*)"),text)) %>%
+      mutate(text = ifelse((neff < 25) %in% TRUE, paste0(text," (!)"),text))
+
   }
 
   dat <- mutate(dat, text = gsub(hundred, "100", text, fixed = TRUE))
 
   if (is.null(note)){
     if (VCQI_IWPLOT_CITEXT == 1){
-      note = "Text at right: 1-sided 95% LCB | Point Estimate | 1-sided 95% UCB"
+      note = language_string(language_use = language_use, str = "OS_328")
+      #"Text at right: 1-sided 95% LCB | Point Estimate | 1-sided 95% UCB"
     }
     if (VCQI_IWPLOT_CITEXT == 2){
-      note = "Text at right: Point Estimate (2-sided 95% Confidence Interval)"
+      note = language_string(language_use = language_use, str = "OS_329")
+      #"Text at right: Point Estimate (2-sided 95% Confidence Interval)"
     }
     if (VCQI_IWPLOT_CITEXT == 3){
-      note = "Text at right: Point Estimate (2-sided 95% Confidence Interval) (0, 1-sided 95% UCB]"
+      note = language_string(language_use = language_use, str = "OS_330")
+      #"Text at right: Point Estimate (2-sided 95% Confidence Interval) (0, 1-sided 95% UCB]"
     }
     if (VCQI_IWPLOT_CITEXT == 4){
-      note = "Text at right: Point Estimate (2-sided 95% Confidence Interval) [1-sided 95% LCB, 100)"
+      note = language_string(language_use = language_use, str = "OS_331")
+      #"Text at right: Point Estimate (2-sided 95% Confidence Interval) [1-sided 95% LCB, 100)"
     }
     if (VCQI_IWPLOT_CITEXT == 5){
-      note = "Text at right: Point Estimate (2-sided 95% CI) (0, 1-sided 95% UCB] [1-sided 95% LCB, 100)"
+      note = language_string(language_use = language_use, str = "OS_332")
+      #"Text at right: Point Estimate (2-sided 95% CI) (0, 1-sided 95% UCB] [1-sided 95% LCB, 100)"
     }
   } else{
     if (VCQI_IWPLOT_CITEXT == 1){
-      note = paste0("Text at right: 1-sided 95% LCB | Point Estimate | 1-sided 95% UCB \n ", note)
+      note = paste0(language_string(language_use = language_use, str = "OS_328")," \n ", note)
+      #"Text at right: 1-sided 95% LCB | Point Estimate | 1-sided 95% UCB"
     }
     if (VCQI_IWPLOT_CITEXT == 2){
-      note = paste0("Text at right: Point Estimate (2-sided 95% Confidence Interval) \n ", note)
+      note = paste0(language_string(language_use = language_use, str = "OS_329")," \n ", note)
+      #"Text at right: Point Estimate (2-sided 95% Confidence Interval)"
     }
     if (VCQI_IWPLOT_CITEXT == 3){
-      note = paste0("Text at right: Point Estimate (2-sided 95% Confidence Interval) (0, 1-sided 95% UCB] \n ", note)
+      note = paste0(language_string(language_use = language_use, str = "OS_330")," \n ", note)
+      #"Text at right: Point Estimate (2-sided 95% Confidence Interval) (0, 1-sided 95% UCB]"
     }
     if (VCQI_IWPLOT_CITEXT == 4){
-      note = paste0("Text at right: Point Estimate (2-sided 95% Confidence Interval) [1-sided 95% LCB, 100) \n ", note)
+      note = paste0(language_string(language_use = language_use, str = "OS_331")," \n ", note)
+      #"Text at right: Point Estimate (2-sided 95% Confidence Interval) [1-sided 95% LCB, 100)"
     }
     if (VCQI_IWPLOT_CITEXT == 5){
-      note = paste0("Text at right: Point Estimate (2-sided 95% CI) (0, 1-sided 95% UCB] [1-sided 95% LCB, 100) \n ", note)
+      note = paste0(language_string(language_use = language_use, str = "OS_332")," \n ", note)
+      #"Text at right: Point Estimate (2-sided 95% CI) (0, 1-sided 95% UCB] [1-sided 95% LCB, 100)"
     }
   }
 
@@ -350,7 +387,8 @@ vcqi_to_plot <- function(
       geom_errorbar(aes(ymin = cill * 100, ymax = ciul * 100), width = .2, position = position_dodge(.9)) +
       geom_text(aes( x = rowid, y = 100 + 1.25 * extraspace, label = text), colour = "black", family = "sans") +
       coord_flip() +
-      labs(y = "Estimated Coverage %", x = "", title = title, subtitle = subtitle, caption = note) +
+      labs(y = language_string(language_use = language_use, str = "OS_327"), #"Estimated Coverage %"
+           x = "", title = title, subtitle = subtitle, caption = note) +
       scale_x_continuous(breaks = seq(min(dat$rowid), max(dat$rowid), by = gap), labels = dat$name) +
       #Note: could find a better way to check the space we need for text
       scale_y_continuous(limits = c(0, 100 + 2.25 * extraspace),

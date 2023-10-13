@@ -132,7 +132,7 @@ make_svyp_output_database <- function(
           cill = ptest$cill, ciul = ptest$ciul,
           lcb = ptest$lcb, ucb = ptest$ucb,
           deff = ptest$deff, icc = icctemp, n = ptest$n, nwtd = ptest$nwtd,
-          nclusters = ptest$nclusters, nwtd_est = ptest$nwtd_est
+          nclusters = ptest$nclusters, nwtd_est = ptest$nwtd_est, neff = ptest$neff
            )
 
         go <- rbind(go, gotemp)
@@ -142,14 +142,16 @@ make_svyp_output_database <- function(
 
     if (rowtype == "BLANK_ROW"){
       gotemp <- data.frame(level = l, level4id = j, level4name = "BLANK_ROW", outcome = variable, estimate = NA, stderr = NA, cilevel = NA,
-                           cill = NA, ciul = NA, lcb = NA, ucb = NA, deff = NA, icc = NA, n = NA, nwtd = NA, nclusters = NA, nwtd_est = NA)
+                           cill = NA, ciul = NA, lcb = NA, ucb = NA, deff = NA, icc = NA, n = NA, nwtd = NA, nclusters = NA, nwtd_est = NA,
+                           neff = NA)
       go <- rbind(go, gotemp)
     }
 
 
     if (rowtype == "LABEL_ONLY"){
       gotemp <- data.frame(level = l, level4id = j, level4name = l4name, outcome = variable, estimate = NA, stderr = NA, cilevel = NA,
-                           cill = NA, ciul = NA, lcb = NA, ucb = NA, deff = NA, icc = NA, n = NA, nwtd = NA, nclusters = NA, nwtd_est = NA)
+                           cill = NA, ciul = NA, lcb = NA, ucb = NA, deff = NA, icc = NA, n = NA, nwtd = NA, nclusters = NA, nwtd_est = NA,
+                           neff = NA)
       go <- rbind(go, gotemp)
     }
 

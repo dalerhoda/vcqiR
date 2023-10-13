@@ -10,7 +10,8 @@ make_count_output_database(
   estlabel,
   vid,
   measureid,
-  VCP = "make_count_output_database"
+  VCP = "make_count_output_database",
+  keepnumerator = FALSE
 )
 }
 \arguments{

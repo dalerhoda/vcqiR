@@ -26,11 +26,15 @@
 # 2022-10-09  1.04      Mia Yu          Package version
 # 2022-10-11  1.05      Mia Yu          Update the usage of vcqi_object_exists
 # 2023-02-07  1.06      Mia Yu          Update to implement level4 customized cell style
+# 2023-09-30  1.07      Mia Yu          Added option to drop level4 variables;
+#                                       Added noACNAME option to allow user to specify sheet name;
+#                                       These changes are made to match Stata version
 # *******************************************************************************
 
 
 
-export_table_to_excel <- function(indicator, tablename = NULL, sheet = NULL, brief = TRUE, VCP = "export_stable_to_excel"){
+export_table_to_excel <- function(indicator, tablename = NULL, sheet = NULL, brief = TRUE,
+                                  VCP = "export_stable_to_excel", droplvel4 = FALSE, noacname = FALSE){
 
   vcqi_log_comment(VCP, 5, "Flow", "Starting")
 
@@ -42,8 +46,15 @@ export_table_to_excel <- function(indicator, tablename = NULL, sheet = NULL, bri
     sheet <- indicator
   }
 
-  sheet1 <- paste0(sheet, " ", ANALYSIS_COUNTER)
-  sheet2 <- paste0(sheet, "_BRIEF ", ANALYSIS_COUNTER)
+  if (noacname == FALSE){
+    # This is the default setting
+    sheet1 <- paste0(sheet, " ", ANALYSIS_COUNTER)
+    sheet2 <- paste0(sheet, "_BRIEF ", ANALYSIS_COUNTER)
+
+  } else if (noacname == TRUE){
+    sheet1 <- paste0(sheet, " ")
+    sheet2 <- paste0(sheet, "_BRIEF ")
+  }
 
   exporttb <- get(tablename, envir = .GlobalEnv)
   exporttb <- exporttb %>% arrange(level4id) %>% select(-c(level4id))

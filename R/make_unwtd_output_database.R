@@ -1,4 +1,4 @@
-#' Create unweited database results
+#' Create unweighted database results
 #'
 #' @param variable Outcome variable
 #' @param estlabel Label for the estimate variable
@@ -28,6 +28,7 @@ make_unwtd_output_database <- function(
     vid,
     measureid,
     VCP = "make_unwtd_output_database",
+    keepnumerator = FALSE,
     ...){
 
   vcqi_log_comment(VCP, 5, "Flow", "Starting")
@@ -123,6 +124,11 @@ make_unwtd_output_database <- function(
   dat <- dat %>%
     relocate(c(name, level4id, level4name), .after = level) %>%
     arrange(level, level4id) # Arranging by level4id no longer matches Stata output
+
+  if (keepnumerator == TRUE){
+    dat <- dat %>% mutate(numerator = estimate*n)
+    dat$numerator <- haven::labelled(dat$numerator, label = "Numerator") %>% suppressWarnings()
+  }
 
   dat$level <- haven::labelled(dat$level, label = "Stratum level") %>% suppressWarnings()
   dat$level4id <- haven::labelled(dat$level4id, label = "Sub-stratum ID") %>% suppressWarnings()

@@ -108,10 +108,12 @@ vcqi_to_uwplot <- function(
     dat <- mutate(
       dat,
       text = paste0(
-        sprintf(paste0("%.", VCQI_NUM_DECIMAL_DIGITS,"f"), estimate*100),
-        "% N = ", prettyNum(n,big.mark=",")))
+        sprintf(paste0("%.", VCQI_NUM_DECIMAL_DIGITS,"f"), estimate*100),"% ",
+        language_string(language_use = language_use, str = "OS_48"),
+        " = ", prettyNum(n,big.mark=",")))
 
-    note <- "Text at right: Unweighted sample proportion (%) and N"
+    #note <- "Text at right: Unweighted sample proportion (%) and N"
+    note <- language_string(language_use = language_use, str = "OS_71")
   } else if (UWPLOT_ANNOTATE_LOW_MED == 1) {
 
     if (!vcqi_object_exists("UWPLOT_ANNOTATE_MED_N")) {
@@ -138,27 +140,29 @@ vcqi_to_uwplot <- function(
       vcqi_global(UWPLOT_ANNOTATE_LOW_N, 25)
     }
 
-    dat <- mutate(
-      dat,
-      text = paste0(
-        sprintf(paste0("%.", VCQI_NUM_DECIMAL_DIGITS, "f"),
-                estimate*100), "% N = ", prettyNum(n,big.mark=",")))
+    dat <- mutate(dat,
+                  text = paste0(
+                    sprintf(paste0("%.", VCQI_NUM_DECIMAL_DIGITS, "f"),
+                            estimate * 100),"% ",
+                    language_string(language_use = language_use, str = "OS_48"),
+                    " = ",
+                    prettyNum(n, big.mark = ",")))
 
     dat <- mutate(
       dat,
       text = ifelse((n < UWPLOT_ANNOTATE_LOW_N) %in% TRUE,
                     paste0(sprintf(paste0("%.", VCQI_NUM_DECIMAL_DIGITS, "f"),
-                                   estimate*100), "% N = ",
-                           prettyNum(n, big.mark = ","), " \u2021"),
-                    text))
+                                   estimate*100), "% ",
+                           language_string(language_use = language_use, str = "OS_48"),
+                           " = ", prettyNum(n, big.mark = ","), " \u2021"),text))
 
     dat <- mutate(
       dat,
       text = ifelse((n >= UWPLOT_ANNOTATE_LOW_N & n < UWPLOT_ANNOTATE_MED_N) %in% TRUE,
                     paste0("(", sprintf(paste0("%.", VCQI_NUM_DECIMAL_DIGITS, "f"),
-                                       estimate*100), "%) N = ",
-                           prettyNum(n, big.mark = ",")),
-                    text))
+                                       estimate*100), "%) ",
+                           language_string(language_use = language_use, str = "OS_48"),
+                           " = ", prettyNum(n, big.mark = ",")),text))
 
     note <- paste0(
       "Text at right: Unweighted sample proportion (%) and N \n Parentheses () mean ", UWPLOT_ANNOTATE_LOW_N,
@@ -290,7 +294,8 @@ vcqi_to_uwplot <- function(
       geom_col(width = 1,fill = dat$bar_fillcolor1_r,color = dat$outlinecolor1_r,size = 0.3) +
       geom_text(aes(x = rowid,y = 100 + 1.25 * extraspace,label = text),colour = "black",family = "sans") +
       coord_flip() +
-      labs(y = "Sample Proportion %",x = "",title = title,caption = note) +
+      labs(y = language_string(language_use = language_use, str = "OS_68"), #Sample Proportion %
+           x = "",title = title,caption = note) +
       scale_x_continuous(breaks = seq(min(dat$rowid), max(dat$rowid), by = gap), labels = dat$name) +
       #Note: could find a better way to check the space we need for text
       scale_y_continuous(limits = c(0, 100 + 1.75 * extraspace),

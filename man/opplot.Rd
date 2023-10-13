@@ -15,7 +15,7 @@ opplot(
   barcolor2 = "white",
   linecolor1 = "gray",
   linecolor2 = "gray",
-  ylabel = "Percent of Cluster",
+  ylabel = language_string(language_use = language_use, str = "OS_316"),
   ymin = 0,
   ymax = 100,
   yby = 50,
@@ -31,7 +31,7 @@ opplot(
   nlinecolor = "black",
   nlinewidth = 0.75,
   nlinepattern = 2,
-  ytitle2 = "Number of Respondents",
+  ytitle2 = language_string(language_use = language_use, str = "OS_317"),
   yround2 = 5,
   savedata = NA_character_,
   savedatatype = "csv"

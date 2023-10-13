@@ -376,6 +376,11 @@ vcqi_global(VCQI_REPORT_DATA_QUALITY, 0)
 # Default value is 0 (no)
 vcqi_global(VCQI_MAKE_AUGMENTED_DATASET, 0)
 
+# Specify the language for table and figure text.
+# Current options are ENGLISH, SPANISH, FRENCH, or PORTUGUESE
+
+vcqi_global(OUTPUT_LANGUAGE, "English")
+
 # *************************************************
 # Code Block: RI-E             (Do not change) ----
 # ** Format the VCQI dose list and pre-process survey data

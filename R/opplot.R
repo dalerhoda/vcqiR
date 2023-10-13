@@ -39,7 +39,7 @@
 #' @rawNamespace import(graphics, except = dotchart)
 #' @importFrom utils write.csv
 
-# opplot R version 1.09 - Biostat Global Consulting - 2022-10-10
+# opplot R version 1.10 - Biostat Global Consulting - 2023-10-02
 # *******************************************************************************
 # Change log
 
@@ -56,6 +56,7 @@
 # 2022-09-19  1.07      Mia Yu          add the ability to save the plot data as rds
 # 2022-09-20  1.08      Caitlin Clary   handle single-cluster survey designs
 # 2022-10-10  1.09      Mia Yu          Package version
+# 2023-10-02  1.10      Mia Yu          Added globals values for multi-lingual purposes
 # *******************************************************************************
 
 opplot <- function(
@@ -71,7 +72,7 @@ opplot <- function(
   barcolor2 = "white",    # color for respondents with yvar = 0
   linecolor1 = "gray",    # color for lines separating lower portion of bars
   linecolor2 = "gray",    # color for lines separating upper portion of bars
-  ylabel = "Percent of Cluster",
+  ylabel = language_string(language_use = language_use, str = "OS_316"), #"Percent of Cluster"
   ymin = 0,
   ymax = 100,
   yby = 50,
@@ -87,7 +88,7 @@ opplot <- function(
   nlinecolor = "black",
   nlinewidth = 0.75,       # color: line indicating # of respondents
   nlinepattern = 2,     # pattern: line indicating # of respondents
-  ytitle2 = "Number of Respondents",
+  ytitle2 = language_string(language_use = language_use, str = "OS_317"), #"Number of Respondents"
   yround2 = 5,
   savedata = NA_character_,
   savedatatype = "csv")

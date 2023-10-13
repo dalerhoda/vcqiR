@@ -24,7 +24,7 @@
 # *******************************************************************************
 
 make_count_output_database <- function(numerator, denominator, estlabel, vid, measureid,
-                                       VCP = "make_count_output_database"){
+                                       VCP = "make_count_output_database",keepnumerator = FALSE){
 
   vcqi_log_comment(VCP, 5, "Flow", "Starting")
 
@@ -72,36 +72,68 @@ make_count_output_database <- function(numerator, denominator, estlabel, vid, me
 
 
       if (den == 0){
-        gotemp <- data.frame(
-          level = l, level4id = j, level4name = l4name, outcome = paste0(numerator," / ",denominator),
-          estimate = 0, n = 0
-        )
+        if (keepnumerator == TRUE){
+          gotemp <- data.frame(
+            level = l, level4id = j, level4name = l4name, outcome = paste0(numerator," / ",denominator),
+            estimate = 0, n = 0, numerator = 0
+          )
+        } else {
+          gotemp <- data.frame(
+            level = l, level4id = j, level4name = l4name, outcome = paste0(numerator," / ",denominator),
+            estimate = 0, n = 0
+          )
+        }
+
         go <- rbind(go,gotemp)
       }
 
       if (den > 0){
-        gotemp <- data.frame(
-          level = l, level4id = j, level4name = l4name, outcome = paste0(numerator," / ",denominator),
-          estimate = tempestimate, n = den
-        )
+        if (keepnumerator == TRUE){
+          gotemp <- data.frame(
+            level = l, level4id = j, level4name = l4name, outcome = paste0(numerator," / ",denominator),
+            estimate = tempestimate, n = den, numerator = num
+          )
+        } else {
+          gotemp <- data.frame(
+            level = l, level4id = j, level4name = l4name, outcome = paste0(numerator," / ",denominator),
+            estimate = tempestimate, n = den
+          )
+        }
+
         go <- rbind(go,gotemp)
       }
 
   } #end of data_row
 
     if (rowtype == "BLANK_ROW"){
-      gotemp <- data.frame(
-        level = l, level4id = j, level4name = "BLANK_ROW", outcome = paste0(numerator," / ",denominator),
-        estimate = NA, n = NA
-      )
+      if (keepnumerator == TRUE){
+        gotemp <- data.frame(
+          level = l, level4id = j, level4name = "BLANK_ROW", outcome = paste0(numerator," / ",denominator),
+          estimate = NA, n = NA, numerator = NA
+        )
+      } else {
+        gotemp <- data.frame(
+          level = l, level4id = j, level4name = "BLANK_ROW", outcome = paste0(numerator," / ",denominator),
+          estimate = NA, n = NA
+        )
+      }
+
       go <- rbind(go,gotemp)
     } #end of blank_row
 
     if (rowtype == "LABEL_ONLY"){
-      gotemp <- data.frame(
-        level = l, level4id = j, level4name = l4name, outcome = paste0(numerator," / ",denominator),
-        estimate = NA, n = NA
-      )
+      if (keepnumerator == TRUE){
+        gotemp <- data.frame(
+          level = l, level4id = j, level4name = l4name, outcome = paste0(numerator," / ",denominator),
+          estimate = NA, n = NA, numerator = NA
+        )
+      } else {
+        gotemp <- data.frame(
+          level = l, level4id = j, level4name = l4name, outcome = paste0(numerator," / ",denominator),
+          estimate = NA, n = NA
+        )
+      }
+
       go <- rbind(go,gotemp)
     } #end of label_only
 
@@ -128,6 +160,9 @@ make_count_output_database <- function(numerator, denominator, estlabel, vid, me
   dat$name <- haven::labelled(dat$name, label = "Stratum name for table output") %>% suppressWarnings()
   dat$outcome <- haven::labelled(dat$outcome, label = "Outcome") %>% suppressWarnings()
   dat$estimate <- haven::labelled(dat$estimate, label = templabel) %>% suppressWarnings()
+  if ("numerator" %in% names(dat)){
+    dat$numerator <- haven::labelled(dat$numerator, label = "Numerator") %>% suppressWarnings()
+  }
 
   saveRDS(dat, filename)
 

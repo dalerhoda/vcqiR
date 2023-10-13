@@ -39,6 +39,7 @@
 # 2023-01-10  1.11      Mia Yu          Added part for customized level4 plot settings
 # 2023-02-07  1.12      Mia Yu          Added part for customized level4 Excel cell formats
 # 2023-07-29  1.13      Mia Yu          Remove HH14 from missing value check
+# 2023-10-03  1.14      Mia Yu          Move vcqi_multi_lingual_strings inside this program
 # *******************************************************************************
 
 # Note: sections of this program that check FMTID are not implemented (2022-10-07)
@@ -68,6 +69,11 @@ check_analysis_metadata <- function(VCP = "check_analysis_metadata"){
       halt_message = errormsgs
     )
   }
+
+  # Establish the labels for tables and figures using the language requested
+  # by the user.  If they did not specify a language, the program defaults
+  # to English
+  vcqi_multi_lingual_strings()
 
   # This syntax should be set in Block E, set as default if user failed to specify
   if(vcqi_object_exists("VCQI_SVYDESIGN_SYNTAX") == FALSE){

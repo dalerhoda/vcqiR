@@ -9,7 +9,9 @@ export_table_to_excel(
   tablename = NULL,
   sheet = NULL,
   brief = TRUE,
-  VCP = "export_stable_to_excel"
+  VCP = "export_stable_to_excel",
+  droplvel4 = FALSE,
+  noacname = FALSE
 )
 }
 \arguments{

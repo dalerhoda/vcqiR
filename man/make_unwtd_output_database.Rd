@@ -2,7 +2,7 @@
 % Please edit documentation in R/make_unwtd_output_database.R
 \name{make_unwtd_output_database}
 \alias{make_unwtd_output_database}
-\title{Create unweited database results}
+\title{Create unweighted database results}
 \usage{
 make_unwtd_output_database(
   variable,
@@ -10,6 +10,7 @@ make_unwtd_output_database(
   vid,
   measureid,
   VCP = "make_unwtd_output_database",
+  keepnumerator = FALSE,
   ...
 )
 }
@@ -30,5 +31,5 @@ make_unwtd_output_database(
 A database in VCQI_OUTPUT_FOLDER
 }
 \description{
-Create unweited database results
+Create unweighted database results
 }

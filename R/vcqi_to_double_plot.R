@@ -243,10 +243,13 @@ vcqi_to_double_plot <- function(
 
   if (is.null(note)){
     if (VCQI_DOUBLE_IWPLOT_CITEXT == 1){
-      note <- "Text at right: Point estimates from colored and from gray bars"
+      note <- language_string(language_use = language_use, str = "OS_324")
+      #"Text at right: Point estimates from colored and from gray bars"
     }
     if (VCQI_DOUBLE_IWPLOT_CITEXT == 2){
-      note <- "Text at right: Colored Point Estimate (2-sided 95% CI)  |  Gray Point Estimate (2-sided 95% CI)"
+      note <- paste0(language_string(language_use = language_use, str = "OS_325"), " | ",
+                     language_string(language_use = language_use, str = "OS_326"))
+      #"Text at right: Colored Point Estimate (2-sided 95% CI)  |  Gray Point Estimate (2-sided 95% CI)"
     }
     if (VCQI_DOUBLE_IWPLOT_CITEXT == 3){
       note <- NULL
@@ -257,10 +260,13 @@ vcqi_to_double_plot <- function(
     }
 
     if (VCQI_DOUBLE_IWPLOT_CITEXT == 1){
-      note <- paste0("Text at right: Point estimates from colored and from gray bars \n ", note)
+      note <- paste0(language_string(language_use = language_use, str = "OS_324")," \n ", note)
+      #"Text at right: Point estimates from colored and from gray bars"
     }
     if (VCQI_DOUBLE_IWPLOT_CITEXT == 2){
-      note <- paste0("Text at right: Colored Point Estimate (2-sided 95% CI)  |  Gray Point Estimate (2-sided 95% CI) \n ", note)
+      note <- paste0(language_string(language_use = language_use, str = "OS_325"), " | ",
+                     language_string(language_use = language_use, str = "OS_326")," \n ", note)
+      #"Text at right: Colored Point Estimate (2-sided 95% CI)  |  Gray Point Estimate (2-sided 95% CI)"
     }
   }
 
@@ -511,7 +517,8 @@ vcqi_to_double_plot <- function(
                      position = position_dodge(.9)) +
       geom_text(aes(x = rowid,y = 100 + extraspace,label = text),size = 3.25,colour = "black",family = "sans") +
       coord_flip() +
-      labs(y = "Estimated Coverage %",x = "",title = title,subtitle = subtitle,caption = note) +
+      labs(y = language_string(language_use = language_use, str = "OS_327"), #"Estimated Coverage %"
+           x = "",title = title,subtitle = subtitle,caption = note) +
       scale_x_continuous(breaks = combined$rowid[!is.na(combined$name)], labels = combined$name[!is.na(combined$name)]) +
       #Note: could find a better way to check the space we need for text
       scale_y_continuous(limits = c(0, 100 + 2 * extraspace),
