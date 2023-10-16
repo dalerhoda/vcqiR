@@ -7,6 +7,7 @@
 #' @import stringr
 #' @import dplyr
 #' @import tidyselect
+#' @import tidyr
 #' @rawNamespace import(rlang, except = c(local_options,with_options))
 #' @import haven
 
@@ -125,10 +126,12 @@ RI_QUAL_07B_03DV <- function(VCP = "RI_QUAL_07B_03DV"){
             group_by(respid) %>%
             mutate(
               !!got_hypo := ifelse(
-                !is.na(age_at_visit) & psweight > 0 &
-                  !is.na(psweight) & age_at_visit >= minage_dose1,
-                1, 0),
-              !!got_hypo_sum := cumsum(!!got_hypo)
+                is.na(age_at_visit) | is.na(psweight) | !psweight > 0, NA,
+                ifelse(
+                  age_at_visit >= minage_dose1, 1, 0
+                )
+              ),
+              !!got_hypo_sum := cumsum(tidyr::replace_na(!!got_hypo, 0))
             ) %>%
             ungroup() %>%
             mutate(
@@ -160,10 +163,12 @@ RI_QUAL_07B_03DV <- function(VCP = "RI_QUAL_07B_03DV"){
             group_by(respid) %>%
             mutate(
               !!got_hypo := ifelse(
-                !is.na(age_at_visit) & psweight > 0 & !is.na(psweight) &
-                  age_at_visit >= minage_dose1 & !!num_days_since_prev >= minint,
-                1, 0),
-              !!got_hypo_sum := cumsum(!!got_hypo)
+                is.na(age_at_visit) | is.na(psweight) | !psweight > 0, NA,
+                ifelse(
+                  age_at_visit >= minage_dose1 & !!num_days_since_prev >= minint, 1, 0
+                )
+              ),
+              !!got_hypo_sum := cumsum(tidyr::replace_na(!!got_hypo, 0))
             ) %>%
             ungroup() %>%
             mutate(
@@ -182,8 +187,11 @@ RI_QUAL_07B_03DV <- function(VCP = "RI_QUAL_07B_03DV"){
               !!got_hypo_sum := ifelse(!!got_hypo_sum > 1, 0, !!got_hypo_sum),
               # Make sure sum is missing when weight is 0 or missing
               !!got_hypo_sum := ifelse(psweight %in% 0 | is.na(psweight), NA, !!got_hypo_sum),
-              !!got_hypo := !!got_hypo_sum
-            ) %>% select(-!!got_hypo_sum, -!!num_days_temp)
+              !!got_hypo := !!got_hypo_sum,
+              # 2023-07-17 update
+              !!got_hypo := ifelse(age_at_interview < minage, NA, !!got_hypo)
+            ) %>%
+            select(-!!got_hypo_sum, -!!num_days_temp)
         }
 
       } # end i loop
@@ -192,6 +200,7 @@ RI_QUAL_07B_03DV <- function(VCP = "RI_QUAL_07B_03DV"){
         select(-contains(paste0("num_days_since_", dn)))
 
     } # end d loop
+
   } # end if multi
 
   # Save dataset in long form
