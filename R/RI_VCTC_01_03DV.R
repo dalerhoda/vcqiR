@@ -163,20 +163,6 @@ RI_VCTC_01_03DV <- function(VCP = "RI_VCTC_01_03DV"){
 
               tplot[d,j] <- 100*ptest$estimate
 
-
-              if (!paste0("timely_age_at_",doselist[d]) %in% names(keep)){
-                sub4 <- dat %>% select(respid, timely_y,tempvar1)
-                names(sub4)[which(names(sub4) == "tempvar1")] <- paste0("timely_age_at_",doselist[d])
-                names(sub4)[which(names(sub4) == "timely_y")] <- paste0("keep_timely_y_",doselist[d],"_",j)
-                keep <- left_join(keep, sub4, by = "respid")
-              } else {
-                sub4 <- dat %>% select(respid, timely_y)
-                names(sub4)[which(names(sub4) == "timely_y")] <- paste0("keep_timely_y_",doselist[d],"_",j)
-                keep <- left_join(keep, sub4, by = "respid")
-              }
-
-              #NOTE: this dataset is slightly different from the Stata version due to the join function in R keeps duplicate variables
-              saveRDS(keep,file = paste0(VCQI_OUTPUT_FOLDER,"/vctc_keepit_",RI_VCTC_01_LEVELS[lvl],"_",llist[l],".rds"))
               #set the middle step dat back
               dat <- saveddat2
 
