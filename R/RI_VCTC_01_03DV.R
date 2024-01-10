@@ -10,7 +10,7 @@
 #' @rawNamespace import(rlang, except = c(local_options,with_options))
 #' @import survey
 #'
-# RI_VCTC_01_03DV R version 1.02 - Biostat Global Consulting - 2023-07-31
+# RI_VCTC_01_03DV R version 1.03 - Biostat Global Consulting - 2024-01-08
 # *******************************************************************************
 # Change log
 
@@ -18,6 +18,8 @@
 # 2022-11-03  1.00      Mia Yu          Original R version
 # 2022-11-04  1.01      Mia Yu          Package version
 # 2023-07-31  1.02      Mia Yu          Save VCTC category data
+# 2024-01-08  1.03      Mia Yu          Correct the lazy logic that cause errors;
+#                                       This is an update to match VCQI in Stata
 # *******************************************************************************
 
 RI_VCTC_01_03DV <- function(VCP = "RI_VCTC_01_03DV"){
@@ -71,25 +73,40 @@ RI_VCTC_01_03DV <- function(VCP = "RI_VCTC_01_03DV"){
         tplot <- as.data.frame(matrix(nrow = TIMELY_N_DOSES, ncol = max_ntiles+2))
 
         doselist <- str_to_lower(TIMELY_DOSE_ORDER)
-
+        keep <- savedsubdat
         for (d in seq_along(doselist)){
           D <- str_to_upper(doselist[d])
 
           cardage <- rlang::sym(paste0("age_at_",doselist[d],"_card"))
           subdat <- subdat %>% mutate(tempvar1 = !!cardage)
 
-          if (RI_RECORDS_NOT_SOUGHT != 1){
+          # if (RI_RECORDS_NOT_SOUGHT != 1){
+          #   regage <- rlang::sym(paste0("age_at_",doselist[d],"_register"))
+          #   subdat <- subdat %>% rowwise() %>% mutate(tempvar1 = min(!!cardage, !!regage,na.rm = TRUE)) %>%
+          #     ungroup() %>% suppressWarnings()
+          #   subdat <- subdat %>% mutate(tempvar1 = ifelse((tempvar1 == Inf | tempvar1 == -Inf) %in% TRUE, NA, tempvar1))
+          # } # end of if RI_RECORDS_NOT_SOUGHT
+
+          if (RI_RECORDS_SOUGHT_FOR_ALL == 1){
             regage <- rlang::sym(paste0("age_at_",doselist[d],"_register"))
             subdat <- subdat %>% rowwise() %>% mutate(tempvar1 = min(!!cardage, !!regage,na.rm = TRUE)) %>%
               ungroup() %>% suppressWarnings()
             subdat <- subdat %>% mutate(tempvar1 = ifelse((tempvar1 == Inf | tempvar1 == -Inf) %in% TRUE, NA, tempvar1))
-          } # end of if RI_RECORDS_NOT_SOUGHT
+          }
+
+          if (RI_RECORDS_SOUGHT_IF_NO_CARD == 1){
+            regage <- rlang::sym(paste0("age_at_",doselist[d],"_register"))
+            subdat <- subdat %>% rowwise() %>% mutate(tempvar1 = ifelse(no_card %in% 1,
+                                                                        min(!!cardage, !!regage,na.rm = TRUE), tempvar1)) %>%
+              ungroup() %>% suppressWarnings()
+            subdat <- subdat %>% mutate(tempvar1 = ifelse((tempvar1 == Inf | tempvar1 == -Inf) %in% TRUE, NA, tempvar1))
+          }
 
           crude <- rlang::sym(paste0("got_crude_",doselist[d],"_to_analyze"))
 
           subdat <- subdat %>% mutate(tempvar1 = ifelse(is.na(!!crude), NA, tempvar1))
           subdatjoin <- subdat %>% select(respid, tempvar1)
-
+          names(subdatjoin)[which(names(subdatjoin) == "tempvar1")] <- paste0("timely_age_at_",doselist[d])
           dat <- left_join(dat, subdatjoin, by = "respid")
 
           #save this middle step dat too for later use
@@ -99,7 +116,7 @@ RI_VCTC_01_03DV <- function(VCP = "RI_VCTC_01_03DV"){
 
             #use default tiles
             numtile <- as.numeric(TIMELY_N_DTS) - 1
-
+            #tempvar1 <- rlang::sym(paste0("timely_age_at_",doselist[d]))
             for (j in 1:numtile){
               dt_ub <- get(paste0("TIMELY_DT_UB_",j), envir = .GlobalEnv)
               minage <- get(paste0(doselist[d],"_min_age_days"), envir = .GlobalEnv)
@@ -110,7 +127,7 @@ RI_VCTC_01_03DV <- function(VCP = "RI_VCTC_01_03DV"){
                 subdat2 <- subdat2 %>% mutate(timely_y = 0) # changed made here 2023/07/31
               }
 
-              subdat2 <- subdat2 %>% select(respid, timely_y)
+              subdat2 <- subdat2 %>% select(respid,tempvar1, timely_y)
 
               #merge the dataset
               dat <- left_join(dat,subdat2, by = "respid")
@@ -155,7 +172,7 @@ RI_VCTC_01_03DV <- function(VCP = "RI_VCTC_01_03DV"){
             #use user defined tiles
             usertile <- get(paste0("TIMELY_CD_",str_to_upper(doselist[d]),"_NTILES"), envir = .GlobalEnv)
             usertile = usertile - 1
-
+            #tempvar1 <- rlang::sym(paste0("timely_age_at_",doselist[d]))
             for (j in 1:usertile){
               dt_ub <- get(paste0("TIMELY_CD_",str_to_upper(doselist[d]),"_UB_",j), envir = .GlobalEnv)
               minage <- get(paste0(doselist[d],"_min_age_days"), envir = .GlobalEnv)
@@ -362,10 +379,15 @@ RI_VCTC_01_03DV <- function(VCP = "RI_VCTC_01_03DV"){
 
         combineddat <- rbind(combineddat,tplott)
         combineddat <- combineddat %>% arrange(level, levelid, order)
-        saveRDS(combineddat, file = paste0(VCQI_OUTPUT_FOLDER,"/RI_VCTC_01_",ANALYSIS_COUNTER,"_TO.rds"))
       } #end of llist loop
-
+      if (lvl == 1){
+        combineddat2 <- combineddat
+      }
+      if (lvl > 1){
+        combineddat2 <- rbind(combineddat2,combineddat)
+      }
     } #end of RI_VCTC_01_LEVELS loop
+    saveRDS(combineddat2, file = paste0(VCQI_OUTPUT_FOLDER,"/RI_VCTC_01_",ANALYSIS_COUNTER,"_TO.rds"))
 
     if (!vcqi_object_exists("RI_VCTC_01_TEMP_DATASETS")){
       RI_VCTC_01_TEMP_DATASETS <- NULL
@@ -395,6 +417,21 @@ RI_VCTC_01_03DV <- function(VCP = "RI_VCTC_01_03DV"){
             ungroup() %>% suppressWarnings()
           dat <- dat %>% mutate(tempvar1 = ifelse((tempvar1 == Inf | tempvar1 == -Inf) %in% TRUE, NA, tempvar1))
         } # end of if RI_RECORDS_NOT_SOUGHT
+
+        if (RI_RECORDS_SOUGHT_FOR_ALL == 1){
+          regage <- rlang::sym(paste0("age_at_",doselist[d],"_register"))
+          dat <- dat %>% rowwise() %>% mutate(tempvar1 = min(!!cardage, !!regage,na.rm = TRUE)) %>%
+            ungroup() %>% suppressWarnings()
+          dat <- dat %>% mutate(tempvar1 = ifelse((tempvar1 == Inf | tempvar1 == -Inf) %in% TRUE, NA, tempvar1))
+        }
+
+        if (RI_RECORDS_SOUGHT_IF_NO_CARD == 1){
+          regage <- rlang::sym(paste0("age_at_",doselist[d],"_register"))
+          dat <- dat %>% rowwise() %>% mutate(tempvar1 = ifelse(no_card %in% 1,
+                                                                min(!!cardage, !!regage,na.rm = TRUE), tempvar1)) %>%
+            ungroup() %>% suppressWarnings()
+          dat <- dat %>% mutate(tempvar1 = ifelse((tempvar1 == Inf | tempvar1 == -Inf) %in% TRUE, NA, tempvar1))
+        }
 
         # Make missing if not eligible
         crude <- rlang::sym(paste0("got_crude_",doselist[d],"_to_analyze"))

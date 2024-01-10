@@ -8,7 +8,7 @@
 #' @import dplyr
 #' @import stringr
 
-# RI_VCTC_01_01PP R version 1.02 - Biostat Global Consulting - 2022-12-21
+# RI_VCTC_01_01PP R version 1.03 - Biostat Global Consulting - 2024-01-08
 # *******************************************************************************
 # Change log
 
@@ -17,6 +17,7 @@
 # 2022-11-03  1.01      Mia Yu          Package version
 # 2022-12-21  1.02      Mia Yu          Update to include the horizontal line and
 #                                       note about fully/not vaccinated
+# 2024-01-08  1.03      Mia Yu          Keep no_card to help with bug fix in 03DV
 # *******************************************************************************
 
 RI_VCTC_01_01PP <- function(VCP = "RI_VCTC_01_01PP"){
@@ -121,7 +122,7 @@ RI_VCTC_01_01PP <- function(VCP = "RI_VCTC_01_01PP"){
     }
 
     dat <- dat %>% select(level1id,level2id,level3id,level1name,level2name,level3name,
-                          stratumid,clusterid,respid,RI01,RI03,RI11,RI12,HH02,HH04,psweight,
+                          stratumid,clusterid,respid,RI01,RI03,RI11,RI12,HH02,HH04,psweight,no_card,
                           all_of(TIMELY_FULLY_VXD_NOTE_VARIABLE),all_of(TIMELY_NOT_VXD_NOTE_VARIABLE),all_of(dlist))
 
     saveRDS(dat, file = paste0(VCQI_OUTPUT_FOLDER, "/RI_VCTC_01_", ANALYSIS_COUNTER, ".rds"))
