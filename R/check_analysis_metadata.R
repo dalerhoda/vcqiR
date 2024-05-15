@@ -12,7 +12,7 @@
 #' @examples
 #' check_analysis_metadata()
 #'
-# check_analysis_metadata R version 1.15 - Biostat Global Consulting - 2023-11-15
+# check_analysis_metadata R version 1.17 - Biostat Global Consulting - 2024-05-07
 # *******************************************************************************
 # Change log
 
@@ -40,6 +40,8 @@
 # 2023-07-29  1.13      Mia Yu          Remove HH14 from missing value check
 # 2023-10-03  1.14      Mia Yu          Move vcqi_multi_lingual_strings inside this program
 # 2023-11-15  1.15      Mia Yu          Add format columns to default settings for level4_layout
+# 2024-03-20	1.16    	Mia Yu      		Add a check for VCQI_PASS_THRU_VARLIST
+# 2024-05-07  1.17      Mia Yu          Add svydesign options for fpc and nest
 # *******************************************************************************
 
 # Note: sections of this program that check FMTID are not implemented (2022-10-07)
@@ -75,9 +77,48 @@ check_analysis_metadata <- function(VCP = "check_analysis_metadata"){
   # to English
   vcqi_multi_lingual_strings()
 
+  # Check global VCQI_PASS_THRU_VARLIST
+  # First assign VCQI_PASS_THRU_VARLIST to NULL if not defined/empty/NA
+  if(!vcqi_object_exists("VCQI_PASS_THRU_VARLIST")){
+    vcqi_global(VCQI_PASS_THRU_VARLIST,NULL)
+  } else {
+    for (i in seq_along(VCQI_PASS_THRU_VARLIST)){
+      if (is.na(VCQI_PASS_THRU_VARLIST[i]) | str_trim(VCQI_PASS_THRU_VARLIST[i]) == ""){
+        vcqi_global(VCQI_PASS_THRU_VARLIST,VCQI_PASS_THRU_VARLIST[-i])
+      }
+    }
+  }
+
+
+  if (!is.null(VCQI_PASS_THRU_VARLIST)){
+    if(vcqi_object_exists("VCQI_DATA_FOLDER")){
+      if(file.exists(paste0(VCQI_DATA_FOLDER,"/",VCQI_RI_DATASET))){
+        ridat <- vcqi_read(paste0(VCQI_DATA_FOLDER,"/",VCQI_RI_DATASET))
+        for(i in seq_along(VCQI_PASS_THRU_VARLIST)){
+          if(!VCQI_PASS_THRU_VARLIST[i] %in% names(ridat)){
+            errormsgs <- c(errormsgs, paste0("The global VCQI_PASS_THRU_VARLIST includes ",
+                                             VCQI_PASS_THRU_VARLIST[i], ", but it is not a variable in VCQI_RI_DATASET."))
+            vcqi_log_comment(VCP, 1, "Error", paste0("The global VCQI_PASS_THRU_VARLIST includes ",
+                                                     VCQI_PASS_THRU_VARLIST[i], ", but it is not a variable in VCQI_RI_DATASET."))
+            exitflag <- 1
+          }
+        } #end of VCQI_PASS_THRU_VARLIST i loop
+      }
+    }
+  }
+
   # This syntax should be set in Block E, set as default if user failed to specify
   if(vcqi_object_exists("VCQI_SVYDESIGN_SYNTAX") == FALSE){
-    vcqi_global(VCQI_SVYDESIGN_SYNTAX, list(ids = ~clusterid, weights = ~psweight, strata = ~stratumid))
+    vcqi_global(VCQI_SVYDESIGN_SYNTAX, list(ids = ~clusterid, weights = ~psweight, strata = ~stratumid, fpc = NULL, nest = FALSE))
+  }
+
+  #2024/05/07 Add options for fpc and nest
+  if (! "fpc" %in% names(VCQI_SVYDESIGN_SYNTAX)){
+    vcqi_global(VCQI_SVYDESIGN_SYNTAX, c(VCQI_SVYDESIGN_SYNTAX, list(fpc = NULL)))
+  }
+
+  if (! "nest" %in% names(VCQI_SVYDESIGN_SYNTAX)){
+    vcqi_global(VCQI_SVYDESIGN_SYNTAX, c(VCQI_SVYDESIGN_SYNTAX, list(nest = FALSE)))
   }
 
   # Check for variables if HH and HM datasets are provided

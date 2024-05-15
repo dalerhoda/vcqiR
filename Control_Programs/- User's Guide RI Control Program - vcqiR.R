@@ -267,6 +267,12 @@ vcqi_global(VCQI_LEVEL4_SET_LAYOUT, paste0(VCQI_DATA_FOLDER, "/Level4_Layout_Tes
 # The data argument in survey::svydesign should *not* be specified here
 vcqi_global(VCQI_SVYDESIGN_SYNTAX, list(ids = ~clusterid, weights = ~psweight, strata = ~stratumid))
 
+# List any additional covariates that should be passed thru from the survey
+# dataset into all indicator datasets.  i.e., any extra variables that are
+# part of the svyset syntax besides clusterid, stratumid, psweight.
+# This option is rarely used.
+vcqi_global(VCQI_PASS_THRU_VARLIST,NULL)
+
 # User specifies the method for calculating confidence intervals
 # Valid choices are "Logit", "Wilson", "Jeffreys" or "Clopper"; our default recommendation is "Wilson"
 vcqi_global(VCQI_CI_METHOD, "Wilson")

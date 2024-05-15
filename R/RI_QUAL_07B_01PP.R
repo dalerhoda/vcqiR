@@ -7,7 +7,7 @@
 #' @import dplyr
 #' @import tidyselect
 
-# RI_QUAL_07B_01PP R version 1.02 - Biostat Global Consulting - 2022-10-24
+# RI_QUAL_07B_01PP R version 1.04 - Biostat Global Consulting - 2024-03-20
 # *******************************************************************************
 # Change log
 
@@ -16,6 +16,7 @@
 # 2022-10-11  1.01      Mia Yu          Package version
 # 2022-10-24  1.02      Mia Yu          Add vcqi_halt_immediately
 # 2023-07-18  1.03      Caitlin Clary   Pass age_at_interview to RI_QUAL_07B_#
+# 2024-03-20  1.04      Mia Yu          Add VCQI_PASS_THRU_VARLIST to selection list
 # *******************************************************************************
 
 RI_QUAL_07B_01PP <- function(VCP = "RI_QUAL_07B_01PP"){
@@ -46,7 +47,8 @@ RI_QUAL_07B_01PP <- function(VCP = "RI_QUAL_07B_01PP"){
   dat2 <- vcqi_read(paste0(VCQI_OUTPUT_FOLDER, "/RI_with_ids.rds"))
   dat2 <- dat2 %>% select(
     respid, age_at_interview, clusterid, stratumid, psweight, level1id, level1name, level2id,
-    level2name, level3id, level3name, all_of(VCQI_LEVEL4_SET_VARLIST))
+    level2name, level3id, level3name, all_of(VCQI_LEVEL4_SET_VARLIST),
+    all_of(VCQI_PASS_THRU_VARLIST))
 
   # Merge back on variables needed in the _GO program
   dat <- full_join(dat, dat2, by = "respid")

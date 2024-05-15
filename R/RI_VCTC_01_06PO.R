@@ -79,18 +79,59 @@ RI_VCTC_01_06PO <- function(VCP = "RI_VCTC_01_06PO"){
 
             if (substring(VCQI_SVYDESIGN_SYNTAX$ids, 1)[[2]] == "1"){
               datdesign <- svydesign(ids = ~1, strata = VCQI_SVYDESIGN_SYNTAX$strata,
-                                     weights = VCQI_SVYDESIGN_SYNTAX$weights, data = dat)
+                                     weights = VCQI_SVYDESIGN_SYNTAX$weights,
+                                     fpc = VCQI_SVYDESIGN_SYNTAX$fpc,
+                                     nest = VCQI_SVYDESIGN_SYNTAX$nest,
+                                     data = dat)
             } else {
-              clusterid <- get(substring(VCQI_SVYDESIGN_SYNTAX$ids, 1)[[2]], dat)
 
-              if (length(unique(clusterid)) == 1){
-                datdesign <- svydesign(ids = ~1, strata = VCQI_SVYDESIGN_SYNTAX$strata,
-                                       weights = VCQI_SVYDESIGN_SYNTAX$weights, data = dat)
+              if (str_count(as.character(VCQI_SVYDESIGN_SYNTAX$ids)[2], pattern = fixed("+")) >= 1){
+
+                clustervars <- str_split(as.character(VCQI_SVYDESIGN_SYNTAX$ids)[2], pattern = fixed("+"))[[1]]
+                clustervars <- str_trim(clustervars)
+
+                justone <- TRUE
+                for (i in seq_along(clustervars)){
+                  clusterid <- get(clustervars[i], dat)
+                  if (!length(unique(clusterid)) %in% 1){
+                    justone <- FALSE
+                  }
+                } #test if all cluster vars only have 1 unique value
+
+                if (justone == TRUE){
+                  datdesign <- svydesign(ids = ~1, strata = VCQI_SVYDESIGN_SYNTAX$strata,
+                                         weights = VCQI_SVYDESIGN_SYNTAX$weights,
+                                         fpc = VCQI_SVYDESIGN_SYNTAX$fpc,
+                                         nest = VCQI_SVYDESIGN_SYNTAX$nest,
+                                         data = dat)
+                } else {
+                  datdesign <- svydesign(ids = VCQI_SVYDESIGN_SYNTAX$ids,
+                                         strata = VCQI_SVYDESIGN_SYNTAX$strata,
+                                         weights = VCQI_SVYDESIGN_SYNTAX$weights,
+                                         fpc = VCQI_SVYDESIGN_SYNTAX$fpc,
+                                         nest = VCQI_SVYDESIGN_SYNTAX$nest,
+                                         data = dat)
+                }
+
               } else {
-                datdesign <- svydesign(ids = VCQI_SVYDESIGN_SYNTAX$ids,
-                                       strata = VCQI_SVYDESIGN_SYNTAX$strata,
-                                       weights = VCQI_SVYDESIGN_SYNTAX$weights, data = dat)
-              }
+                clusterid <- get(substring(VCQI_SVYDESIGN_SYNTAX$ids, 1)[[2]], dat)
+
+                if (length(unique(clusterid)) == 1){
+                  datdesign <- svydesign(ids = ~1, strata = VCQI_SVYDESIGN_SYNTAX$strata,
+                                         weights = VCQI_SVYDESIGN_SYNTAX$weights,
+                                         fpc = VCQI_SVYDESIGN_SYNTAX$fpc,
+                                         nest = VCQI_SVYDESIGN_SYNTAX$nest,
+                                         data = dat)
+                } else {
+                  datdesign <- svydesign(ids = VCQI_SVYDESIGN_SYNTAX$ids,
+                                         strata = VCQI_SVYDESIGN_SYNTAX$strata,
+                                         weights = VCQI_SVYDESIGN_SYNTAX$weights,
+                                         fpc = VCQI_SVYDESIGN_SYNTAX$fpc,
+                                         nest = VCQI_SVYDESIGN_SYNTAX$nest,
+                                         data = dat)
+                }
+              } #one stage
+
             }
 
             if (TIMELY_TEXTBAR_ORDER[e] == "COVG"){

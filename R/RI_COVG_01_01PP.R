@@ -7,7 +7,7 @@
 #' @import dplyr
 #' @import tidyselect
 
-# RI_COVG_01_01PP R version 1.02 - Biostat Global Consulting - 2023-07-18
+# RI_COVG_01_01PP R version 1.03 - Biostat Global Consulting - 2024-03-20
 # *******************************************************************************
 # Change log
 
@@ -15,6 +15,7 @@
 # 2022-08-03  1.00      Mia Yu          Original R version
 # 2022-10-05  1.01      Mia Yu          Package version
 # 2023-07-18  1.02      Mia Yu          Keep level3name and match Stata version
+# 2024-03-20  1.03      Mia Yu          Add VCQI_PASS_THRU_VARLIST to selection list
 # *******************************************************************************
 
 RI_COVG_01_01PP <- function(VCP = "RI_COVG_01_01PP"){
@@ -44,7 +45,8 @@ RI_COVG_01_01PP <- function(VCP = "RI_COVG_01_01PP"){
   dat <- select(dat, c(level1id, level2id, level3id, level3name, stratumid, clusterid,
                        respid, RI01, RI03, RI11, RI12,HH02, HH04, psweight,
                        all_of(VCQI_LEVEL4_SET_VARLIST), all_of(dlist),
-                       no_card, age_at_interview))
+                       no_card, age_at_interview,
+                       all_of(VCQI_PASS_THRU_VARLIST)))
 
   saveRDS(dat, file = paste0(VCQI_OUTPUT_FOLDER,"/RI_COVG_01_",ANALYSIS_COUNTER,".rds"))
 
