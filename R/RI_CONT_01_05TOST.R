@@ -6,12 +6,13 @@
 #'
 #' @import stringr
 
-# RI_CONT_01_05TOST R version 1.00 - Biostat Global Consulting - 2023-07-24
+# RI_CONT_01_05TOST R version 1.01 - Biostat Global Consulting - 2024-05-15
 # *******************************************************************************
 # Change log
 
 # Date 			  Version 	Name			      What Changed
 # 2023-07-24  1.00      Mia Yu          Original R package version
+# 2024-05-15  1.01      Mia Yu          Added multi lingual strings
 # *******************************************************************************
 
 
@@ -35,13 +36,17 @@ RI_CONT_01_05TOST <- function(VCP = "RI_CONT_01_05TOST"){
       tablename = "TO_RI_CONT_01",
       dbfilename = paste0("RI_CONT_01_",ANALYSIS_COUNTER,"_",d1,"_",d2,"_database.rds"),
       variable = "estimate", replacevar = NA, noannotate = TRUE,
-      label = paste0(str_to_upper(d1),"-",str_to_upper(d2)," Dropout (%)"))
+      label = paste0(str_to_upper(d1),"-",str_to_upper(d2),
+                     " ",
+                     language_string(language_use = language_use, str = "OS_384"),
+                     " ",
+                     language_string(language_use = language_use, str = "OS_1"))) #Dropout (%)
 
     make_table_column(
       tablename = "TO_RI_CONT_01",
       dbfilename = paste0("RI_CONT_01_",ANALYSIS_COUNTER,"_",d1,"_",d2,"_database.rds"),
       variable = "n", replacevar = NA, noannotate = TRUE,
-      label = "N")
+      label = language_string(language_use = language_use, str = "OS_48")) #N
   } #end of while
 
   export_table_to_excel(indicator = "RI_CONT_01",brief = FALSE)

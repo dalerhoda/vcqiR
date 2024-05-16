@@ -346,6 +346,14 @@ vcqi_global(VCQI_MAKE_AUGMENTED_DATASET, 1)
 
 vcqi_global(OUTPUT_LANGUAGE, "English")
 
+# Specify the row character cut off length for plot Title
+# meaning if a Title is > ### characters it will be split onto the next line(s)
+vcqi_global(TITLE_CUTOFF, NA)
+
+# Specify the row character cut off length for plot Footnotes
+# meaning if a Footnotes is > ### characters it will be split onto the next line(s)
+vcqi_global(FOOTNOTE_CUTOFF, NA)
+
 # *************************************************
 # Code Block: RI-E             (Do not change) ----
 # ** Format the VCQI dose list and pre-process survey data

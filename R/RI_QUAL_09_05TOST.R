@@ -7,12 +7,13 @@
 #' @import stringr
 #' @import dplyr
 
-# RI_QUAL_09_05TOST R version 1.00 - Biostat Global Consulting - 2023-07-24
+# RI_QUAL_09_05TOST R version 1.01 - Biostat Global Consulting - 2024-05-15
 # *******************************************************************************
 # Change log
 
 # Date 			  Version 	Name			      What Changed
 # 2023-07-24  1.00      Mia Yu          Original R package version
+# 2024-05-15  1.01      Mia Yu          Added multi lingual strings
 # *******************************************************************************
 
 RI_QUAL_09_05TOST <- function(VCP = "RI_QUAL_09_05TOST"){
@@ -84,43 +85,81 @@ RI_QUAL_09_05TOST <- function(VCP = "RI_QUAL_09_05TOST"){
         tablename = "TO_RI_QUAL_09",
         dbfilename = paste0("RI_QUAL_09_",ANALYSIS_COUNTER,"_",ldose,"_TO.rds"),
         variable = "n_mov", replacevar = NA, noannotate = TRUE,
-        label = paste0("Had MOV for ", udose, " (N)"), varformat = list("#,##0"))
+        label = paste0(language_string(language_use = language_use, str = "OS_24"),
+                       " ",
+                       udose,
+                       " ",
+                       language_string(language_use = language_use, str = "OS_2")),
+        varformat = list("#,##0")) #"Had MOV for ", udose, " (N)"
 
       make_table_column(
         tablename = "TO_RI_QUAL_09",
         dbfilename = paste0("RI_QUAL_09_",ANALYSIS_COUNTER,"_",ldose,"_TO.rds"),
         variable = "pct_mov", replacevar = NA, noannotate = TRUE,
-        label = paste0("Had MOV for ", udose, " (%)"))
+        label = paste0(language_string(language_use = language_use, str = "OS_24"),
+                       " ",
+                       udose,
+                       " ",
+                       language_string(language_use = language_use, str = "OS_1")))
+      #label = paste0("Had MOV for ", udose, " (%)"))
 
       make_table_column(
         tablename = "TO_RI_QUAL_09",
         dbfilename = paste0("RI_QUAL_09_",ANALYSIS_COUNTER,"_",ldose,"_TO.rds"),
         variable = "n_uncor_mov", replacevar = NA, noannotate = TRUE,
-        label = paste0("MOV uncorrected for ", udose, " (N)"), varformat = list("#,##0"))
+        label = paste0(language_string(language_use = language_use, str = "OS_46"),
+                       " ",
+                       udose,
+                       " ",
+                       language_string(language_use = language_use, str = "OS_2")),
+        varformat = list("#,##0"))
+      #label = paste0("MOV uncorrected for ", udose, " (N)")
 
       make_table_column(
         tablename = "TO_RI_QUAL_09",
         dbfilename = paste0("RI_QUAL_09_",ANALYSIS_COUNTER,"_",ldose,"_TO.rds"),
         variable = "pct_uncor", replacevar = NA, noannotate = TRUE,
-        label = paste0("MOV uncorrected for ", udose, " (%)"))
+        label = paste0(language_string(language_use = language_use, str = "OS_46"),
+                       " ",
+                       udose,
+                       " ",
+                       language_string(language_use = language_use, str = "OS_1")))
+       #label = paste0("MOV uncorrected for ", udose, " (%)"))
 
       make_table_column(
         tablename = "TO_RI_QUAL_09",
         dbfilename = paste0("RI_QUAL_09_",ANALYSIS_COUNTER,"_",ldose,"_TO.rds"),
         variable = "n_cor_mov", replacevar = NA, noannotate = TRUE,
-        label = paste0("MOSV corrected for ", udose, " (N)"), varformat = list("#,##0"))
+        label = paste0(language_string(language_use = language_use, str = "OS_45"),
+                       " ",
+                       udose,
+                       " ",
+                       language_string(language_use = language_use, str = "OS_2")),
+        varformat = list("#,##0"))
+      #label = paste0("MOSV corrected for ", udose, " (N)")
 
       make_table_column(
         tablename = "TO_RI_QUAL_09",
         dbfilename = paste0("RI_QUAL_09_",ANALYSIS_COUNTER,"_",ldose,"_TO.rds"),
         variable = "pct_cor", replacevar = NA, noannotate = TRUE,
-        label = paste0("MOSV corrected for ", udose, " (%)"))
+        label = paste0(language_string(language_use = language_use, str = "OS_45"),
+                       " ",
+                       udose,
+                       " ",
+                       language_string(language_use = language_use, str = "OS_1")))
+      #label = paste0("MOSV corrected for ", udose, " (%)"))
 
       make_table_column(
         tablename = "TO_RI_QUAL_09",
         dbfilename = paste0("RI_QUAL_09_",ANALYSIS_COUNTER,"_",ldose,"_TO.rds"),
         variable = "n", replacevar = NA, noannotate = TRUE,
-        label = paste0("Had visits eligible ", udose, " (N)"), varformat = list("#,##0"))
+        label = paste0(language_string(language_use = language_use, str = "OS_26"),
+                       " ",
+                       udose,
+                       " ",
+                       language_string(language_use = language_use, str = "OS_2")),
+        varformat = list("#,##0"))
+      #label = paste0("Had visits eligible ", udose, " (N)")
     }
 
     if (dose == "anydose") {
@@ -130,55 +169,85 @@ RI_QUAL_09_05TOST <- function(VCP = "RI_QUAL_09_05TOST"){
         tablename = "TO_RI_QUAL_09",
         dbfilename = paste0("RI_QUAL_09_",ANALYSIS_COUNTER,"_",ldose,"_TO.rds"),
         variable = "n_mov", replacevar = NA, noannotate = TRUE,
-        label = "Had MOSV for any dose (N)", varformat = list("#,##0"))
+        label = paste0(language_string(language_use = language_use, str = "OS_25"),
+                       " ",
+                       language_string(language_use = language_use, str = "OS_2")),
+        varformat = list("#,##0"))
+      #label = "Had MOSV for any dose (N)"
 
       make_table_column(
         tablename = "TO_RI_QUAL_09",
         dbfilename = paste0("RI_QUAL_09_",ANALYSIS_COUNTER,"_",ldose,"_TO.rds"),
         variable = "pct_mov", replacevar = NA, noannotate = TRUE,
-        label = "Had MOSV for any dose (%)")
+        label = paste0(language_string(language_use = language_use, str = "OS_25"),
+                       " ",
+                       language_string(language_use = language_use, str = "OS_1")))
+       #label = "Had MOSV for any dose (%)")
 
       make_table_column(
         tablename = "TO_RI_QUAL_09",
         dbfilename = paste0("RI_QUAL_09_",ANALYSIS_COUNTER,"_",ldose,"_TO.rds"),
         variable = "n_uncor_mov", replacevar = NA, noannotate = TRUE,
-        label = "All MOSVs were uncorrected (N)", varformat = list("#,##0"))
+        label = paste0(language_string(language_use = language_use, str = "OS_7"),
+                       " ",
+                       language_string(language_use = language_use, str = "OS_2")),
+        varformat = list("#,##0"))
+      #label = "All MOSVs were uncorrected (N)"
 
       make_table_column(
         tablename = "TO_RI_QUAL_09",
         dbfilename = paste0("RI_QUAL_09_",ANALYSIS_COUNTER,"_",ldose,"_TO.rds"),
         variable = "pct_uncor", replacevar = NA, noannotate = TRUE,
-        label = "All MOSVs were uncorrected (%)")
+        label = paste0(language_string(language_use = language_use, str = "OS_7"),
+                       " ",
+                       language_string(language_use = language_use, str = "OS_1")))
+      #label = "All MOSVs were uncorrected (%)")
 
       make_table_column(
         tablename = "TO_RI_QUAL_09",
         dbfilename = paste0("RI_QUAL_09_",ANALYSIS_COUNTER,"_",ldose,"_TO.rds"),
         variable = "n_cor_mov", replacevar = NA, noannotate = TRUE,
-        label = "All MOSVs were corrected (N)", varformat = list("#,##0"))
+        label = paste0(language_string(language_use = language_use, str = "OS_6"),
+                       " ",
+                       language_string(language_use = language_use, str = "OS_2")),
+        varformat = list("#,##0"))
+      #label = "All MOSVs were corrected (N)"
 
       make_table_column(
         tablename = "TO_RI_QUAL_09",
         dbfilename = paste0("RI_QUAL_09_",ANALYSIS_COUNTER,"_",ldose,"_TO.rds"),
         variable = "pct_cor", replacevar = NA, noannotate = TRUE,
-        label = "All MOSVs were corrected (%)")
+        label = paste0(language_string(language_use = language_use, str = "OS_6"),
+                       " ",
+                       language_string(language_use = language_use, str = "OS_1")))
+      #label = "All MOSVs were corrected (%)")
 
       make_table_column(
         tablename = "TO_RI_QUAL_09",
         dbfilename = paste0("RI_QUAL_09_",ANALYSIS_COUNTER,"_",ldose,"_TO.rds"),
         variable = "n_partial", replacevar = NA, noannotate = TRUE,
-        label = "Some (not all) MOSVs were corrected (N)", varformat = list("#,##0"))
+        label = paste0(language_string(language_use = language_use, str = "OS_69"),
+                       " ",
+                       language_string(language_use = language_use, str = "OS_2")),
+        varformat = list("#,##0"))
+    #label = "Some (not all) MOSVs were corrected (N)"
 
       make_table_column(
         tablename = "TO_RI_QUAL_09",
         dbfilename = paste0("RI_QUAL_09_",ANALYSIS_COUNTER,"_",ldose,"_TO.rds"),
         variable = "pct_partial", replacevar = NA, noannotate = TRUE,
-        label = "Some (not all) MOSVs were corrected (%)")
+        label = paste0(language_string(language_use = language_use, str = "OS_69"),
+                       " ",
+                       language_string(language_use = language_use, str = "OS_1")))
+      #label = "Some (not all) MOSVs were corrected (%)")
 
       make_table_column(
         tablename = "TO_RI_QUAL_09",
         dbfilename = paste0("RI_QUAL_09_",ANALYSIS_COUNTER,"_",ldose,"_TO.rds"),
         variable = "n", replacevar = NA, noannotate = TRUE,
-        label = "Had visits eligible for any dose (N)", varformat = list("#,##0"))
+        label = language_string(language_use = language_use, str = "OS_27"),
+        varformat = list("#,##0"))
+      #label = "Had visits eligible for any dose (N)"
     }
 
   } #end of d loop

@@ -6,12 +6,13 @@
 #'
 #' @import stringr
 
-# RI_QUAL_08_05TOST R version 1.00 - Biostat Global Consulting - 2023-07-24
+# RI_QUAL_08_05TOST R version 1.00 - Biostat Global Consulting - 2024-05-15
 # *******************************************************************************
 # Change log
 
 # Date 			  Version 	Name			      What Changed
 # 2023-07-24  1.00      Mia Yu          Original R package version
+# 2024-05-15  1.01      Mia Yu          Added multi lingual strings
 # *******************************************************************************
 
 RI_QUAL_08_05TOST <- function(VCP = "RI_QUAL_08_05TOST"){
@@ -26,13 +27,19 @@ RI_QUAL_08_05TOST <- function(VCP = "RI_QUAL_08_05TOST"){
       tablename = "TO_RI_QUAL_08",
       dbfilename = paste0("RI_QUAL_08_",ANALYSIS_COUNTER,"_",MOV_OUTPUT_DOSE_LIST[d],"_database.rds"),
       variable = "estimate", replacevar = NA, noannotate = TRUE,
-      label = paste0("Visits with MOV for",str_to_upper(MOV_OUTPUT_DOSE_LIST[d])," (%)"))
+      label = paste0(language_string(language_use = language_use, str = "OS_81"),
+                     " ",
+                     str_to_upper(MOV_OUTPUT_DOSE_LIST[d]),
+                     " ",
+                     language_string(language_use = language_use, str = "OS_1"))
+      )
+    #label = paste0("Visits with MOV for",str_to_upper(MOV_OUTPUT_DOSE_LIST[d])," (%)")
 
     make_table_column(
       tablename = "TO_RI_QUAL_08",
       dbfilename = paste0("RI_QUAL_08_",ANALYSIS_COUNTER,"_",MOV_OUTPUT_DOSE_LIST[d],"_database.rds"),
       variable = "n", replacevar = NA, noannotate = TRUE,
-      label = "N")
+      label = language_string(language_use = language_use, str = "OS_48")) #"N"
   } #end of d loop
 
   print("Totals...")
@@ -41,25 +48,29 @@ RI_QUAL_08_05TOST <- function(VCP = "RI_QUAL_08_05TOST"){
     tablename = "TO_RI_QUAL_08",
     dbfilename = paste0("RI_QUAL_08_",ANALYSIS_COUNTER,"_any_database.rds"),
     variable = "estimate", replacevar = NA, noannotate = TRUE,
-    label = "Visits with MOV for any dose (%)")
+    label = paste0(language_string(language_use = language_use, str = "OS_82"),
+                   " ",
+                   language_string(language_use = language_use, str = "OS_1"))
+    )
+  #label = "Visits with MOV for any dose (%)"
 
   make_table_column(
     tablename = "TO_RI_QUAL_08",
     dbfilename = paste0("RI_QUAL_08_",ANALYSIS_COUNTER,"_any_database.rds"),
     variable = "n", replacevar = NA, noannotate = TRUE,
-    label = "N")
+    label = language_string(language_use = language_use, str = "OS_48")) #label = "N"
 
   make_table_column(
     tablename = "TO_RI_QUAL_08",
     dbfilename = paste0("RI_QUAL_08_",ANALYSIS_COUNTER,"_rate_database.rds"),
     variable = "estimate", replacevar = NA, noannotate = TRUE,noscale= TRUE,
-    label = "MOVs per Visit", varformat = list("0.000"))
+    label = language_string(language_use = language_use, str = "OS_47"), varformat = list("0.000")) #"MOVs per Visit"
 
   make_table_column(
     tablename = "TO_RI_QUAL_08",
     dbfilename = paste0("RI_QUAL_08_",ANALYSIS_COUNTER,"_rate_database.rds"),
     variable = "n", replacevar = NA, noannotate = TRUE,
-    label = "N")
+    label = language_string(language_use = language_use, str = "OS_48")) #label = "N"
 
   export_table_to_excel(indicator = "RI_QUAL_08",brief = FALSE)
 
