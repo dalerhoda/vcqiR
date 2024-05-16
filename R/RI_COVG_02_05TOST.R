@@ -6,13 +6,14 @@
 #'
 #' @import stringr
 
-# RI_COVG_02_05TOST R version 1.01 - Biostat Global Consulting - 2022-10-11
+# RI_COVG_02_05TOST R version 1.02 - Biostat Global Consulting - 2024-05-15
 # *******************************************************************************
 # Change log
 
 # Date 			  Version 	Name			      What Changed
 # 2022-09-06  1.00      Mia Yu          Original R version
 # 2022-10-11  1.01      Mia Yu          Package version
+# 2024-05-15  1.02      Mia Yu          Added multi lingual strings
 # *******************************************************************************
 
 RI_COVG_02_05TOST <- function(VCP = "RI_COVG_02_05TOST"){
@@ -32,7 +33,11 @@ RI_COVG_02_05TOST <- function(VCP = "RI_COVG_02_05TOST"){
       tablename = "TO_RI_COVG_02",
       dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_c_database.rds"),
       variable = "estimate", replacevar = NA, noannotate = TRUE,
-      label = paste0(du," valid coverage, by card (%)"))
+      label = paste0(du,
+                     " ",
+                     language_string(language_use = language_use, str = "OS_393"),
+                     " ",
+                     language_string(language_use = language_use, str = "OS_1"))) #" valid coverage, by card (%)"
     make_table_column(
       tablename = "TO_RI_COVG_02",
       dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_c_database.rds"),
@@ -44,7 +49,11 @@ RI_COVG_02_05TOST <- function(VCP = "RI_COVG_02_05TOST"){
         tablename = "TO_RI_COVG_02",
         dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_r_database.rds"),
         variable = "estimate", replacevar = NA, noannotate = TRUE,
-        label = paste0(du," valid coverage, by register (%)"))
+        label = paste0(du,
+                       " ",
+                       language_string(language_use = language_use, str = "OS_394"),
+                       " ",
+                       language_string(language_use = language_use, str = "OS_1"))) #" valid coverage, by register (%)"
       make_table_column(
         tablename = "TO_RI_COVG_02",
         dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_r_database.rds"),
@@ -55,7 +64,11 @@ RI_COVG_02_05TOST <- function(VCP = "RI_COVG_02_05TOST"){
         tablename = "TO_RI_COVG_02",
         dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_cr_database.rds"),
         variable = "estimate", replacevar = NA, noannotate = TRUE,
-        label = paste0(du," valid coverage, by card or register (%)"))
+        label = paste0(du,
+                       " ",
+                       language_string(language_use = language_use, str = "OS_395"),
+                       " ",
+                       language_string(language_use = language_use, str = "OS_1"))) #" valid coverage, by card or register (%)"))
       make_table_column(
         tablename = "TO_RI_COVG_02",
         dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_cr_database.rds"),
@@ -68,7 +81,11 @@ RI_COVG_02_05TOST <- function(VCP = "RI_COVG_02_05TOST"){
       tablename = "TO_RI_COVG_02",
       dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_a_database.rds"),
       variable = "estimate", replacevar = NA, noannotate = TRUE,
-      label = paste0(du," valid coverage (%)"))
+      label = paste0(du,
+                     " ",
+                     language_string(language_use = language_use, str = "OS_396"),
+                     " ",
+                     language_string(language_use = language_use, str = "OS_1"))) #" valid coverage (%)"))
     make_table_column(
       tablename = "TO_RI_COVG_02",
       dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_a_database.rds"),
@@ -76,31 +93,53 @@ RI_COVG_02_05TOST <- function(VCP = "RI_COVG_02_05TOST"){
     make_table_column(
       tablename = "TO_RI_COVG_02",
       dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_a_database.rds"),
-      variable = "stderr", replacevar = NA, noannotate = TRUE, label = "StdErr (%)")
+      variable = "stderr", replacevar = NA, noannotate = TRUE,
+      label = language_string(language_use = language_use, str = "OS_318")) #"StdErr (%)"
     make_table_column(
       tablename = "TO_RI_COVG_02",
       dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_a_database.rds"),
-      variable = "lcb", replacevar = NA, noannotate = TRUE, label = "95% LCB (%)")
+      variable = "lcb", replacevar = NA, noannotate = TRUE,
+      label = language_string(language_use = language_use, str = "OS_319")) #"95% LCB (%)"
     make_table_column(
       tablename = "TO_RI_COVG_02",
       dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_a_database.rds"),
-      variable = "ucb", replacevar = NA, noannotate = TRUE, label = "95% UCB (%)")
+      variable = "ucb", replacevar = NA, noannotate = TRUE,
+      label = language_string(language_use = language_use, str = "OS_320")) #"95% UCB (%)"
     make_table_column(
       tablename = "TO_RI_COVG_02",
       dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_a_database.rds"),
-      variable = "deff", replacevar = NA, noannotate = TRUE, label = "DEFF")
+      variable = "deff", replacevar = NA, noannotate = TRUE,
+      label = language_string(language_use = language_use, str = "OS_321")) #"DEFF"
     make_table_column(
       tablename = "TO_RI_COVG_02",
       dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_a_database.rds"),
-      variable = "icc", replacevar = NA, noannotate = TRUE, label = "ICC")
+      variable = "icc", replacevar = NA, noannotate = TRUE,
+      label = language_string(language_use = language_use, str = "OS_322")) #"ICC"
     make_table_column(
       tablename = "TO_RI_COVG_02",
       dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_a_database.rds"),
-      variable = "n", replacevar = NA, noannotate = TRUE, label = "N")
+      variable = "n", replacevar = NA, noannotate = TRUE,
+      label = language_string(language_use = language_use, str = "OS_48")) #"N"
     make_table_column(
       tablename = "TO_RI_COVG_02",
       dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_a_database.rds"),
-      variable = "nwtd", replacevar = NA, noannotate = TRUE, label = "Weighted N")
+      variable = "nwtd", replacevar = NA, noannotate = TRUE,
+      label = language_string(language_use = language_use, str = "OS_323")) #"Weighted N"
+
+    #Brief
+    make_table_column(
+      tablename = "TO_RI_COVG_02_BRIEF",
+      dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_a_database.rds"),
+      variable = "estimate", replacevar = NA, noannotate = TRUE,
+      label = paste0(du,
+                     " ",
+                     language_string(language_use = language_use, str = "OS_396"),
+                     " ",
+                     language_string(language_use = language_use, str = "OS_1"))) #" valid coverage (%)"
+    make_table_column(
+      tablename = "TO_RI_COVG_02_BRIEF",
+      dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_a_database.rds"),
+      variable = "ci", noannotate = TRUE, label = NA)
 
     # Valid coverage by age 1
     min_age <- get(paste0(RI_DOSE_LIST[d],"_min_age_days"), envir = .GlobalEnv)
@@ -110,7 +149,11 @@ RI_COVG_02_05TOST <- function(VCP = "RI_COVG_02_05TOST"){
         tablename = "TO_RI_COVG_02",
         dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_ca1_database.rds"),
         variable = "estimate", replacevar = NA, noannotate = TRUE,
-        label = paste0(du," valid coverage by age 1, by card (%)"))
+        label = paste0(du,
+                       " ",
+                       language_string(language_use = language_use, str = "OS_397"),
+                       " ",
+                       language_string(language_use = language_use, str = "OS_1"))) #" valid coverage by age 1, by card (%)"
       make_table_column(
         tablename = "TO_RI_COVG_02",
         dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_ca1_database.rds"),
@@ -121,7 +164,11 @@ RI_COVG_02_05TOST <- function(VCP = "RI_COVG_02_05TOST"){
           tablename = "TO_RI_COVG_02",
           dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_ra1_database.rds"),
           variable = "estimate", replacevar = NA, noannotate = TRUE,
-          label = paste0(du," valid coverage by age 1, by register (%)"))
+          label = paste0(du,
+                         " ",
+                         language_string(language_use = language_use, str = "OS_398"),
+                         " ",
+                         language_string(language_use = language_use, str = "OS_1"))) #" valid coverage by age 1, by register (%)"))
         make_table_column(
           tablename = "TO_RI_COVG_02",
           dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_ra1_database.rds"),
@@ -131,7 +178,11 @@ RI_COVG_02_05TOST <- function(VCP = "RI_COVG_02_05TOST"){
           tablename = "TO_RI_COVG_02",
           dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_cra1_database.rds"),
           variable = "estimate", replacevar = NA, noannotate = TRUE,
-          label = paste0(du," valid coverage by age 1, by card or register (%)"))
+          label = paste0(du,
+                         " ",
+                         language_string(language_use = language_use, str = "OS_399"),
+                         " ",
+                         language_string(language_use = language_use, str = "OS_1"))) #" valid coverage by age 1, by card or register (%)"))
         make_table_column(
           tablename = "TO_RI_COVG_02",
           dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_cra1_database.rds"),
@@ -143,7 +194,11 @@ RI_COVG_02_05TOST <- function(VCP = "RI_COVG_02_05TOST"){
         tablename = "TO_RI_COVG_02",
         dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_aa1_database.rds"),
         variable = "estimate", replacevar = NA, noannotate = TRUE,
-        label = paste0(du," valid coverage by age 1 (%)"))
+        label = paste0(du,
+                       " ",
+                       language_string(language_use = language_use, str = "OS_400"),
+                       " ",
+                       language_string(language_use = language_use, str = "OS_1"))) #" valid coverage by age 1 (%)"))
       make_table_column(
         tablename = "TO_RI_COVG_02",
         dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_aa1_database.rds"),
@@ -151,37 +206,48 @@ RI_COVG_02_05TOST <- function(VCP = "RI_COVG_02_05TOST"){
       make_table_column(
         tablename = "TO_RI_COVG_02",
         dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_aa1_database.rds"),
-        variable = "stderr", replacevar = NA, noannotate = TRUE, label = "StdErr (%)")
+        variable = "stderr", replacevar = NA, noannotate = TRUE,
+        label = language_string(language_use = language_use, str = "OS_318")) #"StdErr (%)"
       make_table_column(
         tablename = "TO_RI_COVG_02",
         dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_aa1_database.rds"),
-        variable = "lcb", replacevar = NA, noannotate = TRUE, label = "95% LCB (%)")
+        variable = "lcb", replacevar = NA, noannotate = TRUE,
+        label = language_string(language_use = language_use, str = "OS_319")) #"95% LCB (%)"
       make_table_column(
         tablename = "TO_RI_COVG_02",
         dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_aa1_database.rds"),
-        variable = "ucb", replacevar = NA, noannotate = TRUE, label = "95% UCB (%)")
+        variable = "ucb", replacevar = NA, noannotate = TRUE,
+        label = language_string(language_use = language_use, str = "OS_320")) #"95% UCB (%)"
       make_table_column(
         tablename = "TO_RI_COVG_02",
         dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_aa1_database.rds"),
-        variable = "deff", replacevar = NA, noannotate = TRUE, label = "DEFF")
+        variable = "deff", replacevar = NA, noannotate = TRUE,
+        label = language_string(language_use = language_use, str = "OS_321")) #"DEFF"
       make_table_column(
         tablename = "TO_RI_COVG_02",
         dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_aa1_database.rds"),
-        variable = "icc", replacevar = NA, noannotate = TRUE, label = "ICC")
+        variable = "icc", replacevar = NA, noannotate = TRUE,
+        label = language_string(language_use = language_use, str = "OS_322")) #"ICC"
       make_table_column(
         tablename = "TO_RI_COVG_02",
         dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_aa1_database.rds"),
-        variable = "n", replacevar = NA, noannotate = TRUE, label = "N")
+        variable = "n", replacevar = NA, noannotate = TRUE,
+        label = language_string(language_use = language_use, str = "OS_48")) #"N"
       make_table_column(
         tablename = "TO_RI_COVG_02",
         dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_aa1_database.rds"),
-        variable = "nwtd", replacevar = NA, noannotate = TRUE, label = "Weighted N")
+        variable = "nwtd", replacevar = NA, noannotate = TRUE,
+        label = language_string(language_use = language_use, str = "OS_323")) #"Weighted N"
 
       make_table_column(
         tablename = "TO_RI_COVG_02_BRIEF",
         dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_aa1_database.rds"),
         variable = "estimate", replacevar = NA, noannotate = TRUE,
-        label = paste0(du," valid coverage by age 1 (%)"))
+        label = paste0(du,
+                       " ",
+                       language_string(language_use = language_use, str = "OS_400"),
+                       " ",
+                       language_string(language_use = language_use, str = "OS_1"))) #" valid coverage by age 1 (%)"))
       make_table_column(
         tablename = "TO_RI_COVG_02_BRIEF",
         dbfilename = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_aa1_database.rds"),

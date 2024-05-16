@@ -4,12 +4,13 @@
 #'
 #' @return Sheet(s) in tabular output Excel file in VCQI_OUTPUT_FOLDER
 
-# RI_COVG_03_05TOST R version 1.00 - Biostat Global Consulting - 2022-12-13
+# RI_COVG_03_05TOST R version 1.01 - Biostat Global Consulting - 2024-05-15
 # *******************************************************************************
 # Change log
 
 # Date 			  Version 	Name			      What Changed
 # 2022-12-13  1.00      Mia Yu          Original R package version
+# 2024-05-15  1.01      Mia Yu          Added multi lingual strings
 # *******************************************************************************
 
 
@@ -20,12 +21,18 @@ RI_COVG_03_05TOST <- function(VCP = "RI_COVG_03_05TOST"){
               "TO_RI_COVG_03_formatnum","TO_RI_COVG_03_BRIEF_formatnum",
               "TO_RI_COVG_03_colformat", "TO_RI_COVG_03_BRIEF_colformat"), envir = .GlobalEnv) %>% suppressWarnings()
 
+  # Set Crude and Valid lower case
+  cl <- str_to_lower(language_string(language_use = language_use, str = "OS_14"))
+  vl <- str_to_lower(language_string(language_use = language_use, str = "OS_80"))
+
   #CRUDE
   make_table_column(
     tablename = "TO_RI_COVG_03",
     dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fvc_database.rds"),
     variable = "estimate", replacevar = NA, noannotate = TRUE,
-    label = "Fully vaccinated - crude")
+    label = paste0(language_string(language_use = language_use, str = "OS_217"),
+                   " - ",cl))
+  #label = "Fully vaccinated - crude")
   make_table_column(
     tablename = "TO_RI_COVG_03",
     dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fvc_database.rds"),
@@ -33,37 +40,46 @@ RI_COVG_03_05TOST <- function(VCP = "RI_COVG_03_05TOST"){
   make_table_column(
     tablename = "TO_RI_COVG_03",
     dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fvc_database.rds"),
-    variable = "stderr", replacevar = NA, noannotate = TRUE, label = "StdErr (%)")
+    variable = "stderr", replacevar = NA, noannotate = TRUE,
+    label = language_string(language_use = language_use, str = "OS_318")) #"StdErr (%)"
   make_table_column(
     tablename = "TO_RI_COVG_03",
     dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fvc_database.rds"),
-    variable = "lcb", replacevar = NA, noannotate = TRUE, label = "95% LCB (%)")
+    variable = "lcb", replacevar = NA, noannotate = TRUE,
+    label = language_string(language_use = language_use, str = "OS_319")) #"95% LCB (%)"
   make_table_column(
     tablename = "TO_RI_COVG_03",
     dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fvc_database.rds"),
-    variable = "ucb", replacevar = NA, noannotate = TRUE, label = "95% UCB (%)")
+    variable = "ucb", replacevar = NA, noannotate = TRUE,
+    label = language_string(language_use = language_use, str = "OS_320")) #"95% UCB (%)"
   make_table_column(
     tablename = "TO_RI_COVG_03",
     dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fvc_database.rds"),
-    variable = "deff", replacevar = NA, noannotate = TRUE, label = "DEFF")
+    variable = "deff", replacevar = NA, noannotate = TRUE,
+    label = language_string(language_use = language_use, str = "OS_321")) #"DEFF"
   make_table_column(
     tablename = "TO_RI_COVG_03",
     dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fvc_database.rds"),
-    variable = "icc", replacevar = NA, noannotate = TRUE, label = "ICC")
+    variable = "icc", replacevar = NA, noannotate = TRUE,
+    label = language_string(language_use = language_use, str = "OS_322")) #"ICC"
   make_table_column(
     tablename = "TO_RI_COVG_03",
     dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fvc_database.rds"),
-    variable = "n", replacevar = NA, noannotate = TRUE, label = "N")
+    variable = "n", replacevar = NA, noannotate = TRUE,
+    label = language_string(language_use = language_use, str = "OS_48")) #"N"
   make_table_column(
     tablename = "TO_RI_COVG_03",
     dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fvc_database.rds"),
-    variable = "nwtd", replacevar = NA, noannotate = TRUE, label = "Weighted N")
+    variable = "nwtd", replacevar = NA, noannotate = TRUE,
+    label = language_string(language_use = language_use, str = "OS_323")) #"Weighted N"
 
   make_table_column(
     tablename = "TO_RI_COVG_03_BRIEF",
     dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fvc_database.rds"),
     variable = "estimate", replacevar = NA, noannotate = TRUE,
-    label = "Fully vaccinated - crude")
+    label = paste0(language_string(language_use = language_use, str = "OS_217"),
+                   " - ",cl))
+  #label = "Fully vaccinated - crude")
   make_table_column(
     tablename = "TO_RI_COVG_03_BRIEF",
     dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fvc_database.rds"),
@@ -76,7 +92,9 @@ RI_COVG_03_05TOST <- function(VCP = "RI_COVG_03_05TOST"){
       tablename = "TO_RI_COVG_03",
       dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fvv_database.rds"),
       variable = "estimate", replacevar = NA, noannotate = TRUE,
-      label = "Fully vaccinated - valid")
+      label = paste0(language_string(language_use = language_use, str = "OS_217"),
+                     " - ",vl))
+    #label = "Fully vaccinated - valid")
     make_table_column(
       tablename = "TO_RI_COVG_03",
       dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fvv_database.rds"),
@@ -84,37 +102,46 @@ RI_COVG_03_05TOST <- function(VCP = "RI_COVG_03_05TOST"){
     make_table_column(
       tablename = "TO_RI_COVG_03",
       dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fvv_database.rds"),
-      variable = "stderr", replacevar = NA, noannotate = TRUE, label = "StdErr (%)")
+      variable = "stderr", replacevar = NA, noannotate = TRUE,
+      label = language_string(language_use = language_use, str = "OS_318")) #"StdErr (%)"
     make_table_column(
       tablename = "TO_RI_COVG_03",
       dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fvv_database.rds"),
-      variable = "lcb", replacevar = NA, noannotate = TRUE, label = "95% LCB (%)")
+      variable = "lcb", replacevar = NA, noannotate = TRUE,
+      label = language_string(language_use = language_use, str = "OS_319")) #"95% LCB (%)"
     make_table_column(
       tablename = "TO_RI_COVG_03",
       dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fvv_database.rds"),
-      variable = "ucb", replacevar = NA, noannotate = TRUE, label = "95% UCB (%)")
+      variable = "ucb", replacevar = NA, noannotate = TRUE,
+      label = language_string(language_use = language_use, str = "OS_320")) #"95% UCB (%)"
     make_table_column(
       tablename = "TO_RI_COVG_03",
       dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fvv_database.rds"),
-      variable = "deff", replacevar = NA, noannotate = TRUE, label = "DEFF")
+      variable = "deff", replacevar = NA, noannotate = TRUE,
+      label = language_string(language_use = language_use, str = "OS_321")) #"DEFF"
     make_table_column(
       tablename = "TO_RI_COVG_03",
       dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fvv_database.rds"),
-      variable = "icc", replacevar = NA, noannotate = TRUE, label = "ICC")
+      variable = "icc", replacevar = NA, noannotate = TRUE,
+      label = language_string(language_use = language_use, str = "OS_322")) #"ICC"
     make_table_column(
       tablename = "TO_RI_COVG_03",
       dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fvv_database.rds"),
-      variable = "n", replacevar = NA, noannotate = TRUE, label = "N")
+      variable = "n", replacevar = NA, noannotate = TRUE,
+      label = language_string(language_use = language_use, str = "OS_48")) #"N"
     make_table_column(
       tablename = "TO_RI_COVG_03",
       dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fvv_database.rds"),
-      variable = "nwtd", replacevar = NA, noannotate = TRUE, label = "Weighted N")
+      variable = "nwtd", replacevar = NA, noannotate = TRUE,
+      label = language_string(language_use = language_use, str = "OS_323")) #"Weighted N"
 
     make_table_column(
       tablename = "TO_RI_COVG_03_BRIEF",
       dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fvv_database.rds"),
       variable = "estimate", replacevar = NA, noannotate = TRUE,
-      label = "Fully vaccinated - valid")
+      label = paste0(language_string(language_use = language_use, str = "OS_217"),
+                     " - ",vl))
+    #label = "Fully vaccinated - valid")
     make_table_column(
       tablename = "TO_RI_COVG_03_BRIEF",
       dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fvv_database.rds"),
@@ -126,7 +153,8 @@ RI_COVG_03_05TOST <- function(VCP = "RI_COVG_03_05TOST"){
       tablename = "TO_RI_COVG_03",
       dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fva1_database.rds"),
       variable = "estimate", replacevar = NA, noannotate = TRUE,
-      label = "Fully vaccinated with valid doses by age 1")
+      label = language_string(language_use = language_use, str = "OS_422"))
+    #label = "Fully vaccinated with valid doses by age 1")
     make_table_column(
       tablename = "TO_RI_COVG_03",
       dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fva1_database.rds"),
@@ -134,37 +162,45 @@ RI_COVG_03_05TOST <- function(VCP = "RI_COVG_03_05TOST"){
     make_table_column(
       tablename = "TO_RI_COVG_03",
       dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fva1_database.rds"),
-      variable = "stderr", replacevar = NA, noannotate = TRUE, label = "StdErr (%)")
+      variable = "stderr", replacevar = NA, noannotate = TRUE,
+      label = language_string(language_use = language_use, str = "OS_318")) #"StdErr (%)"
     make_table_column(
       tablename = "TO_RI_COVG_03",
       dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fva1_database.rds"),
-      variable = "lcb", replacevar = NA, noannotate = TRUE, label = "95% LCB (%)")
+      variable = "lcb", replacevar = NA, noannotate = TRUE,
+      label = language_string(language_use = language_use, str = "OS_319")) #"95% LCB (%)"
     make_table_column(
       tablename = "TO_RI_COVG_03",
       dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fva1_database.rds"),
-      variable = "ucb", replacevar = NA, noannotate = TRUE, label = "95% UCB (%)")
+      variable = "ucb", replacevar = NA, noannotate = TRUE,
+      label = language_string(language_use = language_use, str = "OS_320")) #"95% UCB (%)"
     make_table_column(
       tablename = "TO_RI_COVG_03",
       dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fva1_database.rds"),
-      variable = "deff", replacevar = NA, noannotate = TRUE, label = "DEFF")
+      variable = "deff", replacevar = NA, noannotate = TRUE,
+      label = language_string(language_use = language_use, str = "OS_321")) #"DEFF"
     make_table_column(
       tablename = "TO_RI_COVG_03",
       dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fva1_database.rds"),
-      variable = "icc", replacevar = NA, noannotate = TRUE, label = "ICC")
+      variable = "icc", replacevar = NA, noannotate = TRUE,
+      label = language_string(language_use = language_use, str = "OS_322")) #"ICC"
     make_table_column(
       tablename = "TO_RI_COVG_03",
       dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fva1_database.rds"),
-      variable = "n", replacevar = NA, noannotate = TRUE, label = "N")
+      variable = "n", replacevar = NA, noannotate = TRUE,
+      label = language_string(language_use = language_use, str = "OS_48")) #"N"
     make_table_column(
       tablename = "TO_RI_COVG_03",
       dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fva1_database.rds"),
-      variable = "nwtd", replacevar = NA, noannotate = TRUE, label = "Weighted N")
+      variable = "nwtd", replacevar = NA, noannotate = TRUE,
+      label = language_string(language_use = language_use, str = "OS_323")) #"Weighted N"
 
     make_table_column(
       tablename = "TO_RI_COVG_03_BRIEF",
       dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fva1_database.rds"),
       variable = "estimate", replacevar = NA, noannotate = TRUE,
-      label = "Fully vaccinated with valid doses by age 1")
+      label = language_string(language_use = language_use, str = "OS_422"))
+    #label = "Fully vaccinated with valid doses by age 1")
     make_table_column(
       tablename = "TO_RI_COVG_03_BRIEF",
       dbfilename = paste0("RI_COVG_03_",ANALYSIS_COUNTER,"_fva1_database.rds"),
