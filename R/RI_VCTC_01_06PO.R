@@ -298,10 +298,16 @@ RI_VCTC_01_06PO <- function(VCP = "RI_VCTC_01_06PO"){
           fvlltext <- sprintf(paste0("%.", TIMELY_TEXTBAR_COVG_DEC_DIGITS,"f"), ptest$cill*100)
           fvultext <- sprintf(paste0("%.", TIMELY_TEXTBAR_COVG_DEC_DIGITS,"f"), ptest$ciul*100)
 
-          fvnotetext1 <- paste0("Fully vaccinated: ", fvptext, "% (95% CI: ", fvlltext, " - ", fvultext, "%).")
+          fvnotetext1 <- paste0(language_string(language_use = language_use, str = "OS_217"),
+                                ": ", fvptext, "% (",
+                                language_string(language_use = language_use, str = "OS_259"),
+                                ": ", fvlltext, " - ", fvultext, "%).")
+          #fvnotetext1 <- paste0("Fully vaccinated: ", fvptext, "% (95% CI: ", fvlltext, " - ", fvultext, "%).")
 
           if (TIMELY_FULLY_VXD_NOTE_SUPPRESS_CI == 1){
-            fvnotetext1 <- paste0("Fully vaccinated: ", fvptext, "%.")
+            fvnotetext1 <- paste0(language_string(language_use = language_use, str = "OS_217"),
+                                  ": ", fvptext, "%.")
+            #fvnotetext1 <- paste0("Fully vaccinated: ", fvptext, "%.")
           }
           fvnotetext2 <- TIMELY_FULLY_VXD_DOSELIST_TEXT
         }
@@ -323,9 +329,16 @@ RI_VCTC_01_06PO <- function(VCP = "RI_VCTC_01_06PO"){
           nvlltext <- sprintf(paste0("%.", TIMELY_TEXTBAR_COVG_DEC_DIGITS,"f"), ptest$cill*100)
           nvultext <- sprintf(paste0("%.", TIMELY_TEXTBAR_COVG_DEC_DIGITS,"f"), ptest$ciul*100)
 
-          nvnotetext1 <- paste0("Not vaccinated: ", nvptext, "% (95% CI: ", nvlltext, " - ", nvultext, "%).")
+          nvnotetext1 <- paste0(language_string(language_use = language_use, str = "OS_403"),
+                                ": ", nvptext, "% (",
+                                language_string(language_use = language_use, str = "OS_259"),
+                                ": ", nvlltext, " - ", nvultext, "%).")
+
+          #nvnotetext1 <- paste0("Not vaccinated: ", nvptext, "% (95% CI: ", nvlltext, " - ", nvultext, "%).")
 
           if (TIMELY_NOT_VXD_NOTE_SUPPRESS_CI == 1){
+            nvnotetext1 <- paste0(language_string(language_use = language_use, str = "OS_403"),
+                                  ": ", nvptext, "%.")
             nvnotetext1 <- paste0("Not vaccinated: ", nvptext, "%.")
           }
           nvnotetext2 <- TIMELY_NOT_VXD_DOSELIST_TEXT
@@ -624,10 +637,12 @@ RI_VCTC_01_06PO <- function(VCP = "RI_VCTC_01_06PO"){
             legend.position = "bottom",
             plot.caption = element_text(hjust = 0)
           ) +
-          labs(x = "Estimated Coverage (%)", y = NULL,
+          labs(x = paste0(language_string(language_use = language_use, str = "OS_327")," (%)"), y = NULL,
                caption = TIMELY_PLOT_NOTE,
-               title = paste0("Vaccination Coverage & Timeliness: ", stratumname))+
+               title = paste0(language_string(language_use = language_use, str = "OS_529"),": ", stratumname))+
           scale_fill_identity("", guide = "legend", breaks=lcolor,labels = llabel)
+        #NOTE: original string for x lab - "Estimated Coverage (%)"
+        #      orignial string for title - "Vaccination Coverage & Timeliness:"
 
         ggsave(plot = baseplot,
                filename = paste0(newpath,"/RI_VCTC_01_",ANALYSIS_COUNTER,"_level_",RI_VCTC_01_LEVELS[lvl],"_id_",llist[l],"_",stratumname,".png"),

@@ -10,7 +10,7 @@
 #' @rawNamespace import(rlang, except = c(local_options,with_options))
 #' @import survey
 #'
-# RI_VCTC_01_03DV R version 1.03 - Biostat Global Consulting - 2024-01-08
+# RI_VCTC_01_03DV R version 1.04 - Biostat Global Consulting - 2024-05-17
 # *******************************************************************************
 # Change log
 
@@ -20,6 +20,7 @@
 # 2023-07-31  1.02      Mia Yu          Save VCTC category data
 # 2024-01-08  1.03      Mia Yu          Correct the lazy logic that cause errors;
 #                                       This is an update to match VCQI in Stata
+# 2024-05-17  1.04      Mia Yu          Added multi lingual strings
 # *******************************************************************************
 
 RI_VCTC_01_03DV <- function(VCP = "RI_VCTC_01_03DV"){
@@ -379,14 +380,20 @@ RI_VCTC_01_03DV <- function(VCP = "RI_VCTC_01_03DV"){
               if (j == 1){
                 dt_ub <- get(paste0("TIMELY_DT_UB_",j), envir = .GlobalEnv)
                 agelimit <- min(VCQI_RI_MAX_AGE_OF_ELIGIBILITY,dt_ub)
-                tplott$agespan[1] <- paste0("Age < ",agelimit, " days")
+                tplott$agespan[1] <- paste0(language_string(language_use = language_use, str = "OS_280"),
+                                            " < ",agelimit, " ",
+                                            language_string(language_use = language_use, str = "OS_408"))
+                #tplott$agespan[1] <- paste0("Age < ",agelimit, " days")
               } #j = 1
 
               if (j > 1 & vcqi_object_exists(paste0("TIMELY_DT_UB_",j))){
                 dt_ub <- get(paste0("TIMELY_DT_UB_",j), envir = .GlobalEnv)
                 minage <- get(paste0(doselist[d],"_min_age_days"), envir = .GlobalEnv)
                 agelimit <- min(VCQI_RI_MAX_AGE_OF_ELIGIBILITY, minage + dt_ub)
-                tplott$agespan[j] <- paste0("Age < ",agelimit, " days")
+                tplott$agespan[j] <- paste0(language_string(language_use = language_use, str = "OS_280"),
+                                            " < ",agelimit, " ",
+                                            language_string(language_use = language_use, str = "OS_408"))
+                #tplott$agespan[j] <- paste0("Age < ",agelimit, " days")
               } #j > 1
 
               if (j > 1 & !is.na(dose[j])){
@@ -401,8 +408,8 @@ RI_VCTC_01_03DV <- function(VCP = "RI_VCTC_01_03DV"){
 
             value = as.numeric(dose[j]) - as.numeric(dose[j-1])
             tplott$height[j] <- value
-            tplott$agespan[j] <- "Timing unknown"
-            tplott$label[j] <- "All ages"
+            tplott$agespan[j] <- language_string(language_use = language_use, str = "OS_448") #"Timing unknown"
+            tplott$label[j] <- language_string(language_use = language_use, str = "OS_521") #"All ages"
 
           } else {
             #use user defined tiles
@@ -417,14 +424,20 @@ RI_VCTC_01_03DV <- function(VCP = "RI_VCTC_01_03DV"){
               if (j == 1){
                 dt_ub <- get(paste0("TIMELY_CD_",str_to_upper(doselist[d]),"_UB_",j), envir = .GlobalEnv)
                 agelimit <- min(VCQI_RI_MAX_AGE_OF_ELIGIBILITY,dt_ub)
-                tplott$agespan[1] <- paste0("Age < ",agelimit, " days")
+                tplott$agespan[1] <- paste0(language_string(language_use = language_use, str = "OS_280"),
+                                            " < ",agelimit, " ",
+                                            language_string(language_use = language_use, str = "OS_408"))
+                #tplott$agespan[1] <- paste0("Age < ",agelimit, " days")
               } #j = 1
 
               if (j > 1 & vcqi_object_exists(paste0("TIMELY_CD_",str_to_upper(doselist[d]),"_UB_",j))){
                 dt_ub <- get(paste0("TIMELY_CD_",str_to_upper(doselist[d]),"_UB_",j), envir = .GlobalEnv)
                 minage <- get(paste0(doselist[d],"_min_age_days"), envir = .GlobalEnv)
                 agelimit <- min(VCQI_RI_MAX_AGE_OF_ELIGIBILITY, minage + dt_ub)
-                tplott$agespan[j] <- paste0("Age < ",agelimit, " days")
+                tplott$agespan[j] <- paste0(language_string(language_use = language_use, str = "OS_280"),
+                                            " < ",agelimit, " ",
+                                            language_string(language_use = language_use, str = "OS_408"))
+                #tplott$agespan[j] <- paste0("Age < ",agelimit, " days")
               } #j > 1
 
               if (j > 1 & !is.na(dose[j])){
@@ -438,8 +451,8 @@ RI_VCTC_01_03DV <- function(VCP = "RI_VCTC_01_03DV"){
 
             value = as.numeric(dose[j]) - as.numeric(dose[j-1])
             tplott$height[j] <- value
-            tplott$agespan[j] <- "Timing unknown"
-            tplott$label[j] <- "All ages"
+            tplott$agespan[j] <- language_string(language_use = language_use, str = "OS_448") #"Timing unknown"
+            tplott$label[j] <- language_string(language_use = language_use, str = "OS_521") #"All ages"
           }
 
           names(tplott)[which(names(tplott) == "label")] <- paste0(doselist[d],"_","label")
@@ -543,8 +556,17 @@ RI_VCTC_01_03DV <- function(VCP = "RI_VCTC_01_03DV"){
           dt_label <- get(paste0("TIMELY_DT_LABEL_",TIMELY_N_DTS), envir = .GlobalEnv)
           dat <- dat %>% mutate(tempvar2 = ifelse(is.na(tempvar2), dt_label, tempvar2))
 
-          dat$tempvar1 <- haven::labelled(dat$tempvar1, label = paste0("VCTC 01 - Age at", doselist[d]))
-          dat$tempvar2 <- haven::labelled(dat$tempvar2, label = paste0("VCTC 01 - category for ", doselist[d]))
+          dat$tempvar1 <- haven::labelled(dat$tempvar1, label = paste0("VCTC 01 - ",
+                                                                       language_string(language_use = language_use, str = "OS_516"),
+                                                                       " ",
+                                                                       doselist[d]))
+          dat$tempvar2 <- haven::labelled(dat$tempvar2, label = paste0("VCTC 01 - ",
+                                                                       language_string(language_use = language_use, str = "OS_522"),
+                                                                       " ",
+                                                                       doselist[d]))
+
+          #dat$tempvar1 <- haven::labelled(dat$tempvar1, label = paste0("VCTC 01 - Age at", doselist[d]))
+          #dat$tempvar2 <- haven::labelled(dat$tempvar2, label = paste0("VCTC 01 - category for ", doselist[d]))
 
           names(dat)[which(names(dat) == "tempvar1")] <- paste0("timely_age_at_",doselist[d])
           names(dat)[which(names(dat) == "tempvar2")] <- paste0("timely_category_",doselist[d])
@@ -578,8 +600,17 @@ RI_VCTC_01_03DV <- function(VCP = "RI_VCTC_01_03DV"){
           dt_label <- get(paste0("TIMELY_CD_",TIMELY_DOSE_ORDER[d],"_LABEL_",cdt), envir = .GlobalEnv)
           dat <- dat %>% mutate(tempvar2 = ifelse(is.na(tempvar2), dt_label, tempvar2))
 
-          dat$tempvar1 <- haven::labelled(dat$tempvar1, label = paste0("VCTC 01 - Age at", doselist[d]))
-          dat$tempvar2 <- haven::labelled(dat$tempvar2, label = paste0("VCTC 01 - category for ", doselist[d]))
+          dat$tempvar1 <- haven::labelled(dat$tempvar1, label = paste0("VCTC 01 - ",
+                                                                       language_string(language_use = language_use, str = "OS_516"),
+                                                                       " ",
+                                                                       doselist[d]))
+          dat$tempvar2 <- haven::labelled(dat$tempvar2, label = paste0("VCTC 01 - ",
+                                                                       language_string(language_use = language_use, str = "OS_522"),
+                                                                       " ",
+                                                                       doselist[d]))
+
+          # dat$tempvar1 <- haven::labelled(dat$tempvar1, label = paste0("VCTC 01 - Age at", doselist[d]))
+          # dat$tempvar2 <- haven::labelled(dat$tempvar2, label = paste0("VCTC 01 - category for ", doselist[d]))
 
           names(dat)[which(names(dat) == "tempvar1")] <- paste0("timely_age_at_",doselist[d])
           names(dat)[which(names(dat) == "tempvar2")] <- paste0("timely_category_",doselist[d])

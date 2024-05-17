@@ -7,13 +7,14 @@
 #' @import stringr
 #' @import openxlsx
 
-# RI_VCTC_01_05TO R version 1.01 - Biostat Global Consulting - 2022-11-06
+# RI_VCTC_01_05TO R version 1.02 - Biostat Global Consulting - 2024-05-16
 # *******************************************************************************
 # Change log
 
 # Date 			  Version 	Name			      What Changed
 # 2022-11-05  1.00      Mia Yu          Original R version
 # 2022-11-06  1.01      Mia Yu          Package version
+# 2024-05-16  1.02      Mia Yu          Added multi lingual strings
 # *******************************************************************************
 
 RI_VCTC_01_05TO <- function(VCP = "RI_VCTC_01_05TO"){
@@ -38,13 +39,30 @@ RI_VCTC_01_05TO <- function(VCP = "RI_VCTC_01_05TO"){
     }
 
     doselist <- str_to_lower(TIMELY_DOSE_ORDER)
-    namedat <- data.frame(newname = c("Level","ID","Stratum name","Chart tile order (left to right)"))
+    namedat <- data.frame(newname = c(language_string(language_use = language_use, str = "OS_513"),
+                                      language_string(language_use = language_use, str = "OS_514"),
+                                      language_string(language_use = language_use, str = "OS_256"),
+                                      language_string(language_use = language_use, str = "OS_515")))
+    #namedat <- data.frame(newname = c("Level","ID","Stratum name","Chart tile order (left to right)"))
 
     for (d in seq_along(doselist)){
-      tempnamedat <- data.frame(newname = c(paste0("Cum pct for ", TIMELY_DOSE_ORDER[d]),
-                                            paste0("Pct width of tile for ", TIMELY_DOSE_ORDER[d]),
-                                            paste0("Tile span of days for ", TIMELY_DOSE_ORDER[d]),
-                                            paste0("Tile label for ", TIMELY_DOSE_ORDER[d])))
+      tempnamedat <- data.frame(newname = c(paste0(language_string(language_use = language_use, str = "OS_519"),
+                                                   " ",
+                                                   TIMELY_DOSE_ORDER[d]),
+                                            paste0(language_string(language_use = language_use, str = "OS_520"),
+                                                   " "
+                                                   , TIMELY_DOSE_ORDER[d]),
+                                            paste0(language_string(language_use = language_use, str = "OS_518"),
+                                                   " ",
+                                                   TIMELY_DOSE_ORDER[d]),
+                                            paste0(language_string(language_use = language_use, str = "OS_517"),
+                                                   " ",
+                                                   TIMELY_DOSE_ORDER[d])))
+
+      # tempnamedat <- data.frame(newname = c(paste0("Cum pct for ", TIMELY_DOSE_ORDER[d]),
+      #                                       paste0("Pct width of tile for ", TIMELY_DOSE_ORDER[d]),
+      #                                       paste0("Tile span of days for ", TIMELY_DOSE_ORDER[d]),
+      #                                       paste0("Tile label for ", TIMELY_DOSE_ORDER[d])))
       namedat <- rbind(namedat, tempnamedat)
     }
 
@@ -54,9 +72,13 @@ RI_VCTC_01_05TO <- function(VCP = "RI_VCTC_01_05TO"){
     writeData(wb, sheet = sheetname, namedat, startRow = 1, colNames = FALSE)
     writeData(wb, sheet = sheetname, dat, startRow = 2, colNames = FALSE)
 
-    note1 <- data.frame(note1 = c("Note: This table is not meant to be copied and pasted into a report, but rather to help someone who is looking at a RI_VCTC_01 plot and wants to know (or mention in a report) the horizontal width of some of the colored tiles in the stacked bars."))
+    note1 <- data.frame(note1 = language_string(language_use = language_use, str = "OS_511"))
 
-    note2 <- data.frame(note2 = c("Note: The sheet is sorted by level and levelid and by left-to-right bar category order."))
+    note2 <- data.frame(note2 = language_string(language_use = language_use, str = "OS_512"))
+
+    # note1 <- data.frame(note1 = c("Note: This table is not meant to be copied and pasted into a report, but rather to help someone who is looking at a RI_VCTC_01 plot and wants to know (or mention in a report) the horizontal width of some of the colored tiles in the stacked bars."))
+    #
+    # note2 <- data.frame(note2 = c("Note: The sheet is sorted by level and levelid and by left-to-right bar category order."))
 
     writeData(wb, sheet = sheetname, note1, startRow = nrow(dat) + 3, colNames = FALSE)
     writeData(wb, sheet = sheetname, note2, startRow = nrow(dat) + 4, colNames = FALSE)
