@@ -28,7 +28,14 @@ RI_QUAL_01_05TOST <- function(VCP = "RI_QUAL_01_05TOST"){
   }
 
   for (s in seq_along(source)){
-    sp <- str_to_title(source[s])
+
+    if (source[s] == "card"){
+      sp <- str_to_title(language_string(language_use = language_use, str = "OS_414"))
+    }
+
+    if (source[s] == "register"){
+      sp <- str_to_title(language_string(language_use = language_use, str = "OS_415"))
+    }
 
     # Respondent had the source ?
     make_table_column(

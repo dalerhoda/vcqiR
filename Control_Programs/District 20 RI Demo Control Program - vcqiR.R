@@ -1,4 +1,4 @@
-# User's Guide RI Control Program R version 1.00 - Biostat Global Consulting - 2022-12-01
+# User's Guide RI Control Program R version 1.01 - Biostat Global Consulting - 2024-05-17
 #
 # Vaccination Coverage Quality Indicators (VCQI) control program to analyze data
 # from a routine immunization survey
@@ -7,6 +7,8 @@
 #
 # Date          Version Number    Name          What Changed
 # 2022-12-01    1.00              BGC           Original R Version
+# 2024-05-17    1.01              Mia Yu        Added multi lingual strings
+#                                               and string cut-off options
 #
 # This program is configured to analyze the VCQI District 20 demo datasets. It
 # serves as a template that users may copy to use with new datasets from real
@@ -451,20 +453,27 @@ vcqi_global(RI_DOSE_LIST, c("bcg", "opv1", "opv2", "opv3", "penta1", "penta2", "
 
 # Estimate crude dose coverage for all the doses in the RI_DOSE_LIST
 
-vcqi_global(RI_COVG_01_TO_TITLE, "Crude Coverage")
+vcqi_global(RI_COVG_01_TO_TITLE, str_to_title(language_string(language_use = language_use, str = "OS_390"))) #"Crude Coverage"
 vcqi_global(RI_COVG_01_TO_SUBTITLE, NA)
-vcqi_global(RI_COVG_01_TO_FOOTNOTE_1, "Abbreviations: CI=Confidence Interval; LCB=Lower Confidence Bound; UCB=Upper Confidence Bound; DEFF=Design Effect; ICC=Intracluster Correlation Coefficient")
-vcqi_global(RI_COVG_01_TO_FOOTNOTE_2, "Note: This measure is a population estimate that incorporates survey weights. The CI, LCB and UCB are calculated with software that take the complex survey design into account.")
-vcqi_global(SORT_PLOT_LOW_TO_HIGH, 1) # 1 means show strata w/ low outcomes at bottom and high at top; 0 is the opposite
+vcqi_global(RI_COVG_01_TO_FOOTNOTE_1, language_string(language_use = language_use, str = "OS_337"))
+vcqi_global(RI_COVG_01_TO_FOOTNOTE_2, language_string(language_use = language_use, str = "OS_338"))
 
+#vcqi_global(RI_COVG_01_TO_FOOTNOTE_1, "Abbreviations: CI=Confidence Interval; LCB=Lower Confidence Bound; UCB=Upper Confidence Bound; DEFF=Design Effect; ICC=Intracluster Correlation Coefficient")
+#vcqi_global(RI_COVG_01_TO_FOOTNOTE_2, "Note: This measure is a population estimate that incorporates survey weights. The CI, LCB and UCB are calculated with software that take the complex survey design into account.")
+
+vcqi_global(SORT_PLOT_LOW_TO_HIGH, 1) # 1 means show strata w/ low outcomes at bottom and high at top; 0 is the opposite
 RI_COVG_01()
 
 # Estimate valid dose coverage
 
-vcqi_global(RI_COVG_02_TO_TITLE, "Valid Coverage")
+vcqi_global(RI_COVG_02_TO_TITLE, str_to_title(language_string(language_use = language_use, str = "OS_396"))) #"Valid Coverage"
 vcqi_global(RI_COVG_02_TO_SUBTITLE, NA)
-vcqi_global(RI_COVG_02_TO_FOOTNOTE_1, "Abbreviations: CI=Confidence Interval; LCB=Lower Confidence Bound; UCB=Upper Confidence Bound; DEFF=Design Effect; ICC=Intracluster Correlation Coefficient")
-vcqi_global(RI_COVG_02_TO_FOOTNOTE_2, "Note: This measure is a population estimate that incorporates survey weights.  The CI, LCB and UCB are calculated with software that take the complex survey design into account.")
+vcqi_global(RI_COVG_02_TO_FOOTNOTE_1, language_string(language_use = language_use, str = "OS_337"))
+vcqi_global(RI_COVG_02_TO_FOOTNOTE_2, language_string(language_use = language_use, str = "OS_338"))
+
+# vcqi_global(RI_COVG_02_TO_FOOTNOTE_1, "Abbreviations: CI=Confidence Interval; LCB=Lower Confidence Bound; UCB=Upper Confidence Bound; DEFF=Design Effect; ICC=Intracluster Correlation Coefficient")
+# vcqi_global(RI_COVG_02_TO_FOOTNOTE_2, "Note: This measure is a population estimate that incorporates survey weights.  The CI, LCB and UCB are calculated with software that take the complex survey design into account.")
+
 vcqi_global(SORT_PLOT_LOW_TO_HIGH, 1) # 1 means show strata w/ low outcomes at bottom and high at top; 0 is the opposite
 
 RI_COVG_02()
@@ -474,9 +483,16 @@ vcqi_global(RI_DOSES_TO_BE_FULLY_VACCINATED, c("BCG","PENTA1", "PENTA2", "PENTA3
 
 vcqi_global(RI_COVG_03_TO_TITLE, "Fully Vaccinated")
 vcqi_global(RI_COVG_03_TO_SUBTITLE, NA)
-vcqi_global(RI_COVG_03_TO_FOOTNOTE_1,  "Abbreviations: CI=Confidence Interval; LCB=Lower Confidence Bound; UCB=Upper Confidence Bound; DEFF=Design Effect; ICC=Intracluster Correlation Coefficient")
-vcqi_global(RI_COVG_03_TO_FOOTNOTE_2,  "Note: This measure is a population estimate that incorporates survey weights.  The CI, LCB and UCB are calculated with software that take the complex survey design into account.")
-vcqi_global(RI_COVG_03_TO_FOOTNOTE_3,  paste0("Note: To be fully vaccinated, the child must have received: ",str_flatten(RI_DOSES_TO_BE_FULLY_VACCINATED, collapse = " ")))
+vcqi_global(RI_COVG_03_TO_FOOTNOTE_1, language_string(language_use = language_use, str = "OS_337"))
+vcqi_global(RI_COVG_03_TO_FOOTNOTE_2, language_string(language_use = language_use, str = "OS_338"))
+vcqi_global(RI_COVG_03_TO_FOOTNOTE_3, paste0(language_string(language_use = language_use, str = "OS_108"),
+                                             " ",
+                                             str_flatten(RI_DOSES_TO_BE_FULLY_VACCINATED, collapse = " ")))
+
+# vcqi_global(RI_COVG_03_TO_FOOTNOTE_1,  "Abbreviations: CI=Confidence Interval; LCB=Lower Confidence Bound; UCB=Upper Confidence Bound; DEFF=Design Effect; ICC=Intracluster Correlation Coefficient")
+# vcqi_global(RI_COVG_03_TO_FOOTNOTE_2,  "Note: This measure is a population estimate that incorporates survey weights.  The CI, LCB and UCB are calculated with software that take the complex survey design into account.")
+# vcqi_global(RI_COVG_03_TO_FOOTNOTE_3,  paste0("Note: To be fully vaccinated, the child must have received: ",str_flatten(RI_DOSES_TO_BE_FULLY_VACCINATED, collapse = " ")))
+
 vcqi_global(SORT_PLOT_LOW_TO_HIGH, 1) # 1 means show strata w/ low outcomes at bottom and high at top; 0 is the opposite
 
 RI_COVG_03()
@@ -486,9 +502,16 @@ RI_COVG_03()
 
 vcqi_global(RI_COVG_04_TO_TITLE, "Not Vaccinated")
 vcqi_global(RI_COVG_04_TO_SUBTITLE, NA)
-vcqi_global(RI_COVG_04_TO_FOOTNOTE_1,  "Abbreviations: CI=Confidence Interval; LCB=Lower Confidence Bound; UCB=Upper Confidence Bound; DEFF=Design Effect; ICC=Intracluster Correlation Coefficient")
-vcqi_global(RI_COVG_04_TO_FOOTNOTE_2,  "Note: This measure is a population estimate that incorporates survey weights.  The CI, LCB and UCB are calculated with software that take the complex survey design into account.")
-vcqi_global(RI_COVG_04_TO_FOOTNOTE_3,  paste0("Note: To be counted as not vaccinated, the child must not have received any of these doses: ", str_flatten(RI_DOSES_TO_BE_FULLY_VACCINATED, collapse = " ")))
+vcqi_global(RI_COVG_04_TO_FOOTNOTE_1, language_string(language_use = language_use, str = "OS_337"))
+vcqi_global(RI_COVG_04_TO_FOOTNOTE_2, language_string(language_use = language_use, str = "OS_338"))
+vcqi_global(RI_COVG_04_TO_FOOTNOTE_3, paste0(language_string(language_use = language_use, str = "OS_431"),
+                                             " ",
+                                             str_flatten(RI_DOSES_TO_BE_FULLY_VACCINATED, collapse = " ")))
+
+# vcqi_global(RI_COVG_04_TO_FOOTNOTE_1,  "Abbreviations: CI=Confidence Interval; LCB=Lower Confidence Bound; UCB=Upper Confidence Bound; DEFF=Design Effect; ICC=Intracluster Correlation Coefficient")
+# vcqi_global(RI_COVG_04_TO_FOOTNOTE_2,  "Note: This measure is a population estimate that incorporates survey weights.  The CI, LCB and UCB are calculated with software that take the complex survey design into account.")
+# vcqi_global(RI_COVG_04_TO_FOOTNOTE_3,  paste0("Note: To be counted as not vaccinated, the child must not have received any of these doses: ", str_flatten(RI_DOSES_TO_BE_FULLY_VACCINATED, collapse = " ")))
+
 vcqi_global(SORT_PLOT_LOW_TO_HIGH, 0) # 1 means show strata w/ low outcomes at bottom and high at top; 0 is the opposite
 
 RI_COVG_04()
@@ -502,19 +525,24 @@ RI_COVG_04()
 
 vcqi_global(RI_CONT_01_DROPOUT_LIST, c("OPV1", "OPV3", "PENTA1", "PENTA3"))
 
-vcqi_global(RI_CONT_01_TO_TITLE, "Dropout")
+vcqi_global(RI_CONT_01_TO_TITLE, language_string(language_use = language_use, str = "OS_384")) #"Dropout"
 vcqi_global(RI_CONT_01_TO_SUBTITLE, NA)
-vcqi_global(RI_CONT_01_TO_FOOTNOTE_1, "Note: This measure is an unweighted summary of a proportion from the survey sample.")
+vcqi_global(RI_CONT_01_TO_FOOTNOTE_1, language_string(language_use = language_use, str = "OS_347"))
+#"Note: This measure is an unweighted summary of a proportion from the survey sample.")
 vcqi_global(SORT_PLOT_LOW_TO_HIGH,0)# 1 means show strata w/ low outcomes at bottom and high at top; 0 is the opposite
 
 RI_CONT_01()
 
 vcqi_global(RI_CONT_01B_DROPOUT_LIST, c("OPV1", "OPV3", "PENTA1", "PENTA3"))
 
-vcqi_global(RI_CONT_01B_TO_TITLE, "Dropout")
+vcqi_global(RI_CONT_01B_TO_TITLE, language_string(language_use = language_use, str = "OS_384")) #"Dropout"
 vcqi_global(RI_CONT_01B_TO_SUBTITLE, NA)
-vcqi_global(RI_CONT_01B_TO_FOOTNOTE_1, "Abbreviations: CI=Confidence Interval; LCB=Lower Confidence Bound; UCB=Upper Confidence Bound; DEFF=Design Effect; ICC=Intracluster Correlation Coefficient")
-vcqi_global(RI_CONT_01B_TO_FOOTNOTE_2, "Note: This measure is a population estimate that incorporates survey weights.  The CI, LCB and UCB are calculated with software that take the complex survey design into account")
+vcqi_global(RI_CONT_01B_TO_FOOTNOTE_1, language_string(language_use = language_use, str = "OS_337"))
+vcqi_global(RI_CONT_01B_TO_FOOTNOTE_2, language_string(language_use = language_use, str = "OS_338"))
+
+#vcqi_global(RI_CONT_01B_TO_FOOTNOTE_1, "Abbreviations: CI=Confidence Interval; LCB=Lower Confidence Bound; UCB=Upper Confidence Bound; DEFF=Design Effect; ICC=Intracluster Correlation Coefficient")
+#vcqi_global(RI_CONT_01B_TO_FOOTNOTE_2, "Note: This measure is a population estimate that incorporates survey weights.  The CI, LCB and UCB are calculated with software that take the complex survey design into account")
+
 vcqi_global(SORT_PLOT_LOW_TO_HIGH,0)# 1 means show strata w/ low outcomes at bottom and high at top; 0 is the opposite
 
 RI_CONT_01B()
@@ -525,20 +553,32 @@ RI_CONT_01B()
 
 # Estimate proportion who have a card with vaccination dates on it
 
-vcqi_global(RI_QUAL_01_TO_TITLE, "RI Card Availability")
+vcqi_global(RI_QUAL_01_TO_TITLE, paste0(language_string(language_use = language_use, str = "OS_416"),
+                                        " ",
+                                        str_to_title(language_string(language_use = language_use, str = "OS_414")),
+                                        " ",
+                                        language_string(language_use = language_use, str = "OS_417"))) #"RI Card Availability"
 vcqi_global(RI_QUAL_01_TO_SUBTITLE, NA)
-vcqi_global(RI_QUAL_01_TO_FOOTNOTE_1,  "Abbreviations: CI=Confidence Interval; LCB=Lower Confidence Bound; UCB=Upper Confidence Bound; DEFF=Design Effect; ICC=Intracluster Correlation Coefficient")
-vcqi_global(RI_QUAL_01_TO_FOOTNOTE_2,  "Note: This measure is a population estimate that incorporates survey weights.  The CI, LCB and UCB are calculated with software that take the complex survey design into account.")
+vcqi_global(RI_QUAL_01_TO_FOOTNOTE_1, language_string(language_use = language_use, str = "OS_337"))
+vcqi_global(RI_QUAL_01_TO_FOOTNOTE_2, language_string(language_use = language_use, str = "OS_338"))
+
+# vcqi_global(RI_QUAL_01_TO_FOOTNOTE_1,  "Abbreviations: CI=Confidence Interval; LCB=Lower Confidence Bound; UCB=Upper Confidence Bound; DEFF=Design Effect; ICC=Intracluster Correlation Coefficient")
+# vcqi_global(RI_QUAL_01_TO_FOOTNOTE_2,  "Note: This measure is a population estimate that incorporates survey weights.  The CI, LCB and UCB are calculated with software that take the complex survey design into account.")
+
 vcqi_global(SORT_PLOT_LOW_TO_HIGH, 1)# 1 means show strata w/ low outcomes at bottom and high at top; 0 is the opposite
 
 RI_QUAL_01()
 
 # Estimate proportion who ever had a vaccination card
 
-vcqi_global(RI_QUAL_02_TO_TITLE, "Ever Received RI Card")
+vcqi_global(RI_QUAL_02_TO_TITLE, language_string(language_use = language_use, str = "OS_411")) #"Ever Received RI Card"
 vcqi_global(RI_QUAL_02_TO_SUBTITLE, NA)
-vcqi_global(RI_QUAL_02_TO_FOOTNOTE_1, "Abbreviations: CI=Confidence Interval; LCB=Lower Confidence Bound; UCB=Upper Confidence Bound; DEFF=Design Effect; ICC=Intracluster Correlation Coefficient")
-vcqi_global(RI_QUAL_02_TO_FOOTNOTE_2, "Note: This measure is a population estimate that incorporates survey weights.  The CI, LCB and UCB are calculated with software that take the complex survey design into account.")
+vcqi_global(RI_QUAL_02_TO_FOOTNOTE_1, language_string(language_use = language_use, str = "OS_337"))
+vcqi_global(RI_QUAL_02_TO_FOOTNOTE_2, language_string(language_use = language_use, str = "OS_338"))
+
+# vcqi_global(RI_QUAL_02_TO_FOOTNOTE_1, "Abbreviations: CI=Confidence Interval; LCB=Lower Confidence Bound; UCB=Upper Confidence Bound; DEFF=Design Effect; ICC=Intracluster Correlation Coefficient")
+# vcqi_global(RI_QUAL_02_TO_FOOTNOTE_2, "Note: This measure is a population estimate that incorporates survey weights.  The CI, LCB and UCB are calculated with software that take the complex survey design into account.")
+
 vcqi_global(SORT_PLOT_LOW_TO_HIGH, 1) # 1 means show strata w/ low outcomes at bottom and high at top; 0 is the opposite
 
 RI_QUAL_02()
@@ -566,10 +606,12 @@ calculate_MOV_flags()
 
 # Estimate what valid coverage would have been if there had been no MOVs
 
-vcqi_global(RI_QUAL_07B_TO_TITLE, "Coverage if no MOVs")
+vcqi_global(RI_QUAL_07B_TO_TITLE, language_string(language_use = language_use, str = "OS_442")) #"Coverage if no MOVs"
 vcqi_global(RI_QUAL_07B_TO_SUBTITLE, NA)
-vcqi_global(RI_QUAL_07B_TO_FOOTNOTE_1, "Abbreviations: CI=Confidence Interval")
-vcqi_global(RI_QUAL_07B_TO_FOOTNOTE_2, "Note: This measure is a population estimate that incorporates survey weights. The CIs are calculated with software that take the complex survey design into account.")
+vcqi_global(RI_QUAL_07B_TO_FOOTNOTE_1, language_string(language_use = language_use, str = "OS_344"))
+#"Abbreviations: CI=Confidence Interval"
+vcqi_global(RI_QUAL_07B_TO_FOOTNOTE_2, language_string(language_use = language_use, str = "OS_51"))
+#"Note: This measure is a population estimate that incorporates survey weights. The CIs are calculated with software that take the complex survey design into account."
 vcqi_global(SORT_PLOT_LOW_TO_HIGH, 1) # 1 means show strata w/ low outcomes at bottom and high at top; 0 is the opposite
 
 RI_QUAL_07B()
@@ -578,19 +620,23 @@ RI_QUAL_07B()
 
 vcqi_global(RI_QUAL_08_VALID_OR_CRUDE, "CRUDE") # Set to CRUDE or VALID
 
-vcqi_global(RI_QUAL_08_TO_TITLE, "Percent of Visits with MOVs")
+vcqi_global(RI_QUAL_08_TO_TITLE, language_string(language_use = language_use, str = "OS_164")) #"Percent of Visits with MOVs"
 vcqi_global(RI_QUAL_08_TO_SUBTITLE, NA)
-vcqi_global(RI_QUAL_08_TO_FOOTNOTE_1, "Percent of visits where children were eligible for the dose and did not receive it.")
+vcqi_global(RI_QUAL_08_TO_FOOTNOTE_1, language_string(language_use = language_use, str = "OS_165"))
+#"Percent of visits where children were eligible for the dose and did not receive it.")
 
 if(stringr::str_to_upper(RI_QUAL_08_VALID_OR_CRUDE) == "VALID"){
-  vcqi_global(RI_QUAL_08_TO_FOOTNOTE_2, "Note: Early doses are ignored in this analysis; the respondent is considered to have not received them.")
+  vcqi_global(RI_QUAL_08_TO_FOOTNOTE_2, language_string(language_use = language_use, str = "OS_90"))
+  #vcqi_global(RI_QUAL_08_TO_FOOTNOTE_2, "Note: Early doses are ignored in this analysis; the respondent is considered to have not received them.")
 }
 
 if(stringr::str_to_upper(RI_QUAL_08_VALID_OR_CRUDE) == "CRUDE"){
-  vcqi_global(RI_QUAL_08_TO_FOOTNOTE_2, "Note: Early doses are accepted in this analysis; all doses are considered valid doses.")
+  vcqi_global(RI_QUAL_08_TO_FOOTNOTE_2, language_string(language_use = language_use, str = "OS_106"))
+  #vcqi_global(RI_QUAL_08_TO_FOOTNOTE_2, "Note: Early doses are accepted in this analysis; all doses are considered valid doses.")
 }
 
-vcqi_global(RI_QUAL_08_TO_FOOTNOTE_3, "Note: The final measure on this sheet, MOVs per Visit, is not a percent. It is a ratio.")
+vcqi_global(RI_QUAL_08_TO_FOOTNOTE_3, language_string(language_use = language_use, str = "OS_166"))
+#vcqi_global(RI_QUAL_08_TO_FOOTNOTE_3, "Note: The final measure on this sheet, MOVs per Visit, is not a percent. It is a ratio.")
 vcqi_global(SORT_PLOT_LOW_TO_HIGH, 0) # 1 means show strata w/ low outcomes at bottom and high at top; 0 is the opposite
 
 RI_QUAL_08()
@@ -598,24 +644,35 @@ RI_QUAL_08()
 # Estimate the proportion of children who experienced 1+ MOVs
 vcqi_global(RI_QUAL_09_VALID_OR_CRUDE, "CRUDE") # Set to CRUDE or VALID
 
-vcqi_global(RI_QUAL_09_TO_TITLE, "Percent of Respondents with MOVs")
+vcqi_global(RI_QUAL_09_TO_TITLE, language_string(language_use = language_use, str = "OS_167")) #"Percent of Respondents with MOVs"
 vcqi_global(RI_QUAL_09_TO_SUBTITLE, NA)
-vcqi_global(RI_QUAL_09_TO_FOOTNOTE_1, "Percent of respondents who had date of birth and visit date data who failed to receive a vaccination for which they were eligible on an occasion when they received another vaccination.")
-vcqi_global(RI_QUAL_09_TO_FOOTNOTE_2, "An uncorrected MOV means that the respondent had still not received a valid dose at the time of the survey.")
-vcqi_global(RI_QUAL_09_TO_FOOTNOTE_3, "A corrected MOV means that the respondent had received a valid dose by the time of the survey.")
-vcqi_global(RI_QUAL_09_TO_FOOTNOTE_4, "The denominator for Had MOV (%) is the number of respondents who had visits eligible.")
-vcqi_global(RI_QUAL_09_TO_FOOTNOTE_5, "The denominator for MOV uncorrected and corrected (%) is the number of MOVs.")
-vcqi_global(RI_QUAL_09_TO_FOOTNOTE_6, "Note that for individual doses, the % MOV uncorrected + % MOV corrected adds up to 100%.")
+vcqi_global(RI_QUAL_09_TO_FOOTNOTE_1, language_string(language_use = language_use, str = "OS_168"))
+vcqi_global(RI_QUAL_09_TO_FOOTNOTE_2, language_string(language_use = language_use, str = "OS_169"))
+vcqi_global(RI_QUAL_09_TO_FOOTNOTE_3, language_string(language_use = language_use, str = "OS_170"))
+vcqi_global(RI_QUAL_09_TO_FOOTNOTE_4, language_string(language_use = language_use, str = "OS_171"))
+vcqi_global(RI_QUAL_09_TO_FOOTNOTE_5, language_string(language_use = language_use, str = "OS_172"))
+vcqi_global(RI_QUAL_09_TO_FOOTNOTE_6, language_string(language_use = language_use, str = "OS_173"))
+
+# vcqi_global(RI_QUAL_09_TO_FOOTNOTE_1, "Percent of respondents who had date of birth and visit date data who failed to receive a vaccination for which they were eligible on an occasion when they received another vaccination.")
+# vcqi_global(RI_QUAL_09_TO_FOOTNOTE_2, "An uncorrected MOV means that the respondent had still not received a valid dose at the time of the survey.")
+# vcqi_global(RI_QUAL_09_TO_FOOTNOTE_3, "A corrected MOV means that the respondent had received a valid dose by the time of the survey.")
+# vcqi_global(RI_QUAL_09_TO_FOOTNOTE_4, "The denominator for Had MOV (%) is the number of respondents who had visits eligible.")
+# vcqi_global(RI_QUAL_09_TO_FOOTNOTE_5, "The denominator for MOV uncorrected and corrected (%) is the number of MOVs.")
+# vcqi_global(RI_QUAL_09_TO_FOOTNOTE_6, "Note that for individual doses, the % MOV uncorrected + % MOV corrected adds up to 100%.")
 
 if(stringr::str_to_upper(RI_QUAL_09_VALID_OR_CRUDE) == "VALID"){
-  vcqi_global(RI_QUAL_09_TO_FOOTNOTE_7, "Note: Early doses are ignored in this analysis; the respondent is considered to have not received them.")
+  vcqi_global(RI_QUAL_09_TO_FOOTNOTE_7, language_string(language_use = language_use, str = "OS_90"))
+  #vcqi_global(RI_QUAL_09_TO_FOOTNOTE_7, "Note: Early doses are ignored in this analysis; the respondent is considered to have not received them.")
 }
 
 if(stringr::str_to_upper(RI_QUAL_09_VALID_OR_CRUDE) == "CRUDE"){
-  vcqi_global(RI_QUAL_09_TO_FOOTNOTE_7, "Note: Early doses are accepted in this analysis; all doses are considered valid doses.")
+  vcqi_global(RI_QUAL_09_TO_FOOTNOTE_7, language_string(language_use = language_use, str = "OS_106"))
+  #vcqi_global(RI_QUAL_09_TO_FOOTNOTE_7, "Note: Early doses are accepted in this analysis; all doses are considered valid doses.")
 }
 
-# This indicator makes plots (1) if any MOV and (2) if corrected. These are sorted in opposite directions, so global SORT_PLOT_LOW_TO_HIGH is set inside RI_QUAL_09_06PO.R rather than here by the user.
+# This indicator makes plots (1) if any MOV and (2) if corrected. These are
+# sorted in opposite directions, so global SORT_PLOT_LOW_TO_HIGH is set inside
+# RI_QUAL_09_06PO.R rather than here by the user.
 
 RI_QUAL_09()
 
