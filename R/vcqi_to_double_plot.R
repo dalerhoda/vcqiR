@@ -21,7 +21,7 @@
 #' @import dplyr
 #' @import stringr
 
-# vcqi_to_double_plot R version 1.06 - Biostat Global Consulting - 2023-02-03
+# vcqi_to_double_plot R version 1.07 - Biostat Global Consulting - 2024-05-20
 # *******************************************************************************
 # Change log
 
@@ -34,6 +34,7 @@
 # 2022-12-21  1.04      Mia Yu          Add part to update footnote
 # 2023-01-12  1.05      Mia Yu          Add parts to allow users customize level4 plots
 # 2023-02-03  1.06      Mia Yu          Updated level4 plots customization
+# 2024-05-20  1.11      Mia Yu          Add % after OS_327
 # *******************************************************************************
 
 vcqi_to_double_plot <- function(
@@ -517,7 +518,7 @@ vcqi_to_double_plot <- function(
                      position = position_dodge(.9)) +
       geom_text(aes(x = rowid,y = 100 + extraspace,label = text),size = 3.25,colour = "black",family = "sans") +
       coord_flip() +
-      labs(y = language_string(language_use = language_use, str = "OS_327"), #"Estimated Coverage %"
+      labs(y = paste0(language_string(language_use = language_use, str = "OS_327"), " %"), #"Estimated Coverage %"
            x = "",title = title,subtitle = subtitle,caption = note) +
       scale_x_continuous(breaks = combined$rowid[!is.na(combined$name)], labels = combined$name[!is.na(combined$name)]) +
       #Note: could find a better way to check the space we need for text

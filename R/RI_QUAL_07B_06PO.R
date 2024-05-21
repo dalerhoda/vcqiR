@@ -6,7 +6,7 @@
 #'
 #' @import stringr
 
-# RI_QUAL_07B_06PO R version 1.01 - Biostat Global Consulting - 2022-10-11
+# RI_QUAL_07B_06PO R version 1.01 - Biostat Global Consulting - 2024-05-21
 # ******************************************************************************
 # Change log
 
@@ -14,6 +14,8 @@
 # 2022-09-29  1.00      Caitlin Clary   Original R version
 # 2022-10-11  1.01      Mia Yu          Fix problems
 # 2022-10-11  1.01      Mia Yu          Package version
+# 2024-05-21	1.02	    Mia Yu      		Added multi lignual globals
+#										                    Added call to split_text for title
 # ******************************************************************************
 
 RI_QUAL_07B_06PO <- function(VCP = "RI_QUAL_07B_06PO"){
@@ -49,14 +51,22 @@ RI_QUAL_07B_06PO <- function(VCP = "RI_QUAL_07B_06PO"){
         savedata <- NA
       }
 
+      title_string <- paste0(language_string(language_use = language_use, str = "OS_416"),
+                             " - ",
+                             language_string(language_use = language_use, str = "OS_401"),
+                             " ", str_to_upper(RI_DOSE_LIST[d]), " ",
+                             language_string(language_use = language_use, str = "OS_413"),
+                             " (%)")
+      title_string <- split_text(text_string = title_string, text_cutoff = TITLE_CUTOFF)
+
       vcqi_to_plot(
         database = paste0(VCQI_OUTPUT_FOLDER, "/RI_QUAL_07B_", ANALYSIS_COUNTER,
                           "_", dn, "_database.rds"),
         filename = paste0(newpath, "/RI_QUAL_07B_", ANALYSIS_COUNTER, "_", plottype, "_", dn),
         datafile = paste0(VCQI_OUTPUT_FOLDER, "/RI_QUAL_07B_", ANALYSIS_COUNTER, ".rds"),
-        title = paste0("RI - Would have Valid ", str_to_upper(dn), " if no MOVs (%)"),
+        title = title_string,
         name = paste0("RI_QUAL_07B_", ANALYSIS_COUNTER, "_iwplot_", dn),
-        savedata = savedata)
+        savedata = savedata) #title = paste0("RI - Would have Valid ", str_to_upper(dn), " if no MOVs (%)")
 
       vcqi_log_comment(VCP, 3, "Comment", paste0(IWPLOT_TYPE, " was created and exported."))
 
@@ -88,6 +98,14 @@ RI_QUAL_07B_06PO <- function(VCP = "RI_QUAL_07B_06PO"){
           savedata <- NA
         }
 
+        title_string <- paste0(language_string(language_use = language_use, str = "OS_416"),
+                               " - ",
+                               language_string(language_use = language_use, str = "OS_401"),
+                               " ", str_to_upper(RI_DOSE_LIST[d]), " ",
+                               language_string(language_use = language_use, str = "OS_413"),
+                               " (%)")
+        title_string <- split_text(text_string = title_string, text_cutoff = TITLE_CUTOFF)
+
         vcqi_to_double_plot(
           database = paste0(VCQI_OUTPUT_FOLDER, "/RI_QUAL_07B_", ANALYSIS_COUNTER,
                             "_", dn, "_database.rds"),
@@ -97,11 +115,14 @@ RI_QUAL_07B_06PO <- function(VCP = "RI_QUAL_07B_06PO"){
                             plottype, "_", dn, "_double"),
           datafile = paste0(VCQI_OUTPUT_FOLDER, "/RI_QUAL_07B_", ANALYSIS_COUNTER, ".rds"),
           datafile2 = paste0(VCQI_OUTPUT_FOLDER, "/RI_COVG_02_", double_ac, ".rds"),
-          title = paste0("RI - Would have Valid ", str_to_upper(dn), " if no MOVs (%)"),
+          title = title_string,
           name = paste0(paste0("RI_QUAL_07B_", ANALYSIS_COUNTER, "_iwplot_", dn, "_double")),
-          note = "Gray shape is valid coverage; colored shape is valid coverage if no MOVs",
+          note = split_text(text_string = language_string(language_use = language_use, str = "OS_537"),
+                            text_cutoff = FOOTNOTE_CUTOFF),
           savedata = savedata
         )
+        #title = paste0("RI - Would have Valid ", str_to_upper(dn), " if no MOVs (%)")
+        #note = "Gray shape is valid coverage; colored shape is valid coverage if no MOVs"
       }
 
     } #end of d loop

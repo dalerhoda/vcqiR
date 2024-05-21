@@ -6,15 +6,17 @@
 #'
 #' @import dplyr
 #' @rawNamespace import(rlang, except = c(local_options,with_options))
+#' @import stringr
 
-
-# RI_COVG_04_06PO R version 1.01 - Biostat Global Consulting - 2023-07-23
+# RI_COVG_04_06PO R version 1.01 - Biostat Global Consulting - 2024-05-20
 # *******************************************************************************
 # Change log
 
 # Date 			  Version 	Name			      What Changed
 # 2022-12-14  1.00      Mia Yu          Original R package version
 # 2023-07-23  1.01      Mia Yu          Use level3name for the opplot name
+# 2024-05-20	1.02	    Mia Yu      		Added multi lignual globals
+#										                    Added call to split_text for title
 # *******************************************************************************
 
 RI_COVG_04_06PO <- function(VCP = "RI_COVG_04_06PO"){
@@ -156,12 +158,19 @@ RI_COVG_04_06PO <- function(VCP = "RI_COVG_04_06PO"){
       savedata <- NA
     }
 
+    title_string <- paste0(language_string(language_use = language_use, str = "OS_416"),
+                           " - ",
+                           str_to_title(language_string(language_use = language_use, str = "OS_403")),
+                           " - ",
+                           language_string(language_use = language_use, str = "OS_14"))
+    title_string <- split_text(text_string = title_string, text_cutoff = TITLE_CUTOFF)
+
     vcqi_to_plot(database = paste0(VCQI_OUTPUT_FOLDER, "/RI_COVG_04_",ANALYSIS_COUNTER,"_nvc_database.rds"),
                  filename = savepng,
                  datafile = paste0(VCQI_OUTPUT_FOLDER, "/RI_COVG_04_",ANALYSIS_COUNTER,".rds"),
-                 title = "RI - Not Vaccinated - Crude",
+                 title = title_string,
                  name = paste0("RI_COVG_04_",ANALYSIS_COUNTER,"_iwplot_nvc"),
-                 savedata = savedata)
+                 savedata = savedata) #title = "RI - Not Vaccinated - Crude"
 
     vcqi_log_comment(VCP, 3, "Comment", paste0("Not vaccinated (crude) ", IWPLOT_TYPE, " was created and exported."))
 
@@ -179,12 +188,20 @@ RI_COVG_04_06PO <- function(VCP = "RI_COVG_04_06PO"){
         savedata <- NA
       }
 
+      title_string <- paste0(language_string(language_use = language_use, str = "OS_416"),
+                             " - ",
+                             str_to_title(language_string(language_use = language_use, str = "OS_403")),
+                             " - ",
+                             language_string(language_use = language_use, str = "OS_80"))
+      title_string <- split_text(text_string = title_string, text_cutoff = TITLE_CUTOFF)
+
       vcqi_to_plot(database = paste0(VCQI_OUTPUT_FOLDER, "/RI_COVG_04_",ANALYSIS_COUNTER,"_nvv_database.rds"),
                    filename = savepng,
                    datafile = paste0(VCQI_OUTPUT_FOLDER, "/RI_COVG_04_",ANALYSIS_COUNTER,".rds"),
-                   title = "RI - Not Vaccinated - Valid",
+                   title = title_string,
                    name = paste0("RI_COVG_04_",ANALYSIS_COUNTER,"_iwplot_nvv"),
                    savedata = savedata)
+      #title = "RI - Not Vaccinated - Valid"
 
       vcqi_log_comment(VCP, 3, "Comment", paste0("Not vaccinated (valid) ", IWPLOT_TYPE, " was created and exported."))
 
@@ -199,6 +216,13 @@ RI_COVG_04_06PO <- function(VCP = "RI_COVG_04_06PO"){
         savedata <- NA
       }
 
+      title_string <- paste0(language_string(language_use = language_use, str = "OS_416"),
+                             " - ",
+                             str_to_title(language_string(language_use = language_use, str = "OS_403")),
+                             " - ",
+                             language_string(language_use = language_use, str = "OS_80"))
+      title_string <- split_text(text_string = title_string, text_cutoff = TITLE_CUTOFF)
+
       vcqi_to_double_plot(database = paste0(VCQI_OUTPUT_FOLDER, "/RI_COVG_04_",ANALYSIS_COUNTER,"_nvv_database.rds"),
                           database2 = paste0(VCQI_OUTPUT_FOLDER, "/RI_COVG_04_",ANALYSIS_COUNTER,"_nvc_database.rds"),
                           filename = savepng,
@@ -206,8 +230,11 @@ RI_COVG_04_06PO <- function(VCP = "RI_COVG_04_06PO"){
                           datafile2 = paste0(VCQI_OUTPUT_FOLDER, "/RI_COVG_04_",ANALYSIS_COUNTER,".rds"),
                           title = "RI - Not Vaccinated - Valid",
                           name = paste0("RI_COVG_04_",ANALYSIS_COUNTER,"_iwplot_nvv_double"),
-                          note = "Gray shape is crude coverage; colored shape is valid coverage",
+                          note = split_text(text_string = language_string(language_use = language_use, str = "OS_534"),
+                                            text_cutoff = FOOTNOTE_CUTOFF),
                           savedata = savedata)
+      #title = "RI - Not Vaccinated - Valid"
+      #note = "Gray shape is crude coverage; colored shape is valid coverage"
 
       vcqi_log_comment(VCP, 3, "Comment", paste0("Valid & crude coverage ", IWPLOT_TYPE, " was created and exported."))
 
@@ -222,12 +249,21 @@ RI_COVG_04_06PO <- function(VCP = "RI_COVG_04_06PO"){
         savedata <- NA
       }
 
+      title_string <- paste0(language_string(language_use = language_use, str = "OS_416"),
+                             " - ",
+                             str_to_title(language_string(language_use = language_use, str = "OS_403")),
+                             " - ",
+                             language_string(language_use = language_use, str = "OS_80"),
+                             " ",
+                             language_string(language_use = language_use, str = "OS_441"))
+      title_string <- split_text(text_string = title_string, text_cutoff = TITLE_CUTOFF)
+
       vcqi_to_plot(database = paste0(VCQI_OUTPUT_FOLDER, "/RI_COVG_04_",ANALYSIS_COUNTER,"_nva1_database.rds"),
                    filename = savepng,
                    datafile = paste0(VCQI_OUTPUT_FOLDER, "/RI_COVG_04_",ANALYSIS_COUNTER,".rds"),
-                   title = "RI - Not Vaccinated - Valid by Age 1",
+                   title = title_string,
                    name = paste0("RI_COVG_04_",ANALYSIS_COUNTER,"_iwplot_nva1"),
-                   savedata = savedata)
+                   savedata = savedata) #title = "RI - Not Vaccinated - Valid by Age 1"
 
       vcqi_log_comment(VCP, 3, "Comment", paste0("Not vaccinated (by age 1) ", IWPLOT_TYPE, " was created and exported."))
     }

@@ -7,7 +7,7 @@
 #' @import dplyr
 #' @rawNamespace import(rlang, except = c(local_options,with_options))
 
-# RI_COVG_02_06PO R version 1.02 - Biostat Global Consulting - 2023-07-23
+# RI_COVG_02_06PO R version 1.03 - Biostat Global Consulting - 2024-05-20
 # *******************************************************************************
 # Change log
 
@@ -15,6 +15,8 @@
 # 2022-08-12  1.00      Mia Yu          Original R version
 # 2022-10-11  1.01      Mia Yu          Package version
 # 2023-07-23  1.02      Mia Yu          Use level3name for the opplot name
+# 2024-05-20	1.03	    Mia Yu      		Added multi lignual globals
+#										                    Added call to split_text for title
 # *******************************************************************************
 
 RI_COVG_02_06PO <- function(VCP = "RI_COVG_02_06PO"){
@@ -120,13 +122,19 @@ RI_COVG_02_06PO <- function(VCP = "RI_COVG_02_06PO"){
         savedata <- NA
       }
 
+      title_string <- paste0(language_string(language_use = language_use, str = "OS_416"),
+                             " - ",
+                             language_string(language_use = language_use, str = "OS_471"),
+                             " ", str_to_upper(RI_DOSE_LIST[d]))
+      title_string <- split_text(text_string = title_string, text_cutoff = TITLE_CUTOFF)
+
       print(RI_DOSE_LIST[d])
       vcqi_to_plot(database = paste0(VCQI_OUTPUT_FOLDER, "/RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_a_database.rds"),
                    filename = savepng,
                    datafile = paste0(VCQI_OUTPUT_FOLDER, "/RI_COVG_02_",ANALYSIS_COUNTER,".rds"),
-                   title = paste0("RI - Valid Coverage of ",str_to_upper(RI_DOSE_LIST[d])),
+                   title = title_string,
                    name = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_iwplot_",RI_DOSE_LIST[d]),
-                   savedata = savedata)
+                   savedata = savedata) #title = paste0("RI - Valid Coverage of ",str_to_upper(RI_DOSE_LIST[d]))
 
       vcqi_log_comment(VCP, 3, "Comment", paste0("Valid coverage ", IWPLOT_TYPE, " for ",RI_DOSE_LIST[d] , " was created and exported."))
 
@@ -141,12 +149,18 @@ RI_COVG_02_06PO <- function(VCP = "RI_COVG_02_06PO"){
           savedata <- NA
         }
 
+        title_string <- paste0(language_string(language_use = language_use, str = "OS_416"),
+                               " - ",
+                               language_string(language_use = language_use, str = "OS_472"),
+                               " ", str_to_upper(RI_DOSE_LIST[d]))
+        title_string <- split_text(text_string = title_string, text_cutoff = TITLE_CUTOFF)
+
         vcqi_to_plot(database = paste0(VCQI_OUTPUT_FOLDER, "/RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_aa1_database.rds"),
                      filename = savepng,
                      datafile = paste0(VCQI_OUTPUT_FOLDER, "/RI_COVG_02_",ANALYSIS_COUNTER,".rds"),
-                     title = paste0("RI - Valid Coverage by Age 1 of ",str_to_upper(RI_DOSE_LIST[d])),
+                     title = title_string,
                      name = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_iwplot_",RI_DOSE_LIST[d],"_age1"),
-                     savedata = savedata)
+                     savedata = savedata) #title = paste0("RI - Valid Coverage by Age 1 of ",str_to_upper(RI_DOSE_LIST[d]))
 
         vcqi_log_comment(VCP, 3, "Comment", paste0("Valid coverage by age 1 ", IWPLOT_TYPE, " for ",RI_DOSE_LIST[d] , " was created and exported."))
       } #end of age1 valid barplot
@@ -161,15 +175,24 @@ RI_COVG_02_06PO <- function(VCP = "RI_COVG_02_06PO"){
         savedata <- NA
       }
 
+      title_string <- paste0(language_string(language_use = language_use, str = "OS_416"),
+                             " - ",
+                             language_string(language_use = language_use, str = "OS_471"),
+                             " ", str_to_upper(RI_DOSE_LIST[d]))
+      title_string <- split_text(text_string = title_string, text_cutoff = TITLE_CUTOFF)
+
       vcqi_to_double_plot(database = paste0(VCQI_OUTPUT_FOLDER, "/RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_a_database.rds"),
                           database2 = paste0(VCQI_OUTPUT_FOLDER, "/RI_COVG_01_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_a_database.rds"),
                           filename = savepng,
                           datafile = paste0(VCQI_OUTPUT_FOLDER, "/RI_COVG_02_",ANALYSIS_COUNTER,".rds"),
                           datafile2 = paste0(VCQI_OUTPUT_FOLDER, "/RI_COVG_01_",ANALYSIS_COUNTER,".rds"),
-                          title = paste0("RI - Valid Coverage of ",str_to_upper(RI_DOSE_LIST[d])),
+                          title = title_string,
                           name = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_iwplot_",RI_DOSE_LIST[d],"_double"),
-                          note = "Gray shape is crude coverage; colored shape is valid coverage",
+                          note = split_text(text_string = language_string(language_use = language_use, str = "OS_534"),
+                                            text_cutoff = FOOTNOTE_CUTOFF),
                           savedata = savedata)
+     #title = paste0("RI - Valid Coverage of ",str_to_upper(RI_DOSE_LIST[d]))
+     #note = "Gray shape is crude coverage; colored shape is valid coverage"
 
       if (minage < 365){
         filestub <- paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_",type,"_",RI_DOSE_LIST[d],"_age1_double")
@@ -181,15 +204,24 @@ RI_COVG_02_06PO <- function(VCP = "RI_COVG_02_06PO"){
           savedata <- NA
         }
 
+        title_string <- paste0(language_string(language_use = language_use, str = "OS_416"),
+                               " - ",
+                               language_string(language_use = language_use, str = "OS_472"),
+                               " ", str_to_upper(RI_DOSE_LIST[d]))
+        title_string <- split_text(text_string = title_string, text_cutoff = TITLE_CUTOFF)
+
         vcqi_to_double_plot(database = paste0(VCQI_OUTPUT_FOLDER, "/RI_COVG_02_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_aa1_database.rds"),
                             database2 = paste0(VCQI_OUTPUT_FOLDER, "/RI_COVG_01_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_a_database.rds"),
                             filename = savepng,
                             datafile = paste0(VCQI_OUTPUT_FOLDER, "/RI_COVG_02_",ANALYSIS_COUNTER,".rds"),
                             datafile2 = paste0(VCQI_OUTPUT_FOLDER, "/RI_COVG_01_",ANALYSIS_COUNTER,".rds"),
-                            title = paste0("RI - Valid Coverage by Age 1 of ",str_to_upper(RI_DOSE_LIST[d])),
+                            title = title_string,
                             name = paste0("RI_COVG_02_",ANALYSIS_COUNTER,"_iwplot_",RI_DOSE_LIST[d],"_age1_double"),
-                            note = "Gray shape is crude coverage; colored shape is valid coverage",
+                            note = split_text(text_string = language_string(language_use = language_use, str = "OS_534"),
+                                              text_cutoff = FOOTNOTE_CUTOFF),
                             savedata = savedata)
+        #title = paste0("RI - Valid Coverage by Age 1 of ",str_to_upper(RI_DOSE_LIST[d]))
+        #note = "Gray shape is crude coverage; colored shape is valid coverage"
 
       } #end of age1 double barplot
 

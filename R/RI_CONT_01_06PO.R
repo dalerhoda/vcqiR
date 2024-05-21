@@ -6,12 +6,14 @@
 #'
 #' @import stringr
 
-# RI_CONT_01_06PO R version 1.00 - Biostat Global Consulting - 2022-12-20
+# RI_CONT_01_06PO R version 1.01 - Biostat Global Consulting - 2024-05-20
 # *******************************************************************************
 # Change log
 
 # Date 			  Version 	Name			      What Changed
 # 2022-12-20  1.00      Mia Yu          Original R package version
+# 2024-05-20	1.01	    Mia Yu      		Added multi lignual globals
+#										                    Added call to split_text for title
 # *******************************************************************************
 
 RI_CONT_01_06PO <- function(VCP = "RI_CONT_01_06PO"){
@@ -38,10 +40,18 @@ RI_CONT_01_06PO <- function(VCP = "RI_CONT_01_06PO"){
         savedata <- NA
       }
 
+      title_string <- paste0(language_string(language_use = language_use, str = "OS_416"),
+                            " - ",
+                            language_string(language_use = language_use, str = "OS_384"),
+                            " ", str_to_upper(d1), " ",
+                            language_string(language_use = language_use, str = "OS_468"),
+                            " ",str_to_upper(d2))
+      title_string <- split_text(text_string = title_string, text_cutoff = TITLE_CUTOFF)
+
       vcqi_to_uwplot(database = paste0(VCQI_OUTPUT_FOLDER,"/RI_CONT_01_",ANALYSIS_COUNTER,"_",d1,"_",d2,"_database.rds"),
-                     title = paste0("RI - Dropout ", str_to_upper(d1), " to ", str_to_upper(d2)),
+                     title = title_string,
                      name = paste0("RI_CONT_01_",ANALYSIS_COUNTER,"_uwplot_",d1,"_",d2),
-                     savedata = savedata)
+                     savedata = savedata) #title = paste0("RI - Dropout ", str_to_upper(d1), " to ", str_to_upper(d2))
 
       vcqi_log_comment(VCP, 3, "Comment",
                        paste0("Dropout plot ",str_to_upper(d1), " to ", str_to_upper(d2)," was created and exported."))

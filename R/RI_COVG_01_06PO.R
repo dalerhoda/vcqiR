@@ -7,7 +7,7 @@
 #' @import dplyr
 #' @rawNamespace import(rlang, except = c(local_options,with_options))
 
-# RI_COVG_01_06PO R version 1.02 - Biostat Global Consulting - 2023-07-23
+# RI_COVG_01_06PO R version 1.03 - Biostat Global Consulting - 2024-05-20
 # *******************************************************************************
 # Change log
 
@@ -15,6 +15,8 @@
 # 2022-08-05  1.00      Mia Yu          Original R version
 # 2022-10-09  1.01      Mia Yu          Package version
 # 2023-07-23  1.02      Mia Yu          Use level3name for the opplot name
+# 2024-05-20	1.03	    Mia Yu      		Added multi lignual globals
+#										                    Added call to split_text for title
 # *******************************************************************************
 
 RI_COVG_01_06PO <- function(VCP = "RI_COVG_01_06PO"){
@@ -129,13 +131,19 @@ RI_COVG_01_06PO <- function(VCP = "RI_COVG_01_06PO"){
         savedata <- NA
       }
 
+      title_string <- paste0(language_string(language_use = language_use, str = "OS_416"),
+                             " - ",
+                             language_string(language_use = language_use, str = "OS_470"),
+                             " ", str_to_upper(RI_DOSE_LIST[d]))
+      title_string <- split_text(text_string = title_string, text_cutoff = TITLE_CUTOFF)
+
       print(RI_DOSE_LIST[d])
       vcqi_to_plot(database = paste0(VCQI_OUTPUT_FOLDER, "/RI_COVG_01_",ANALYSIS_COUNTER,"_",RI_DOSE_LIST[d],"_a_database.rds"),
                    filename = savepng,
                    datafile = paste0(VCQI_OUTPUT_FOLDER, "/RI_COVG_01_",ANALYSIS_COUNTER,".rds"),
-                   title = paste0("RI - Crude Coverage of ",str_to_upper(RI_DOSE_LIST[d])),
+                   title = title_string,
                    name = paste0("RI_COVG_01_",ANALYSIS_COUNTER,"_iwplot_",RI_DOSE_LIST[d]),
-                   savedata = savedata)
+                   savedata = savedata) #title = paste0("RI - Crude Coverage of ",str_to_upper(RI_DOSE_LIST[d]))
 
       vcqi_log_comment(VCP, 3, "Comment", paste0("Crude coverage ", IWPLOT_TYPE, " for ",RI_DOSE_LIST[d] , " was created and exported."))
 

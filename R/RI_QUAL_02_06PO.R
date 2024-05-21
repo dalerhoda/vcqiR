@@ -8,13 +8,15 @@
 #' @rawNamespace import(rlang, except = c(local_options,with_options))
 
 
-# RI_QUAL_02_06PO R version 1.01 - Biostat Global Consulting - 2023-07-23
+# RI_QUAL_02_06PO R version 1.02 - Biostat Global Consulting - 2024-05-20
 # *******************************************************************************
 # Change log
 
 # Date 			  Version 	Name			      What Changed
 # 2022-12-21  1.00      Mia Yu          Original R package version
 # 2023-07-23  1.01      Mia Yu          Use level3name for the opplot name
+# 2024-05-20	1.02	    Mia Yu      		Added multi lignual globals
+#										                    Added call to split_text for title
 # *******************************************************************************
 
 RI_QUAL_02_06PO <- function(VCP = "RI_QUAL_02_06PO"){
@@ -125,12 +127,17 @@ RI_QUAL_02_06PO <- function(VCP = "RI_QUAL_02_06PO"){
       savedata <- NA
     }
 
+    title_string <- paste0(language_string(language_use = language_use, str = "OS_416"),
+                           " - ",
+                           language_string(language_use = language_use, str = "OS_411"))
+    title_string <- split_text(text_string = title_string, text_cutoff = TITLE_CUTOFF)
+
     vcqi_to_plot(database = paste0(VCQI_OUTPUT_FOLDER, "/RI_QUAL_02_",ANALYSIS_COUNTER,"_1_database.rds"),
                  filename = savepng,
                  datafile = paste0(VCQI_OUTPUT_FOLDER, "/RI_QUAL_02_",ANALYSIS_COUNTER,".rds"),
-                 title = "RI - Ever Received a Card",
+                 title = title_string,
                  name = paste0("RI_QUAL_02_",ANALYSIS_COUNTER,"_iwplot"),
-                 savedata = savedata)
+                 savedata = savedata) #title = "RI - Ever Received a Card"
 
     vcqi_log_comment(VCP, 3, "Comment", paste0(IWPLOT_TYPE, " was created and exported."))
   } #end of IW plot

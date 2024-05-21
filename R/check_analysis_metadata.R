@@ -12,7 +12,7 @@
 #' @examples
 #' check_analysis_metadata()
 #'
-# check_analysis_metadata R version 1.17 - Biostat Global Consulting - 2024-05-07
+# check_analysis_metadata R version 1.18 - Biostat Global Consulting - 2024-05-20
 # *******************************************************************************
 # Change log
 
@@ -42,6 +42,8 @@
 # 2023-11-15  1.15      Mia Yu          Add format columns to default settings for level4_layout
 # 2024-03-20	1.16    	Mia Yu      		Add a check for VCQI_PASS_THRU_VARLIST
 # 2024-05-07  1.17      Mia Yu          Add svydesign options for fpc and nest
+# 2024-05-20	1.18     	Mia Yu      		Add check for FOOTNOTE_CUTOFF and TITLE_CUTOFF
+#										                    Set to default if not set
 # *******************************************************************************
 
 # Note: sections of this program that check FMTID are not implemented (2022-10-07)
@@ -76,6 +78,14 @@ check_analysis_metadata <- function(VCP = "check_analysis_metadata"){
   # by the user.  If they did not specify a language, the program defaults
   # to English
   vcqi_multi_lingual_strings()
+
+  # check to see if the TITLE and FOOTNOTE CUTOFF globals are set
+  if(!vcqi_object_exists("TITLE_CUTOFF")){
+    vcqi_global(TITLE_CUTOFF,40)
+  }
+  if(!vcqi_object_exists("FOOTNOTE_CUTOFF")){
+    vcqi_global(FOOTNOTE_CUTOFF,100)
+  }
 
   # Check global VCQI_PASS_THRU_VARLIST
   # First assign VCQI_PASS_THRU_VARLIST to NULL if not defined/empty/NA

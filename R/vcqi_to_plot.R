@@ -19,7 +19,7 @@
 #' @import dplyr
 #' @import stringr
 
-# vcqi_to_plot R version 1.05 - Biostat Global Consulting - 2023-10-02
+# vcqi_to_plot R version 1.11 - Biostat Global Consulting - 2024-05-20
 # *******************************************************************************
 # Change log
 
@@ -31,7 +31,9 @@
 # 2022-12-15  1.03      Mia Yu          Add title etc. to the dataset
 # 2023-01-11  1.04      Mia Yu          Add parts to allow users customize level4 plots
 # 2023-02-03  1.05      Mia Yu          Updated level4 plot customization
-# 2023-10-02  1.10      Mia Yu          Added globals values for multi-lingual purposes
+# 2023-10-02  1.10      Mia Yu          Add globals values for multi-lingual purposes
+# 2024-05-20  1.11      Mia Yu          Add % after OS_327
+#                                       Switch to split_text program
 # *******************************************************************************
 
 vcqi_to_plot <- function(
@@ -252,6 +254,8 @@ vcqi_to_plot <- function(
       #"Text at right: Point Estimate (2-sided 95% CI) (0, 1-sided 95% UCB] [1-sided 95% LCB, 100)"
     }
   }
+  #2024-05-20:
+  note <- split_text(text_string = note, text_cutoff = FOOTNOTE_CUTOFF)
 
   #DEC 15: add title etc. to the dataset
   dat <- dat %>% mutate(graphtitle = NA, graphsubtitle = NA, graphcaption = NA)
@@ -387,7 +391,7 @@ vcqi_to_plot <- function(
       geom_errorbar(aes(ymin = cill * 100, ymax = ciul * 100), width = .2, position = position_dodge(.9)) +
       geom_text(aes( x = rowid, y = 100 + 1.25 * extraspace, label = text), colour = "black", family = "sans") +
       coord_flip() +
-      labs(y = language_string(language_use = language_use, str = "OS_327"), #"Estimated Coverage %"
+      labs(y = paste0(language_string(language_use = language_use, str = "OS_327"), " %"), #"Estimated Coverage %"
            x = "", title = title, subtitle = subtitle, caption = note) +
       scale_x_continuous(breaks = seq(min(dat$rowid), max(dat$rowid), by = gap), labels = dat$name) +
       #Note: could find a better way to check the space we need for text
