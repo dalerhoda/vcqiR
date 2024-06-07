@@ -4,7 +4,7 @@ Vaccination Coverage Quality Indicators (VCQI)
 
 This is the repository for the R implementation of VCQI, an open-source set of R programs meant to analyze data from vaccination coverage surveys. VCQI conducts analyses that are consistent with recent guidance from the World Health Organization (WHO) in the [2018 Vaccination Coverage Cluster Survey Reference Manual](https://www.who.int/immunization/documents/who_ivb_18.09/en/). VCQI documentation can be found in the Documentation directory in this repository. A [VCQI User's Group](http://www.technet-21.org/en/network/groups/293-vcqi) is hosted on the [TechNet-21](http://www.technet-21.org/en/) website. The user's group includes a forum for discussion and links to tutorial materials. Users are welcome to submit issues to this repository, but the main thread for discussing VCQI development plans will be in the user's group forum. Links to VCQI resources may also be found at [this website](http:/www.biostatglobal.com/VCQI_RESOURCES.html).
 
-To install this package, ensure you have R version 4.2.1 or later, and then run the following commands: 
+To install this package, ensure you (a) have R version 4.2.1 or later and (b) have installed [RTools](https://cran.r-project.org/bin/windows/Rtools/). Then run the following commands: 
 
 ``` r
 if (!requireNamespace("pak")){install.packages("pak")}
