@@ -17,6 +17,24 @@
 #' @param title Title of the plot
 #' @param subtitle Subtitle of the plot
 #' @param footnote Footnote of the plot
+#' @param footnotecovg Add estimated coverage as a footnote to the plot
+#' @param footnotedeff Add design effect (DEFF) as a footnote to the plot
+#' @param footnoteicc Add intracluster correlation coefficient (ICC) as a footnote to the plot
+#' @param covgcategories Stratify plot into high, medium, and low coverage categories
+#' @param lowcovgthreshold The numeric percent value (0-100) used to identify low coverage; clusters with coverage less than or equal to this number will be assigned to the low coverage category
+#' @param highcovgthreshold The numeric percent value (0-100) used to identify high coverage; clusters with coverage greater than or equal to this number will be assigned to the high coverage category
+#' @param barcolorhigh1 Valid R color or hex color used to represent respondents with yvar = 1 who fall in the high coverage category
+#' @param barcolormid1 Valid R color or hex color used to represent respondents with yvar = 1 who fall in the middle coverage category
+#' @param barcolorlow1 Valid R color or hex color used to represent respondents with yvar = 1 who fall in the low coverage category
+#' @param barcolorhigh2 Valid R color or hex color used to represent respondents with yvar = 0 or missing who fall in the high coverage category
+#' @param barcolormid2 Valid R color or hex color used to represent respondents with yvar = 0 or missing who fall in the middle coverage category
+#' @param barcolorlow2 Valid R color or hex color used to represent respondents with yvar = 0 or missing who fall in the low coverage category
+#' @param linecolorhigh1 Valid R color or hex color used to mark boundaries between the lower portion of the bars in the high coverage category; should have good contrast with barcolorhigh1
+#' @param linecolormid1 Valid R color or hex color used to mark boundaries between the lower portion of the bars in the middle coverage category; should have good contrast with barcolormid1
+#' @param linecolorlow1 Valid R color or hex color used to mark boundaries between the lower portion of the bars in the low coverage category; should have good contrast with barcolorlow1
+#' @param linecolorhigh2 Valid R color or hex color used to mark boundaries between the upper portion of the bars in the high coverage category; should have good contrast with barcolorhigh2
+#' @param linecolormid2 Valid R color or hex color used to mark boundaries between the upper portion of the bars in the middle coverage category; should have good contrast with barcolormid2
+#' @param linecolorlow2 Valid R color or hex color used to mark boundaries between the upper portion of the bars in the low coverage category; should have good contrast with barcolorlow2
 #' @param output_to_screen Show the plot in plot window or not, default to be FALSE
 #' @param filename Path to save the plot
 #' @param platform Type of plot file (may be png, pdf, or wmf; default to png)
@@ -34,12 +52,13 @@
 #' @return A plot
 #'
 #' @import ggplot2
+#' @import stringr
 #' @rawNamespace import(doBy, except = order_by)
 #' @import dplyr
 #' @rawNamespace import(graphics, except = dotchart)
 #' @importFrom utils write.csv
 
-# opplot R version 1.10 - Biostat Global Consulting - 2023-10-02
+# opplot R version 1.11 - Biostat Global Consulting - 2024-08-20
 # *******************************************************************************
 # Change log
 
@@ -57,6 +76,9 @@
 # 2022-09-20  1.08      Caitlin Clary   handle single-cluster survey designs
 # 2022-10-10  1.09      Mia Yu          Package version
 # 2023-10-02  1.10      Mia Yu          Added globals values for multi-lingual purposes
+# 2024-08-20  1.11      Caitlin Clary   New options: low, mid, high color coding,
+#                                       footnotes (covg, deff, icc); left align
+#                                       captions
 # *******************************************************************************
 
 opplot <- function(
@@ -68,17 +90,41 @@ opplot <- function(
   weightvar = NA,
   stratvar = NA,
   stratum = "",
-  barcolor1 = "hot pink", # color for respondents with yvar = 1
+  barcolor1 = "hotpink",  # color for respondents with yvar = 1
   barcolor2 = "white",    # color for respondents with yvar = 0
   linecolor1 = "gray",    # color for lines separating lower portion of bars
   linecolor2 = "gray",    # color for lines separating upper portion of bars
-  ylabel = language_string(language_use = language_use, str = "OS_316"), #"Percent of Cluster"
+  ylabel = language_string(language_use = language_use, str = "OS_316"), # "Percent of Cluster"
   ymin = 0,
   ymax = 100,
   yby = 50,
   title = "",
   subtitle = "",
   footnote = "",
+
+  footnotecovg = FALSE,
+  footnotedeff = FALSE,
+  footnoteicc = FALSE,
+
+  covgcategories = FALSE,
+
+  lowcovgthreshold = NA,
+  highcovgthreshold = NA,
+
+  barcolorhigh1 = "#67A9CF",
+  barcolormid1 = "#000080",
+  barcolorlow1 = "#FF5B00",
+  barcolorhigh2 = "#f0f0f0",
+  barcolormid2 = "#f0f0f0",
+  barcolorlow2 = "#f0f0f0",
+
+  linecolorhigh1 = "gray",
+  linecolormid1 = "gray",
+  linecolorlow1 = "gray",
+  linecolorhigh2 = "gray",
+  linecolormid2 = "gray",
+  linecolorlow2 = "gray",
+
   output_to_screen = FALSE,
   filename = NA_character_,
   platform = "png",
@@ -86,7 +132,7 @@ opplot <- function(
   sizeh = 6,
   plotn = FALSE,
   nlinecolor = "black",
-  nlinewidth = 0.75,       # color: line indicating # of respondents
+  nlinewidth = 0.75,    # color: line indicating # of respondents
   nlinepattern = 2,     # pattern: line indicating # of respondents
   ytitle2 = language_string(language_use = language_use, str = "OS_317"), #"Number of Respondents"
   yround2 = 5,
@@ -168,7 +214,7 @@ opplot <- function(
   # Subset data to ignore rows flagged above
   if(length(c(y_ind,wt_ind,cl_ind))>0) {
     dat <- dat[-c(y_ind,wt_ind,cl_ind),]
-    print(paste("Original dataset had",nrow(dat_orig),"rows.  The dataset used to make OP plot has",nrow(dat),"rows."))
+    print(paste("Original dataset had", nrow(dat_orig),"rows.  The dataset used to make OP plot has",nrow(dat),"rows."))
   }
 
   # Check if plot is saved to disk, that the platform specified is either wmf or pdf
@@ -254,112 +300,327 @@ opplot <- function(
     }
   }
 
-  to_plot<- mutate(to_plot ,left = left, right = right)
+  to_plot <- mutate(to_plot ,left = left, right = right)
 
-  ### Make OPP
-  if (plotn == T) {
+  # Build footnotes ----
+
+  VCQI_SVYDESIGN_SYNTAX <- get("VCQI_SVYDESIGN_SYNTAX", envir = .GlobalEnv)
+
+  if (substring(VCQI_SVYDESIGN_SYNTAX$ids, 1)[[2]] == "1"){
+    datdesign <- svydesign(ids = ~1, strata = VCQI_SVYDESIGN_SYNTAX$strata,
+                           weights = VCQI_SVYDESIGN_SYNTAX$weights,
+                           fpc = VCQI_SVYDESIGN_SYNTAX$fpc,
+                           nest = VCQI_SVYDESIGN_SYNTAX$nest,
+                           data = dat)
+  } else {
+
+    if (str_count(as.character(VCQI_SVYDESIGN_SYNTAX$ids)[2], pattern = fixed("+")) >= 1){
+
+      clustervars <- str_split(as.character(VCQI_SVYDESIGN_SYNTAX$ids)[2], pattern = fixed("+"))[[1]]
+      clustervars <- str_trim(clustervars)
+
+      justone <- TRUE
+      for (i in seq_along(clustervars)){
+        clusterid <- get(clustervars[i], dat)
+        if (!length(unique(clusterid)) %in% 1){
+          justone <- FALSE
+        }
+      } # test if all cluster vars only have 1 unique value
+
+      if (justone == TRUE){
+        datdesign <- svydesign(ids = ~1, strata = VCQI_SVYDESIGN_SYNTAX$strata,
+                               weights = VCQI_SVYDESIGN_SYNTAX$weights,
+                               fpc = VCQI_SVYDESIGN_SYNTAX$fpc,
+                               nest = VCQI_SVYDESIGN_SYNTAX$nest,
+                               data = dat)
+      } else {
+        datdesign <- svydesign(ids = VCQI_SVYDESIGN_SYNTAX$ids,
+                               strata = VCQI_SVYDESIGN_SYNTAX$strata,
+                               weights = VCQI_SVYDESIGN_SYNTAX$weights,
+                               fpc = VCQI_SVYDESIGN_SYNTAX$fpc,
+                               nest = VCQI_SVYDESIGN_SYNTAX$nest,
+                               data = dat)
+      }
+
+    } else {
+      clusterid <- get(substring(VCQI_SVYDESIGN_SYNTAX$ids, 1)[[2]], dat)
+
+      if (length(unique(clusterid)) == 1){
+        datdesign <- svydesign(ids = ~1, strata = VCQI_SVYDESIGN_SYNTAX$strata,
+                               weights = VCQI_SVYDESIGN_SYNTAX$weights,
+                               fpc = VCQI_SVYDESIGN_SYNTAX$fpc,
+                               nest = VCQI_SVYDESIGN_SYNTAX$nest,
+                               data = dat)
+      } else {
+        datdesign <- svydesign(ids = VCQI_SVYDESIGN_SYNTAX$ids,
+                               strata = VCQI_SVYDESIGN_SYNTAX$strata,
+                               weights = VCQI_SVYDESIGN_SYNTAX$weights,
+                               fpc = VCQI_SVYDESIGN_SYNTAX$fpc,
+                               nest = VCQI_SVYDESIGN_SYNTAX$nest,
+                               data = dat)
+      }
+    } # one stage
+  }
+
+  opp_svypd <- svypd(
+    datdesign,
+    yvar,
+    ci_method = VCQI_CI_METHOD
+  )
+
+  opp_est <- opp_svypd$estimate*100
+  opp_lb <- opp_svypd$cill*100
+  opp_ub <- opp_svypd$ciul*100
+  opp_deff <- opp_svypd$deff
+
+  opp_icc <- calc_icc(
+    y = yvar,
+    svydata = datdesign,
+    ci.type = "smith"
+  )
+
+  opp_icc <- opp_icc$estimates$ICC
+
+  # Estimated Coverage
+  if (footnotecovg == TRUE){
+    opplot_footnote1 <- paste0(
+      language_string(language_use = language_use, str = "OS_327"),
+      " = ", round(opp_est, 1), "%"
+      )
+  } else {
+    opplot_footnote1 <- NULL
+  }
+
+  # Design Effect
+  if (footnotedeff == TRUE){
+    opplot_footnote2 <- paste0(
+      language_string(language_use = language_use, str = "OS_498"),
+      " = ", round(opp_deff, 1)
+    )
+  } else {
+    opplot_footnote2 <- NULL
+  }
+
+  # Intracluster Correlation Coefficient
+  if (footnoteicc == TRUE){
+    opplot_footnote3 <- paste0(
+      stringr::str_to_title(language_string(language_use = language_use, str = "OS_493")),
+      " = ", round(opp_icc, 4)
+    )
+  } else {
+    opplot_footnote3 <- NULL
+  }
+
+  # User-supplied footnote
+  if (footnote == ""){
+    custom_footnote <- NULL
+  } else {
+    custom_footnote <- footnote
+  }
+
+  opplot_footnote <- paste(c(opplot_footnote1, opplot_footnote2, opplot_footnote3, custom_footnote), collapse = "; ")
+
+  if (length(opplot_footnote) == 0){opplot_footnote <- ""} else {
+    if (nchar(opplot_footnote) > 100){
+      opplot_footnote <- stringr::str_wrap(opplot_footnote, width = 100)
+    }
+  }
+
+  # Check supplied colors
+  if (covgcategories == TRUE){
+
+    invalid_colors <- NULL
+
+    if (!vcqi_check_color(barcolorhigh1)){
+      invalid_colors <- c(invalid_colors, paste0("barcolorhigh1 = ", barcolorhigh1))
+      barcolorhigh1 <- "#67A9CF"
+    }
+
+    if (!vcqi_check_color(barcolormid1)){
+      invalid_colors <- c(invalid_colors, paste0("barcolormid1 = ", barcolormid1))
+      barcolormid1 <- "#000080"
+    }
+
+    if (!vcqi_check_color(barcolorlow1)){
+      invalid_colors <- c(invalid_colors, paste0("barcolorlow1 = ", barcolorlow1))
+      barcolorlow1 <- "#FF5B00"
+    }
+
+    if (!vcqi_check_color(barcolorhigh2)){
+      invalid_colors <- c(invalid_colors, paste0("barcolorhigh2 = ", barcolorhigh2))
+      barcolorhigh2 <- "#f0f0f0"
+    }
+
+    if (!vcqi_check_color(barcolormid2)){
+      invalid_colors <- c(invalid_colors, paste0("barcolormid2 = ", barcolormid2))
+      barcolormid2 <- "#f0f0f0"
+    }
+
+    if (!vcqi_check_color(barcolorlow2)){
+      invalid_colors <- c(invalid_colors, paste0("barcolorlow2 = ", barcolorlow2))
+      barcolorlow2 <- "#f0f0f0"
+    }
+
+    if (!vcqi_check_color(linecolorhigh1)){
+      invalid_colors <- c(invalid_colors, paste0("linecolorhigh1 = ", linecolorhigh1))
+      linecolorhigh1 <- "gray"
+    }
+
+    if (!vcqi_check_color(linecolormid1)){
+      invalid_colors <- c(invalid_colors, paste0("linecolormid1 = ", linecolormid1))
+      linecolormid1 <- "gray"
+    }
+
+    if (!vcqi_check_color(linecolorlow1)){
+      invalid_colors <- c(invalid_colors, paste0("linecolorlow1 = ", linecolorlow1))
+      linecolorlow1 <- "gray"
+    }
+
+    if (!vcqi_check_color(linecolorhigh2)){
+      invalid_colors <- c(invalid_colors, paste0("linecolorhigh2 = ", linecolorhigh2))
+      linecolorhigh2 <- "gray"
+    }
+
+    if (!vcqi_check_color(linecolormid2)){
+      invalid_colors <- c(invalid_colors, paste0("linecolormid2 = ", linecolormid2))
+      linecolormid2 <- "gray"
+    }
+
+    if (!vcqi_check_color(linecolorlow2)){
+      invalid_colors <- c(invalid_colors, paste0("linecolorlow2 = ", linecolorlow2))
+      linecolorlow2 <- "gray"
+    }
+
+    if (!vcqi_check_color(nlinecolor)){
+      invalid_colors <- c(invalid_colors, paste0("nlinecolor = ", nlinecolor))
+      nlinecolor <- "black"
+    }
+
+  } else {
+
+    invalid_colors <- NULL
+
+    if (!vcqi_check_color(barcolor1)){
+      invalid_colors <- c(invalid_colors, paste0("barcolor1 = ", barcolor1))
+      barcolor1 <- "hotpink"
+    }
+
+    if (!vcqi_check_color(barcolor2)){
+      invalid_colors <- c(invalid_colors, paste0("barcolor2 = ", barcolor2))
+      barcolor2 <- "white"
+    }
+
+    if (!vcqi_check_color(linecolor1)){
+      invalid_colors <- c(invalid_colors, paste0("linecolor1 = ", linecolor1))
+      linecolor1 <- "gray"
+    }
+
+    if (!vcqi_check_color(linecolor2)){
+      invalid_colors <- c(invalid_colors, paste0("linecolor2 = ", linecolor2))
+      linecolor2 <- "gray"
+    }
+
+    if (!vcqi_check_color(nlinecolor)){
+      invalid_colors <- c(invalid_colors, paste0("nlinecolor = ", nlinecolor))
+      nlinecolor <- "black"
+    }
+
+  }
+
+  if (!is.null(invalid_colors)){
+    warning(paste0(
+      "Some opplot colors were not valid: ", paste(invalid_colors, collapse = "; "), ". ",
+      "Invalid colors have been replaced with default values."
+    ))
+  }
+
+   # Make organ pipe plot ----
+  if (plotn == TRUE) {
     par(mar = c(5, 4, 4, 4) + 0.3)  # Leave space for second y axis
-  }
 
-  if(plotn == F){
-    plot_result <- ggplot(to_plot) +
-      geom_rect(
-        aes(
-          xmin = left,
-          xmax = right,
-          ymin = 0,
-          ymax = barheight
-        ),
-        fill = barcolor1,
-        color = linecolor1
-      ) +
-      geom_rect(
-        aes(
-          xmin = left,
-          xmax = right,
-          ymin = barheight,
-          ymax = 100
-        ),
-        fill = barcolor2,
-        color = linecolor2
-      ) +
-      labs(title = title,
-           subtitle = subtitle,
-           caption = footnote) +
-      theme(panel.border = element_rect(color = "black")) +
-      theme_bw() +
-      theme(panel.grid.major = element_blank(),
-            panel.grid.minor = element_blank()) +
-      theme(
-        axis.title.x = element_blank(),
-        axis.text.x = element_blank(),
-        axis.ticks.x = element_blank()
-      ) +
-      theme(plot.title = element_text(hjust = 0.5),
-            plot.subtitle = element_text(hjust = 0.5)) +
-      scale_y_continuous(name = ylabel, breaks = seq(ymin, ymax, by = yby))
-  }
-
-  # Check if user wants to plot the number of respondents (N) (plotn option),
-  #  Add second axis with n's to the plot if plotn==T
-  if(plotn==T) {
-    # Calculate ymax2 for second y axis
     ymax2_temp <- max(one_obs_subset$nresp)
     ymax2 <- yround2 * ceiling((ymax2_temp+1)/yround2)
 
     # creating new dataset for the geom_step
-    pointdata <- data.frame(xpoint =c(to_plot$left,to_plot$right[nrow(to_plot)]),
+    pointdata <- data.frame(xpoint = c(to_plot$left,to_plot$right[nrow(to_plot)]),
                             ypoint = c(to_plot$nresp*(ymax/ymax2),to_plot$nresp[nrow(to_plot)]*(ymax/ymax2)))
 
-    # Add second y axis as new plot on top of barchart plot
-    plot_result <- ggplot(to_plot) +
-      geom_rect(
-        aes(
-          xmin = left,
-          xmax = right,
-          ymin = 0,
-          ymax = barheight
-        ),
-        fill = barcolor1,
-        color = linecolor1
-      ) +
-      geom_rect(
-        aes(
-          xmin = left,
-          xmax = right,
-          ymin = barheight,
-          ymax = 100
-        ),
-        fill = barcolor2,
-        color = linecolor2
-      ) +
-      labs(title = title,
-           subtitle = subtitle,
-           caption = footnote) +
-      theme(panel.border = element_rect(color = "black")) +
-      theme_bw() +
-      theme(panel.grid.major = element_blank(),
-            panel.grid.minor = element_blank()) +
-      theme(
-        axis.title.x = element_blank(),
-        axis.text.x = element_blank(),
-        axis.ticks.x = element_blank()
-      ) +
-      theme(plot.title = element_text(hjust = 0.5),
-            plot.subtitle = element_text(hjust = 0.5)) +
-      scale_y_continuous(name = ylabel, breaks = seq(ymin, ymax, by = yby),sec.axis = sec_axis(~./(ymax/ymax2), name = ytitle2, breaks = seq(0,ymax2,yround2)))+
-      geom_step(pointdata,mapping = aes(x = xpoint,y = ypoint),color= nlinecolor, size = nlinewidth,linetype = nlinepattern)+
-      theme(axis.title.y.right = element_text(angle = 90))
   }
 
-  if(!is.na(filename)){
+  plot_result <- ggplot(to_plot) +
+    {if (covgcategories == FALSE) geom_rect(
+      aes(xmin = left, xmax = right, ymin = 0, ymax = barheight),
+      fill = barcolor1, color = linecolor1
+    )} +
+    {if (covgcategories == FALSE) geom_rect(
+      aes(xmin = left, xmax = right, ymin = barheight, ymax = 100),
+      fill = barcolor2, color = linecolor2
+    )} +
+    # Categorized coverage: high, medium, and low bars - upper and lower
+    {if (covgcategories == TRUE) geom_rect(
+      data = filter(to_plot, barheight >= highcovgthreshold),
+      aes(xmin = left, xmax = right, ymin = 0, ymax = barheight),
+      fill = barcolorhigh1, color = linecolorhigh1
+    )} +
+    {if (covgcategories == TRUE) geom_rect(
+      data = filter(to_plot, barheight >= highcovgthreshold),
+      aes(xmin = left, xmax = right, ymin = barheight, ymax = 100),
+      fill = barcolorhigh2, color = linecolorhigh2
+    )} +
+    {if (covgcategories == TRUE) geom_rect(
+      data = filter(to_plot, barheight < highcovgthreshold & barheight > lowcovgthreshold),
+      aes(xmin = left, xmax = right, ymin = 0, ymax = barheight),
+      fill = barcolormid1, color = linecolormid1
+    )} +
+    {if (covgcategories == TRUE) geom_rect(
+      data = filter(to_plot, barheight < highcovgthreshold & barheight > lowcovgthreshold),
+      aes(xmin = left, xmax = right, ymin = barheight, ymax = 100),
+      fill = barcolormid2, color = linecolormid2
+    )} +
+    {if (covgcategories == TRUE) geom_rect(
+      data = filter(to_plot, barheight <= lowcovgthreshold),
+      aes(xmin = left, xmax = right, ymin = 0, ymax = barheight),
+      fill = barcolorlow1, color = linecolorlow1
+    )} +
+    {if (covgcategories == TRUE) geom_rect(
+      data = filter(to_plot, barheight <= lowcovgthreshold),
+      aes(xmin = left, xmax = right, ymin = barheight, ymax = 100),
+      fill = barcolorlow2, color = linecolorlow2
+    )} +
+    labs(title = title,
+         subtitle = subtitle,
+         caption = opplot_footnote) +
+    theme_bw() +
+    theme(panel.border = element_rect(color = "black"),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          axis.title.x = element_blank(),
+          axis.text.x = element_blank(),
+          axis.ticks.x = element_blank(),
+          plot.title = element_text(hjust = 0.5),
+          plot.subtitle = element_text(hjust = 0.5),
+          plot.caption = element_text(hjust = 0)
+    ) +
+    {if (plotn == FALSE) scale_y_continuous(name = ylabel, breaks = seq(ymin, ymax, by = yby))} +
+    {if (plotn == TRUE) scale_y_continuous(
+      name = ylabel, breaks = seq(ymin, ymax, by = yby),
+      sec.axis = sec_axis(~./(ymax/ymax2), name = ytitle2,
+                          breaks = seq(0, ymax2, yround2)))} +
+    {if (plotn == TRUE) geom_step(
+      pointdata, mapping = aes(x = xpoint, y = ypoint),
+      color= nlinecolor, size = nlinewidth,linetype = nlinepattern)} +
+    {if (plotn == TRUE) theme(axis.title.y.right = element_text(angle = 90))}
+
+  if (!is.na(filename)){
     ggsave(filenamesave, plot_result, width = sizew, height = sizeh, units = "in")
   }
-  # If the user has asked for underlying data to be saved, then trim down to a small
-  # dataset that summarizes what is shown in the bars; this is to help users
-  # identify the clusterid of a particular bar in the figure; the order in which
-  # clusterids appear in the saved dataset is the same order they appear in the plot
-  if(!is.na(savedata)) {
+  # If the user has asked for underlying data to be saved, then trim down to a
+  # small dataset that summarizes what is shown in the bars; this is to help
+  # users identify the clusterid of a particular bar in the figure; the order in
+  # which clusterids appear in the saved dataset is the same order they appear
+  # in the plot
+
+  if (!is.na(savedata)) {
     # First, save 10 variables as vectors
     yvar_rep <- rep(yvar,length(to_plot$yvar))
     stratvar_rep <- rep(stratvar,length(to_plot$yvar))
@@ -381,17 +642,17 @@ opplot <- function(
     to_save <- to_save[!is.na(to_save$clusterid),]
 
     # Re-name the *_rep variables
-    colnames(to_save)[colnames(to_save)=="yvar_rep"] <- "yvar"
-    colnames(to_save)[colnames(to_save)=="stratvar_rep"] <- "stratvar"
-    colnames(to_save)[colnames(to_save)=="stratum_rep"] <- "stratum"
-    colnames(to_save)[colnames(to_save)=="cluster_rep"] <- "cluster"
+    colnames(to_save)[colnames(to_save) == "yvar_rep"] <- "yvar"
+    colnames(to_save)[colnames(to_save) == "stratvar_rep"] <- "stratvar"
+    colnames(to_save)[colnames(to_save) == "stratum_rep"] <- "stratum"
+    colnames(to_save)[colnames(to_save) == "cluster_rep"] <- "cluster"
 
     # Save data.frame to disk (as a .csv or a .rds)
     if (savedatatype == "rds") {
       saveRDS(to_save, file = file.path(paste0(savedata, ".rds")))
     } else if (savedatatype == "csv") {
       write.csv(to_save, file = file.path(paste0(savedata, ".csv")), row.names = FALSE)
-    } else{
+    } else {
       print("savedatatype has to be either csv or rds")
     }
   }

@@ -11,7 +11,7 @@ opplot(
   weightvar = NA,
   stratvar = NA,
   stratum = "",
-  barcolor1 = "hot pink",
+  barcolor1 = "hotpink",
   barcolor2 = "white",
   linecolor1 = "gray",
   linecolor2 = "gray",
@@ -22,6 +22,24 @@ opplot(
   title = "",
   subtitle = "",
   footnote = "",
+  footnotecovg = FALSE,
+  footnotedeff = FALSE,
+  footnoteicc = FALSE,
+  covgcategories = FALSE,
+  lowcovgthreshold = NA,
+  highcovgthreshold = NA,
+  barcolorhigh1 = "#67A9CF",
+  barcolormid1 = "#000080",
+  barcolorlow1 = "#FF5B00",
+  barcolorhigh2 = "#f0f0f0",
+  barcolormid2 = "#f0f0f0",
+  barcolorlow2 = "#f0f0f0",
+  linecolorhigh1 = "gray",
+  linecolormid1 = "gray",
+  linecolorlow1 = "gray",
+  linecolorhigh2 = "gray",
+  linecolormid2 = "gray",
+  linecolorlow2 = "gray",
   output_to_screen = FALSE,
   filename = NA_character_,
   platform = "png",
@@ -71,6 +89,42 @@ opplot(
 \item{subtitle}{Subtitle of the plot}
 
 \item{footnote}{Footnote of the plot}
+
+\item{footnotecovg}{Add estimated coverage as a footnote to the plot}
+
+\item{footnotedeff}{Add design effect (DEFF) as a footnote to the plot}
+
+\item{footnoteicc}{Add intracluster correlation coefficient (ICC) as a footnote to the plot}
+
+\item{covgcategories}{Stratify plot into high, medium, and low coverage categories}
+
+\item{lowcovgthreshold}{The numeric percent value (0-100) used to identify low coverage; clusters with coverage less than or equal to this number will be assigned to the low coverage category}
+
+\item{highcovgthreshold}{The numeric percent value (0-100) used to identify high coverage; clusters with coverage greater than or equal to this number will be assigned to the high coverage category}
+
+\item{barcolorhigh1}{Valid R color or hex color used to represent respondents with yvar = 1 who fall in the high coverage category}
+
+\item{barcolormid1}{Valid R color or hex color used to represent respondents with yvar = 1 who fall in the middle coverage category}
+
+\item{barcolorlow1}{Valid R color or hex color used to represent respondents with yvar = 1 who fall in the low coverage category}
+
+\item{barcolorhigh2}{Valid R color or hex color used to represent respondents with yvar = 0 or missing who fall in the high coverage category}
+
+\item{barcolormid2}{Valid R color or hex color used to represent respondents with yvar = 0 or missing who fall in the middle coverage category}
+
+\item{barcolorlow2}{Valid R color or hex color used to represent respondents with yvar = 0 or missing who fall in the low coverage category}
+
+\item{linecolorhigh1}{Valid R color or hex color used to mark boundaries between the lower portion of the bars in the high coverage category; should have good contrast with barcolorhigh1}
+
+\item{linecolormid1}{Valid R color or hex color used to mark boundaries between the lower portion of the bars in the middle coverage category; should have good contrast with barcolormid1}
+
+\item{linecolorlow1}{Valid R color or hex color used to mark boundaries between the lower portion of the bars in the low coverage category; should have good contrast with barcolorlow1}
+
+\item{linecolorhigh2}{Valid R color or hex color used to mark boundaries between the upper portion of the bars in the high coverage category; should have good contrast with barcolorhigh2}
+
+\item{linecolormid2}{Valid R color or hex color used to mark boundaries between the upper portion of the bars in the middle coverage category; should have good contrast with barcolormid2}
+
+\item{linecolorlow2}{Valid R color or hex color used to mark boundaries between the upper portion of the bars in the low coverage category; should have good contrast with barcolorlow2}
 
 \item{output_to_screen}{Show the plot in plot window or not, default to be FALSE}
 
