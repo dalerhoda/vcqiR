@@ -79,6 +79,9 @@
 # 2024-08-20  1.11      Caitlin Clary   New options: low, mid, high color coding,
 #                                       footnotes (covg, deff, icc); left align
 #                                       captions
+# 2024-09-24  1.12      Caitlin Clary   New options: lines indicating low and
+#                                       high coverage thresholds, settings for
+#                                       line color for each
 # *******************************************************************************
 
 opplot <- function(
@@ -124,6 +127,12 @@ opplot <- function(
   linecolorhigh2 = "gray",
   linecolormid2 = "gray",
   linecolorlow2 = "gray",
+
+  lowcovgthresholdline = FALSE,
+  highcovgthresholdline = FALSE,
+
+  lowcovgthresholdlinecolor = "red",
+  highcovgthresholdlinecolor = "red",
 
   output_to_screen = FALSE,
   filename = NA_character_,
@@ -587,6 +596,13 @@ opplot <- function(
       aes(xmin = left, xmax = right, ymin = barheight, ymax = 100),
       fill = barcolorlow2, color = linecolorlow2
     )} +
+    {if (covgcategories == TRUE & lowcovgthresholdline == TRUE) geom_hline(
+      aes(yintercept = lowcovgthreshold), color = lowcovgthresholdlinecolor
+    )} +
+    {if (covgcategories == TRUE & highcovgthresholdline == TRUE) geom_hline(
+      aes(yintercept = highcovgthreshold), color = highcovgthresholdlinecolor
+    )} +
+
     labs(title = title,
          subtitle = subtitle,
          caption = opplot_footnote) +
