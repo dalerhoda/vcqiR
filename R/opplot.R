@@ -35,6 +35,10 @@
 #' @param linecolorhigh2 Valid R color or hex color used to mark boundaries between the upper portion of the bars in the high coverage category; should have good contrast with barcolorhigh2
 #' @param linecolormid2 Valid R color or hex color used to mark boundaries between the upper portion of the bars in the middle coverage category; should have good contrast with barcolormid2
 #' @param linecolorlow2 Valid R color or hex color used to mark boundaries between the upper portion of the bars in the low coverage category; should have good contrast with barcolorlow2
+#' @param lowcovgthresholdline Show line indicating low coverage threshold (lowcovgthreshold)
+#' @param highcovgthresholdline Show line indicating high coverage threshold (highcovgthreshold)
+#' @param lowcovgthresholdlinecolor Valid R color or hex color for line indicating low coverage threshold (lowcovgthreshold)
+#' @param highcovgthresholdlinecolor Valid R color or hex color for line indicating high coverage threshold (highcovgthreshold)
 #' @param output_to_screen Show the plot in plot window or not, default to be FALSE
 #' @param filename Path to save the plot
 #' @param platform Type of plot file (may be png, pdf, or wmf; default to png)
@@ -177,7 +181,7 @@ opplot <- function(
   ### Rename variables
 
   if (clustvar != "1"){
-    dat$clustvar <- get(clustvar,dat)
+    dat$clustvar <- get(clustvar, dat)
   } else {
     dat$clustvar <- 1
   }
@@ -196,8 +200,6 @@ opplot <- function(
   } else {
     dat$weightvar <- 1
   }
-
-  # ^ This process will fail and error ("duplicate subscripts for columns") if there are already variables called clustvar, yvar, stratvar, or weightvar in the input dataset.
 
   ### Check data and provide warnings if necessary
   dat_orig <- dat
@@ -505,6 +507,22 @@ opplot <- function(
       nlinecolor <- "black"
     }
 
+    if (!vcqi_check_color(lowcovgthresholdlinecolor)){
+      invalid_colors <- c(
+        invalid_colors,
+        paste0("lowcovgthresholdlinecolor = ", lowcovgthresholdlinecolor))
+
+      lowcovgthresholdlinecolor <- "red"
+    }
+
+    if (!vcqi_check_color(highcovgthresholdlinecolor)){
+      invalid_colors <- c(
+        invalid_colors,
+        paste0("highcovgthresholdlinecolor = ", highcovgthresholdlinecolor))
+
+      highcovgthresholdlinecolor <- "red"
+    }
+
   } else {
 
     invalid_colors <- NULL
@@ -551,8 +569,11 @@ opplot <- function(
     ymax2 <- yround2 * ceiling((ymax2_temp+1)/yround2)
 
     # creating new dataset for the geom_step
-    pointdata <- data.frame(xpoint = c(to_plot$left,to_plot$right[nrow(to_plot)]),
-                            ypoint = c(to_plot$nresp*(ymax/ymax2),to_plot$nresp[nrow(to_plot)]*(ymax/ymax2)))
+    pointdata <- data.frame(
+      xpoint = c(to_plot$left,
+                 to_plot$right[nrow(to_plot)]),
+      ypoint = c(to_plot$nresp*(ymax/ymax2),
+                 to_plot$nresp[nrow(to_plot)]*(ymax/ymax2)))
 
   }
 
