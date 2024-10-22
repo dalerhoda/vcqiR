@@ -158,7 +158,7 @@ make_DESC_0203_output_database <- function(
         valuematch <- DESC_03_VARIABLES[i]
       }
       if (mid == "02"){
-        valuematch <- get(paste0("DESC02_VALUE_LEVEL_",i), envir = .GlobalEnv)
+        valuematch <- get(paste0("DESC02_VALUE_LEVEL_", i), envir = .GlobalEnv)
       }
 
       # If a subtotal is supposed to be listed *before* this individual response...add it here
@@ -168,8 +168,8 @@ make_DESC_0203_output_database <- function(
           for (k in 1:sub_count){
             if (vcqi_object_exists(paste0("DESC_",mid,"_SUBTOTAL_LIST_",k))){
               sub_list <- get(paste0("DESC_",mid,"_SUBTOTAL_LIST_",k), envir = .GlobalEnv)
-              worldmatch = (word(sub_list,2) %in% as.character(valuematch)) | (is.na(valuematch) & word(sub_list,2) == "NA")
-              if (((str_to_upper(word(sub_list,1)) == "BEFORE") %in% TRUE & worldmatch) %in% TRUE){
+              wordmatch = (word(sub_list,2) %in% as.character(valuematch)) | (is.na(valuematch) & word(sub_list,2) == "NA")
+              if (((str_to_upper(word(sub_list,1)) == "BEFORE") %in% TRUE & wordmatch) %in% TRUE){
                 vorder <- c(vorder,level_count_without_subtotals + k)
                 vlist <- c(vlist, paste0("desc",mid,"_",tempvid,"_st",k))
               }
@@ -189,8 +189,8 @@ make_DESC_0203_output_database <- function(
           for (k in 1:sub_count){
             if (vcqi_object_exists(paste0("DESC_",mid,"_SUBTOTAL_LIST_",k))){
               sub_list <- get(paste0("DESC_",mid,"_SUBTOTAL_LIST_",k), envir = .GlobalEnv)
-              worldmatch = (word(sub_list,2) %in% as.character(valuematch)) | (is.na(valuematch) & word(sub_list,2) == "NA")
-              if ((str_to_upper(word(sub_list,1)) %in% "AFTER" & worldmatch) %in% TRUE){
+              wordmatch = (word(sub_list,2) %in% as.character(valuematch)) | (is.na(valuematch) & word(sub_list,2) == "NA")
+              if ((str_to_upper(word(sub_list,1)) %in% "AFTER" & wordmatch) %in% TRUE){
                 vorder <- c(vorder,level_count_without_subtotals + k)
                 vlist <- c(vlist, paste0("desc",mid,"_",tempvid,"_st",k))
               }
@@ -223,10 +223,18 @@ make_DESC_0203_output_database <- function(
   DESC_labels <- NULL
 
   # Record and save the labels for pct_*
+
   for (k in seq_along(vlist)){
     varlabel <- attr(get(vlist[k], dat),"label")
     if (is.null(varlabel)){
-      varlabel <- ""
+
+      # NOTE change made here 20241011
+      if (mid == "03"){
+        # browser()
+        varlabel <- DESC_03_VARIABLES[k]
+      } else {
+        varlabel <- ""
+      }
     }
     label_temp <- data.frame(var = paste0("pct",vorder[k]), label = varlabel)
     DESC_labels <- rbind(DESC_labels,label_temp)
