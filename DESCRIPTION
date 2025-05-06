@@ -16,7 +16,7 @@ Description: Vaccination Coverage Quality Indicators (VCQI) is an open source
     VCQI conducts analyses consistent with recent guidance from the World Health
     Organization in its 2018 Vaccination Coverage Cluster Survey Reference 
     Manual.
-License: GPL (>= 3)
+License: file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
