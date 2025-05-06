@@ -24,7 +24,8 @@
 DESC_02_03DV <- function(VCP = "DESC_02_03DV"){
   vcqi_log_comment(VCP, 5, "Flow", "Starting")
 
-  dat <- vcqi_read(paste0(VCQI_OUTPUT_FOLDER,"/DESC_02_",ANALYSIS_COUNTER,"_",DESC_02_COUNTER,".rds"))
+  dat <- vcqi_read(paste0(VCQI_OUTPUT_FOLDER, "/DESC_02_", ANALYSIS_COUNTER,
+                          "_", DESC_02_COUNTER, ".rds"))
 
   vcounter <- 1
 
@@ -40,7 +41,7 @@ DESC_02_03DV <- function(VCP = "DESC_02_03DV"){
     var2 <- get(DESC_02_VARIABLES[v],dat)
 
     var2 <- zap_labels(var2)
-    if (class(var2) == "character"){
+    if ("character" %in% class(var2)){
       if (length(which(var == "" %in% TRUE)) > 0){
         var[which(var == "")] <- NA #replace "" to NA
         dat <- dat %>% mutate(!!va := ifelse(!!va == "", NA_character_, !!va))
@@ -55,11 +56,17 @@ DESC_02_03DV <- function(VCP = "DESC_02_03DV"){
     llist <- sort(unique(var),na.last = TRUE)
 
     if (missing != "TRUE"){
-      if (length(which(is.na(llist))) > 0){
-        na <- which(is.na(llist))
-        llist <- llist[-na]
+      if ("character" %in% class(var)){
+        if (length(which(is.na(llist) | llist == "")) > 0){
+          na <- which(is.na(llist) | llist == "")
+          llist <- llist[-na]
+        }
+      } else {
+        if (length(which(is.na(llist))) > 0){
+          na <- which(is.na(llist))
+          llist <- llist[-na]
+        }
       }
-    }
 
     if (!is.null(attr(var, "labels"))){
       original_var_labelled <- TRUE
@@ -83,15 +90,15 @@ DESC_02_03DV <- function(VCP = "DESC_02_03DV"){
     # detach the value labels from the variable
     var <- zap_labels(var)
     # get the variable type
-    if (class(var) == "character"){
+    if ("character" %in% class(var)){
       vtype <- "string"
     }
 
-    if (class(var) == "numeric"){
+    if (any(class(var) %in% c("numeric", "integer", "double"))){
       vtype <- "number"
     }
 
-    if (class(var) == "logical"){
+    if ("logical" %in% class(var)){
       dat <- dat %>% mutate(!!va := as.numeric(!!va))
       vtype <- "number"
     }
@@ -106,9 +113,28 @@ DESC_02_03DV <- function(VCP = "DESC_02_03DV"){
             psweight > 0 & !is.na(psweight),
           1, 0))
       assign(paste0("DESC02_VALUE_LEVEL_", lcounter), llist[l], envir = .GlobalEnv)
-      dat <- dat %>% mutate(tempvar1 = ifelse((
-          is.na(!!va) & (str_to_upper(DESC_02_DENOMINATOR) == "RESPONDED") & psweight > 0 & !is.na(psweight)),
-        NA, tempvar1))
+
+      # Update 2024-11-13: using !!va == "" check on a non-character variable
+      # causes errors, so use different checks depending on variable type
+      if ("character" %in% class(var)){
+        dat <- dat %>%
+          mutate(
+            tempvar1 = ifelse((
+              (is.na(!!va) | !!va == "") &
+                (str_to_upper(DESC_02_DENOMINATOR) == "RESPONDED") &
+                psweight > 0 & !is.na(psweight)),
+              NA, tempvar1)
+          )
+      } else {
+        dat <- dat %>%
+          mutate(
+            tempvar1 = ifelse((
+              is.na(!!va) &
+                str_to_upper(DESC_02_DENOMINATOR) == "RESPONDED" &
+                psweight > 0 & !is.na(psweight)),
+              NA, tempvar1)
+          )
+      }
 
       if (vtype == "string"){
         dat$tempvar1 <- haven::labelled(dat$tempvar1, label = llist[l]) %>% suppressWarnings()
