@@ -245,4 +245,5 @@ DESC_02_03DV <- function(VCP = "DESC_02_03DV"){
 
   vcqi_log_comment(VCP, 5, "Flow", "Exiting")
 
+  }
 }
