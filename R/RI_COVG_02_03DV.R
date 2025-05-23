@@ -59,8 +59,16 @@ RI_COVG_02_03DV <- function(VCP = "RI_COVG_02_03DV"){
   } # end of type loop
 
   # Generate variables to determine if the dose was received in a valid timeframe
-  if(vcqi_object_exists("RI_SINGLE_DOSE_LIST")){
+  if (vcqi_object_exists("RI_SINGLE_DOSE_LIST")){
+
     single_dose <- str_to_lower(RI_SINGLE_DOSE_LIST)
+    single_dose <- single_dose[single_dose %in% str_to_lower(RI_DOSE_LIST)]
+
+    assign("RI_SINGLE_DOSE_LIST", single_dose, envir = .GlobalEnv)
+    vcqi_log_global(RI_SINGLE_DOSE_LIST)
+  }
+
+  if (vcqi_object_exists("RI_SINGLE_DOSE_LIST")){
     for(s in seq_along(type)){
       for(d in seq_along(single_dose)){
         # Assume age_at_`d' was calculated using a valid dob and valid vaccination date.
@@ -100,6 +108,18 @@ RI_COVG_02_03DV <- function(VCP = "RI_COVG_02_03DV"){
     } # end of type loop
   }
   # Multi-dose series: got_valid and which_valid variables ----
+
+  # Process multi-dose lists to only keep doses in RI_DOSE_LIST
+  lapply(2:9, function(x) if (vcqi_object_exists(paste0("RI_MULTI_", x, "_DOSE_LIST"))){
+    temp <- get(paste0("RI_MULTI_", x, "_DOSE_LIST"))
+    tempnew <- NULL
+    for(dl in 1:length(temp)){
+      in_ridl <- sum(str_detect(str_to_lower(RI_DOSE_LIST), str_to_lower(temp[dl]))) > 0
+      if (in_ridl){tempnew <- c(tempnew, temp[dl])}
+      assign(paste0("RI_MULTI_", x, "_DOSE_LIST"), tempnew, envir = .GlobalEnv)
+      vcqi_log_global(str2lang(paste0("RI_MULTI_", x, "_DOSE_LIST")))
+    }
+  })
 
   # Summarize multi-dose lists
   multi <- lapply(2:9, function(x) if(vcqi_object_exists(paste0("RI_MULTI_", x, "_DOSE_LIST"))){

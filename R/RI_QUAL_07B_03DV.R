@@ -57,6 +57,15 @@ RI_QUAL_07B_03DV <- function(VCP = "RI_QUAL_07B_03DV"){
 
   # Single doses
   if (vcqi_object_exists("RI_SINGLE_DOSE_LIST")){
+
+    single_dose <- str_to_lower(RI_SINGLE_DOSE_LIST)
+    single_dose <- single_dose[single_dose %in% str_to_lower(RI_DOSE_LIST)]
+
+    assign("RI_SINGLE_DOSE_LIST", single_dose, envir = .GlobalEnv)
+    vcqi_log_global(RI_SINGLE_DOSE_LIST)
+  }
+
+  if (vcqi_object_exists("RI_SINGLE_DOSE_LIST")){
     for(d in seq_along(RI_SINGLE_DOSE_LIST)){
 
       dn <- RI_SINGLE_DOSE_LIST[d] %>% stringr::str_to_lower()
@@ -87,6 +96,19 @@ RI_QUAL_07B_03DV <- function(VCP = "RI_QUAL_07B_03DV"){
   } # end if single
 
   # Multi doses
+
+  # Process multi-dose lists to only keep doses in RI_DOSE_LIST
+  lapply(2:9, function(x) if (vcqi_object_exists(paste0("RI_MULTI_", x, "_DOSE_LIST"))){
+    temp <- get(paste0("RI_MULTI_", x, "_DOSE_LIST"))
+    tempnew <- NULL
+    for(dl in 1:length(temp)){
+      in_ridl <- sum(str_detect(str_to_lower(RI_DOSE_LIST), str_to_lower(temp[dl]))) > 0
+      if (in_ridl){tempnew <- c(tempnew, temp[dl])}
+      assign(paste0("RI_MULTI_", x, "_DOSE_LIST"), tempnew, envir = .GlobalEnv)
+      vcqi_log_global(str2lang(paste0("RI_MULTI_", x, "_DOSE_LIST")))
+    }
+  })
+
   multi <- lapply(2:9, function(x) if(vcqi_object_exists(paste0("RI_MULTI_", x, "_DOSE_LIST"))){
     data.frame(
       doselist = paste0("RI_MULTI_", x, "_DOSE_LIST"),
