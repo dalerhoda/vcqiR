@@ -14,6 +14,7 @@
 #' @import survey
 #' @rawNamespace import(rlang, except = c(local_options, with_options))
 #' @import dplyr
+#' @import withr
 
 # svypd R version 1.05 - Biostat Global Consulting - 2023-01-09
 # *******************************************************************************
@@ -43,8 +44,7 @@ svypd <- function(
 
   # Inside function, set survey design handling of lone PSUs
   # User's setting is restored at the end of the function
-  save_user_survey_option <- options("survey.lonely.psu")
-  options(survey.lonely.psu = "adjust")
+  withr::local_options(list(survey.lonely.psu = "adjust"))
 
   dat_full <- svydf
 
@@ -72,8 +72,6 @@ svypd <- function(
 
   # Halt if there are no 0s or 1s in the variable of interest
   if (all(is.na(outcome))){
-
-    # svyp_null_result
 
     ci_levels_svyp_null_result <- ifelse(!is.null(ci_level_list), ci_level_list, ci_level)
 
@@ -293,8 +291,6 @@ svypd <- function(
     } # end nrow(dat) > 0
   } # end variable not all NA
 
-  # Reset survey.lonely.psu option
-  options(survey.lonely.psu = save_user_survey_option)
 
   out
 
