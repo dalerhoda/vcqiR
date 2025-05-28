@@ -234,23 +234,23 @@ vcqi_to_plot <- function(
     }
   } else{
     if (VCQI_IWPLOT_CITEXT == 1){
-      note = paste0(language_string(language_use = language_use, str = "OS_328")," \n ", note)
+      note = paste0(language_string(language_use = language_use, str = "OS_328")," \n", note)
       #"Text at right: 1-sided 95% LCB | Point Estimate | 1-sided 95% UCB"
     }
     if (VCQI_IWPLOT_CITEXT == 2){
-      note = paste0(language_string(language_use = language_use, str = "OS_329")," \n ", note)
+      note = paste0(language_string(language_use = language_use, str = "OS_329")," \n", note)
       #"Text at right: Point Estimate (2-sided 95% Confidence Interval)"
     }
     if (VCQI_IWPLOT_CITEXT == 3){
-      note = paste0(language_string(language_use = language_use, str = "OS_330")," \n ", note)
+      note = paste0(language_string(language_use = language_use, str = "OS_330")," \n", note)
       #"Text at right: Point Estimate (2-sided 95% Confidence Interval) (0, 1-sided 95% UCB]"
     }
     if (VCQI_IWPLOT_CITEXT == 4){
-      note = paste0(language_string(language_use = language_use, str = "OS_331")," \n ", note)
+      note = paste0(language_string(language_use = language_use, str = "OS_331")," \n", note)
       #"Text at right: Point Estimate (2-sided 95% Confidence Interval) [1-sided 95% LCB, 100)"
     }
     if (VCQI_IWPLOT_CITEXT == 5){
-      note = paste0(language_string(language_use = language_use, str = "OS_332")," \n ", note)
+      note = paste0(language_string(language_use = language_use, str = "OS_332")," \n", note)
       #"Text at right: Point Estimate (2-sided 95% CI) (0, 1-sided 95% UCB] [1-sided 95% LCB, 100)"
     }
   }

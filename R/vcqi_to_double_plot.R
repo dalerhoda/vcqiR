@@ -261,12 +261,12 @@ vcqi_to_double_plot <- function(
     }
 
     if (VCQI_DOUBLE_IWPLOT_CITEXT == 1){
-      note <- paste0(language_string(language_use = language_use, str = "OS_324")," \n ", note)
+      note <- paste0(language_string(language_use = language_use, str = "OS_324")," \n", note)
       #"Text at right: Point estimates from colored and from gray bars"
     }
     if (VCQI_DOUBLE_IWPLOT_CITEXT == 2){
       note <- paste0(language_string(language_use = language_use, str = "OS_325"), " | ",
-                     language_string(language_use = language_use, str = "OS_326")," \n ", note)
+                     language_string(language_use = language_use, str = "OS_326")," \n", note)
       #"Text at right: Colored Point Estimate (2-sided 95% CI)  |  Gray Point Estimate (2-sided 95% CI)"
     }
   }

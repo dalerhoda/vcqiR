@@ -16,42 +16,66 @@
 # *******************************************************************************
 
 split_text <- function(text_string, text_cutoff = -99){
-  print(text_string)
 
-  l = nchar(text_string)
+  # print(text_string)
 
-  # If the default cut off value is used, set it to the text length
+  # If the default cut off value is used, return string as-is
   if (text_cutoff == -99){
-    text_cutoff = l
-  }
-
-  # Check to see if the text length is > TEXT_CUTOFF characters (48 can fit across the plots)
-  # If it is, we will need to split them up
-
-  if (l > text_cutoff){
-    wordlength = sapply(strsplit(text_string, " "), length)
-
-    final_text <- stringr::word(text_string,1)
-    currentline <- stringr::word(text_string,1)
-
-    for (i in 2:wordlength){
-
-      t <- paste0(currentline, " ", stringr::word(text_string,i))
-      check <- stringr::str_trim(t)
-
-      if (nchar(check) > text_cutoff){
-        currentline <- stringr::word(text_string,i)
-        final_text <- paste0(final_text, "\n", stringr::word(text_string,i))
-      } else {
-        currentline <- paste0(currentline, " ", stringr::word(text_string,i))
-        final_text <- paste0(final_text, " ", stringr::word(text_string,i))
-      }
-
-    } #end of wordlength i loop
-
-  } else {
     final_text <- text_string
+  } else {
+
+    # First, split by existing line breaks
+    step1 <- stringr::str_split(text_string, pattern = "\n", simplify = TRUE) |>
+      as.vector()
+
+    # Within lines, wrap by text_cutoff
+    step2 <- sapply(step1, function(x) stringr::str_wrap(x, text_cutoff))
+
+    # Paste back together
+    final_text <- paste(step2, collapse = "\n")
   }
 
   return(final_text)
 }
+
+## 2024-05-20 version:
+# split_text <- function(text_string, text_cutoff = -99){
+#   print(text_string)
+#
+#   l = nchar(text_string)
+#
+#   # If the default cut off value is used, set it to the text length
+#   if (text_cutoff == -99){
+#     text_cutoff = l
+#   }
+#
+#   # Check to see if the text length is > TEXT_CUTOFF characters (48 can fit across the plots)
+#   # If it is, we will need to split them up
+#
+#   if (l > text_cutoff){
+#     wordlength = sapply(strsplit(text_string, " "), length)
+#
+#     final_text <- stringr::word(text_string,1)
+#     currentline <- stringr::word(text_string,1)
+#
+#     for (i in 2:wordlength){
+#
+#       t <- paste0(currentline, " ", stringr::word(text_string,i))
+#       check <- stringr::str_trim(t)
+#
+#       if (nchar(check) > text_cutoff){
+#         currentline <- stringr::word(text_string,i)
+#         final_text <- paste0(final_text, "\n", stringr::word(text_string,i))
+#       } else {
+#         currentline <- paste0(currentline, " ", stringr::word(text_string,i))
+#         final_text <- paste0(final_text, " ", stringr::word(text_string,i))
+#       }
+#
+#     } #end of wordlength i loop
+#
+#   } else {
+#     final_text <- text_string
+#   }
+#
+#   return(final_text)
+# }

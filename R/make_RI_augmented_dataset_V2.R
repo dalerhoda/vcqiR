@@ -67,6 +67,7 @@
 
 make_RI_augmented_dataset_v2 <- function(outpath = NA, analysiscounter = 10){
 
+
   # This program will be used to take the individual indicator datasets to make
   # one large VCQI dataset
 
@@ -83,11 +84,11 @@ make_RI_augmented_dataset_v2 <- function(outpath = NA, analysiscounter = 10){
 
   #NOTE: this part is different than Stata since Stata can control the type of
   #      of the input value
-  # If not default value, check to make sure that AC is an interger >= 1
+  # If not default value, check to make sure that AC is an integer >= 1
   if (analysiscounter != 10){
     # Check that analysis counter is numeric and > 0
     if (!is.integer(type.convert(analysiscounter, as.is = TRUE))){
-      stop("analysiscounter must be an interger")}
+      stop("analysiscounter must be an integer")}
     if (analysiscounter < 1){
       stop("analysiscounter must be 1 or higher")
     }
@@ -100,19 +101,20 @@ make_RI_augmented_dataset_v2 <- function(outpath = NA, analysiscounter = 10){
   # is not included in the augmented dataset
   # NOTE: We currently only implemented some indicators
 
-  RILIST <- c("RI_COVG_01","RI_COVG_02","RI_COVG_03","RI_COVG_04","RI_CONT_01",
-              "RI_CONT_01B","RI_QUAL_01","RI_QUAL_02","RI_QUAL_07B","RI_QUAL_08",
-              "RI_QUAL_09","RI_VCTC_01")
+  RILIST <- c(
+    "RI_COVG_01", "RI_COVG_02", "RI_COVG_03", "RI_COVG_04", "RI_CONT_01",
+    "RI_CONT_01B", "RI_QUAL_01", "RI_QUAL_02", "RI_QUAL_07B", "RI_QUAL_08",
+    "RI_QUAL_09", "RI_VCTC_01")
 
   RI_COVG_01 <- "got_crude_*"
   RI_COVG_02 <- c("age_at_*", "got_valid_*")
-  RI_COVG_03 <- c("fully_vaccinated_*", "fully_vxd_for_age_crude","fully_vxd_for_age_valid")
+  RI_COVG_03 <- c("fully_vaccinated_*", "fully_vxd_for_age_crude", "fully_vxd_for_age_valid")
   RI_COVG_04 <- c("not_vaccinated_crude", "not_vaccinated_valid", "not_vaccinated_by_age1")
   RI_CONT_01 <- "dropout_*"
   RI_CONT_01B <- "wtd_dropout_*"
   RI_QUAL_01 <- c("had_card", "had_card_with_*", "had_card_or_register")
   if (RI_RECORDS_SOUGHT_FOR_ALL == 1 | RI_RECORDS_SOUGHT_IF_NO_CARD == 1){
-    RI_QUAL_01 <- c(RI_QUAL_01,"had_register", "had_register_with_*")
+    RI_QUAL_01 <- c(RI_QUAL_01, "had_register", "had_register_with_*")
   }
   RI_QUAL_02 <- "ever_had_an_ri_card"
   RI_QUAL_07B <- c("age_at_visit", "num_days_since_*", "got_hypo_*")
@@ -120,8 +122,8 @@ make_RI_augmented_dataset_v2 <- function(outpath = NA, analysiscounter = 10){
   RI_QUAL_09 <- c("doses_with_*", "child_had_*")
   RI_VCTC_01 <- c("timely_age_at_*", "timely_category_*")
 
-  # Delete dataset if it already existis
-  if(file.exists("RI_augmented_dataset_v2.rds")) {
+  # Delete dataset if it already exists
+  if (file.exists("RI_augmented_dataset_v2.rds")) {
     file.remove("RI_augmented_dataset_v2.rds")
   }
 
@@ -135,9 +137,10 @@ make_RI_augmented_dataset_v2 <- function(outpath = NA, analysiscounter = 10){
     # Check to see if there are files with multiple analysis counters
     for (i in 1:analysiscounter) {
       # Confirm which datasets exist and add them to the filelist
-      if (file.exists(paste0(VCQI_OUTPUT_FOLDER, "/",RILIST[v],"_",i,".rds"))) {
-        filelist <- c(filelist, paste0(RILIST[v],"_",i,".rds"))
-        filelist_globals <- c(filelist_globals,RILIST[v])
+      if (file.exists(paste0(VCQI_OUTPUT_FOLDER, "/",
+                             RILIST[v], "_", i, ".rds"))) {
+        filelist <- c(filelist, paste0(RILIST[v], "_", i, ".rds"))
+        filelist_globals <- c(filelist_globals, RILIST[v])
       }
 
     } #end of i loop
@@ -169,7 +172,7 @@ make_RI_augmented_dataset_v2 <- function(outpath = NA, analysiscounter = 10){
     dat <- dat %>% select(-c(all_of(dupname)))
 
     # Merge with RI dataset
-    dat <- full_join(dat,dat2, by = c("RI01", "RI03", "RI11", "RI12"))
+    dat <- full_join(dat, dat2, by = c("RI01", "RI03", "RI11", "RI12"))
 
   } else {
 
@@ -177,9 +180,9 @@ make_RI_augmented_dataset_v2 <- function(outpath = NA, analysiscounter = 10){
 
   }
 
-  saveRDS(dat,"RI_augmented_dataset_v2.rds")
+  saveRDS(dat, "RI_augmented_dataset_v2.rds")
 
-  keep <- c("level1id","level2id","level3id", VCQI_LEVEL4_SET_VARLIST)
+  keep <- c("level1id", "level2id", "level3id", VCQI_LEVEL4_SET_VARLIST)
 
   dat2 <- vcqi_read(paste0(VCQI_OUTPUT_FOLDER, "/RI_with_ids.rds")) %>%
     select(all_of(keep), RI01, RI03, RI11, RI12,
@@ -191,18 +194,20 @@ make_RI_augmented_dataset_v2 <- function(outpath = NA, analysiscounter = 10){
 
   dat <- full_join(dat, dat2, by = c("RI01", "RI03", "RI11", "RI12"))
   rm(dat2)
-  dat <- dat %>% arrange(respid,stratumid,clusterid)
-  saveRDS(dat,"RI_augmented_dataset_v2.rds")
+  dat <- dat %>% arrange(respid, stratumid, clusterid)
+  saveRDS(dat, "RI_augmented_dataset_v2.rds")
 
   for (i in 1:3){
-    dat2 <- vcqi_read(get(paste0("LEVEL",i,"_NAME_DATASET"), envir = .GlobalEnv))
+    dat2 <- vcqi_read(get(paste0("LEVEL", i, "_NAME_DATASET"),
+                          envir = .GlobalEnv))
     dupname <- names(dat2)[which(names(dat2) %in% names(dat))]
-    dupname <- dupname[which(!dupname %in% paste0("level",i,"id"))]
+    dupname <- dupname[which(!dupname %in% paste0("level", i, "id"))]
     dat2 <- dat2 %>% select(-c(all_of(dupname)))
 
-    dat <- full_join(dat, dat2, by = paste0("level",i,"id"))
-    dat <- dat %>% relocate(paste0("level",i,"name"),.after = paste0("level",i,"id"))
-    saveRDS(dat,"RI_augmented_dataset_v2.rds")
+    dat <- full_join(dat, dat2, by = paste0("level", i,"id"))
+    dat <- dat %>% relocate(paste0("level", i, "name"),
+                            .after = paste0("level", i, "id"))
+    saveRDS(dat, "RI_augmented_dataset_v2.rds")
   }
 
   orderlist <- names(dat)
@@ -211,30 +216,32 @@ make_RI_augmented_dataset_v2 <- function(outpath = NA, analysiscounter = 10){
     fileuse <- filelist[i]
     indicator_name <- get(filelist_globals[i])
 
-    ad <- vcqi_read(paste0(VCQI_OUTPUT_FOLDER, "/",fileuse))
-    ad <- haven::zap_label(ad)
-    ad <- haven::zap_labels(ad)
+    ad <- vcqi_read(paste0(VCQI_OUTPUT_FOLDER, "/", fileuse))
+    # ad <- haven::zap_label(ad)
+    # ad <- haven::zap_labels(ad)
 
-    ad <- ad %>% arrange(respid,stratumid,clusterid)
+    ad <- ad %>% arrange(respid, stratumid, clusterid)
 
     keeplist <- NULL
     for (n in seq_along(indicator_name)){
       ac <- as.numeric(substr(fileuse, nchar(fileuse) - 4,nchar(fileuse) - 4))
-      keeplist <- c(keeplist,grep(glob2rx(indicator_name[n]), names(ad), value=TRUE))
+      keeplist <- c(keeplist, grep(glob2rx(indicator_name[n]),
+                                   names(ad), value = TRUE))
     } # end of indicator_name n loop
 
-    ad <- ad %>% select(respid,stratumid,clusterid, all_of(keeplist))
+    ad <- ad %>% select(respid, stratumid, clusterid, all_of(keeplist))
 
     for (v in seq_along(keeplist)){
-      f <- paste0("comment(ad$",keeplist[v],
-                  ") <- 'Original Varname -",keeplist[v],
+      f <- paste0("comment(ad$", keeplist[v],
+                  ") <- 'Original Varname -", keeplist[v],
                   "; Analysis Counter - ", ac,
-                  "; Indicator - ",filelist_globals[i],"'")
+                  "; Indicator - ", filelist_globals[i], "'")
       eval(rlang::parse_expr(f))
 
-      if (grepl("RI_QUAL_09", fileuse, fixed = TRUE) & grepl("child_had", keeplist[v], fixed = TRUE)){
-        rename <- gsub("child_had_","had_",keeplist[v],fixed = TRUE)
-        f <- paste0("comment(ad$",keeplist[v],") <- Changing varname from ",keeplist[v]," to",rename,"due to character limits")
+      if (grepl("RI_QUAL_09", fileuse, fixed = TRUE) &
+          grepl("child_had", keeplist[v], fixed = TRUE)){
+        rename <- gsub("child_had_", "had_", keeplist[v], fixed = TRUE)
+        f <- paste0("comment(ad$", keeplist[v],") <- Changing varname from ", keeplist[v], " to", rename, "due to character limits")
         names(ad)[names(ad) == keeplist[v]] <- rename
         keeplist[v] <- rename
       }
@@ -254,27 +261,26 @@ make_RI_augmented_dataset_v2 <- function(outpath = NA, analysiscounter = 10){
       }
 
       if (ac < 10){
-        ac_new <- paste0("0",ac)
+        ac_new <- paste0("0", ac)
       }
-      names(ad)[names(ad) == keeplist[v]] <- paste0(keeplist[v],"_",ac_new)
-      orderlist <- c(orderlist, paste0(keeplist[v],"_",ac_new))
+      names(ad)[names(ad) == keeplist[v]] <- paste0(keeplist[v], "_",ac_new)
+      orderlist <- c(orderlist, paste0(keeplist[v], "_", ac_new))
 
     } # end of keeplist v loop
 
-
-    saveRDS(ad,paste0("VCQI_ADS_",fileuse))
+    saveRDS(ad, paste0("VCQI_ADS_", fileuse))
 
     dat <- vcqi_read("RI_augmented_dataset_v2.rds")
     dat <- full_join(dat, ad, by = c("respid", "stratumid", "clusterid"))
-    saveRDS(dat,"RI_augmented_dataset_v2.rds")
+    saveRDS(dat, "RI_augmented_dataset_v2.rds")
 
   } #end of i loop
   dat <- vcqi_read("RI_augmented_dataset_v2.rds")
   dat <- dat %>% relocate(all_of(orderlist))
-  saveRDS(dat,"RI_augmented_dataset_v2.rds")
+  saveRDS(dat, "RI_augmented_dataset_v2.rds")
 
   for (v in seq_along(filelist)){
-    file.remove(paste0("VCQI_ADS_",filelist[v]))
+    file.remove(paste0("VCQI_ADS_", filelist[v]))
   }
 
   # We want to merge on the derived variables from calc_mov if the file exists
@@ -293,12 +299,14 @@ make_RI_augmented_dataset_v2 <- function(outpath = NA, analysiscounter = 10){
                "total_elig_*_valid",
                "total_mov_*_crude",
                "total_mov_*_valid")
+
     for (f in seq_along(flags)){
-      keeplist2 <- c(keeplist2,grep(glob2rx(flags[f]), names(dat2), value=TRUE))
+      keeplist2 <- c(keeplist2, grep(glob2rx(flags[f]), names(dat2), value=TRUE))
     }
     dat2 <- dat2 %>%
-      select(c(respid,total_movs_crude,total_movs_valid,total_elig_visits_crude,
-               total_elig_visits_valid,total_visit_movs_crude,total_visit_movs_valid,
+      select(c(respid, total_movs_crude, total_movs_valid,
+               total_elig_visits_crude, total_elig_visits_valid,
+               total_visit_movs_crude, total_visit_movs_valid,
                all_of(keeplist2)))
 
     dat <- left_join(dat, dat2, by = "respid")
