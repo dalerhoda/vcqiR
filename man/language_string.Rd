@@ -9,11 +9,14 @@ language_string(language_use, str, replaceq = FALSE)
 \arguments{
 \item{language_use}{The global that stored the language the user choose}
 
-\item{str}{The string to be retrived from the language file}
+\item{str}{The string to be retrieved from the language file}
 }
 \value{
 A string
 }
 \description{
 Get the specific string with the user required language
+}
+\examples{
+language_string()
 }

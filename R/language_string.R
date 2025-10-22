@@ -1,12 +1,17 @@
 #' Get the specific string with the user required language
 #'
 #' @param language_use The global that stored the language the user choose
-#' @param str The string to be retrived from the language file
+#' @param str The string to be retrieved from the language file
 #'
 #' @return A string
 #'
 #' @import openxlsx
 #' @import stringr
+#'
+#' @export
+#'
+#' @examples
+#' language_string()
 
 # language_string R version 1.00 - Biostat Global Consulting - 2023-08-12
 # *******************************************************************************
