@@ -209,6 +209,19 @@ vcqi_to_plot <- function(
 
   }
 
+
+  if (VCQI_IWPLOT_CITEXT == 7){
+    dat <- mutate(
+      dat,
+      text = paste0(
+        sprintf(paste0("%4.", VCQI_NUM_DECIMAL_DIGITS, "f"), estimate*100),"% (",
+        sprintf(paste0("%4.", VCQI_NUM_DECIMAL_DIGITS, "f"), cill*100), ", ",
+        sprintf(paste0("%4.", VCQI_NUM_DECIMAL_DIGITS, "f"), ciul*100), ") ",
+        language_string(language_use = language_use, str = "OS_48"),
+                                    "= ",prettyNum(round(n),big.mark=","))
+    )
+  }
+
   dat <- mutate(dat, text = gsub(hundred, "100", text, fixed = TRUE))
 
   if (is.null(note)){
@@ -232,6 +245,10 @@ vcqi_to_plot <- function(
       note = language_string(language_use = language_use, str = "OS_332")
       #"Text at right: Point Estimate (2-sided 95% CI) (0, 1-sided 95% UCB] [1-sided 95% LCB, 100)"
     }
+    if (VCQI_IWPLOT_CITEXT == 7){
+      note = "Text at right: Point Estimate (2-sided 95% Confidence Interval) N"
+      #"Text at right: Point Estimate (2-sided 95% Confidence Interval) N"
+    }
   } else{
     if (VCQI_IWPLOT_CITEXT == 1){
       note = paste0(language_string(language_use = language_use, str = "OS_328")," \n", note)
@@ -252,6 +269,10 @@ vcqi_to_plot <- function(
     if (VCQI_IWPLOT_CITEXT == 5){
       note = paste0(language_string(language_use = language_use, str = "OS_332")," \n", note)
       #"Text at right: Point Estimate (2-sided 95% CI) (0, 1-sided 95% UCB] [1-sided 95% LCB, 100)"
+    }
+    if (VCQI_IWPLOT_CITEXT == 7){
+      note = paste0("Text at right: Point Estimate (2-sided 95% Confidence Interval) N"," \n",note)
+      #"Text at right: Point Estimate (2-sided 95% Confidence Interval) N"
     }
   }
   #2024-05-20:
@@ -386,10 +407,13 @@ vcqi_to_plot <- function(
 
     } #end of nrow l loop
 
+    geom.text.size = 3
+    theme.size = (19/5) * geom.text.size
+
     baseplot <- baseplot +
       geom_col(width = 1, fill = dat$bar_fillcolor1_r, color = dat$outlinecolor1_r, size = 0.3) +
-      geom_errorbar(aes(ymin = cill * 100, ymax = ciul * 100), width = .2, position = position_dodge(.9)) +
-      geom_text(aes( x = rowid, y = 100 + 1.25 * extraspace, label = text), colour = "black", family = "sans") +
+      geom_errorbar(aes(ymin = cill * 100, ymax = ciul * 100), colour = "gray35", width = .2, position = position_dodge(.9)) +
+      geom_text(aes( x = rowid, y = 105, label = text), colour = "black", family = "sans",  size=geom.text.size, hjust = 0) +
       coord_flip() +
       labs(y = paste0(language_string(language_use = language_use, str = "OS_327"), " %"), #"Estimated Coverage %"
            x = "", title = title, subtitle = subtitle, caption = note) +
@@ -398,7 +422,8 @@ vcqi_to_plot <- function(
       scale_y_continuous(limits = c(0, 100 + 2.25 * extraspace),
                          breaks = c(0, 25, 50, 75, 100)) +
       theme(plot.caption = element_text(hjust = 0),
-            text = element_text(family = "sans", colour = "black"))
+            text         = element_text(family = "sans", colour = "black", size=theme.size),
+            axis.text.y  = element_text(color = "black"))
 
     ggsave(plot = baseplot, paste0(filename, ".png"), width = savew, height = saveh, units = "in")
 

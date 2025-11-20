@@ -395,7 +395,7 @@ RI_VCTC_01_06PO <- function(VCP = "RI_VCTC_01_06PO"){
         }
 
         if (vcqi_object_exists("TIMELY_TEXTBAR_ORDER") & TIMELY_HBR_LINE_PLOT == 1){
-          TIMELY_PLOT_NOTE <- paste0(TIMELY_ABBREV_CAPTION_LINE1,"\n",captiontext)
+          TIMELY_PLOT_NOTE <- paste0(TIMELY_ABBREV_CAPTION_LINE1,"; ",captiontext)
         } else if (vcqi_object_exists("TIMELY_TEXTBAR_ORDER") & TIMELY_HBR_LINE_PLOT != 1){
           TIMELY_PLOT_NOTE <- captiontext
         } else if (!vcqi_object_exists("TIMELY_TEXTBAR_ORDER") & TIMELY_HBR_LINE_PLOT == 1){
@@ -635,14 +635,22 @@ RI_VCTC_01_06PO <- function(VCP = "RI_VCTC_01_06PO"){
             axis.text.y = element_text(size = TIMELY_YLABEL_SIZE,
                                        colour = TIMELY_YLABEL_COLOR),
             legend.position = "bottom",
-            plot.caption = element_text(hjust = 0)
+            plot.caption = element_text(hjust = -.05),
+            plot.title = element_text(size = 15, hjust = -.05),
+            panel.border = element_blank(),                      # Remove the full panel border
+            axis.line.x.bottom = element_line(color = "black"),  # Add bottom x-axis line
+            axis.line.y.left   = element_line(color = "black"),  # Add left y-axis line
+            plot.title.position   = "plot",                      # Align title to the plot area
+            plot.caption.position = "plot",
+            plot.margin = margin(t=1,b=1,r=2,l=2,unit = "cm")
           ) +
           labs(x = paste0(language_string(language_use = language_use, str = "OS_327")," (%)"), y = NULL,
                caption = TIMELY_PLOT_NOTE,
-               title = paste0(language_string(language_use = language_use, str = "OS_529"),": ", stratumname))+
+               title = paste0(language_string(language_use = language_use, str = "OS_529"),": ", stratumname, "\n")) +
+          guides(fill = guide_legend(nrow = 1)) +
           scale_fill_identity("", guide = "legend", breaks=lcolor,labels = llabel)
         #NOTE: original string for x lab - "Estimated Coverage (%)"
-        #      orignial string for title - "Vaccination Coverage & Timeliness:"
+        #      original string for title - "Vaccination Coverage & Timeliness:"
 
         ggsave(plot = baseplot,
                filename = paste0(newpath,"/RI_VCTC_01_",ANALYSIS_COUNTER,"_level_",RI_VCTC_01_LEVELS[lvl],"_id_",llist[l],"_",stratumname,".png"),
