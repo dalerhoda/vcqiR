@@ -19,7 +19,7 @@
 #' @import dplyr
 #' @import stringr
 
-# vcqi_to_plot R version 1.11 - Biostat Global Consulting - 2024-05-20
+# vcqi_to_plot R version 1.13 - Biostat Global Consulting - 2025-11-20
 # *******************************************************************************
 # Change log
 
@@ -34,6 +34,9 @@
 # 2023-10-02  1.10      Mia Yu          Add globals values for multi-lingual purposes
 # 2024-05-20  1.11      Mia Yu          Add % after OS_327
 #                                       Switch to split_text program
+# 2025-11-20  1.12      Dale Rhoda      Add VCQI_IWPLOT_CITEXT == 7 option,
+#                                       update plot styling
+# 2025-11-20  1.13      Caitlin Clary   Convert some notes to language_string calls
 # *******************************************************************************
 
 vcqi_to_plot <- function(
@@ -246,7 +249,10 @@ vcqi_to_plot <- function(
       #"Text at right: Point Estimate (2-sided 95% CI) (0, 1-sided 95% UCB] [1-sided 95% LCB, 100)"
     }
     if (VCQI_IWPLOT_CITEXT == 7){
-      note = "Text at right: Point Estimate (2-sided 95% Confidence Interval) N"
+      note = paste0(
+        language_string(language_use = language_use, str = "OS_329"), " ",
+        language_string(language_use = language_use, str = "OS_48")
+      )
       #"Text at right: Point Estimate (2-sided 95% Confidence Interval) N"
     }
   } else{
@@ -271,7 +277,10 @@ vcqi_to_plot <- function(
       #"Text at right: Point Estimate (2-sided 95% CI) (0, 1-sided 95% UCB] [1-sided 95% LCB, 100)"
     }
     if (VCQI_IWPLOT_CITEXT == 7){
-      note = paste0("Text at right: Point Estimate (2-sided 95% Confidence Interval) N"," \n",note)
+      note = paste0(
+        language_string(language_use = language_use, str = "OS_329"), " ",
+        language_string(language_use = language_use, str = "OS_48"),
+        " \n", note)
       #"Text at right: Point Estimate (2-sided 95% Confidence Interval) N"
     }
   }
